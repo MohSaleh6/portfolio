@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mohammad Saleh | Creative Developer</title>
     
-    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=Syncopate:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -25,7 +24,8 @@
             background-color: var(--bg);
             color: var(--text);
             overflow-x: hidden;
-            cursor: none; /* Custom Cursor */
+            cursor: none; 
+            scroll-behavior: smooth;
         }
 
         /* Custom Cursor */
@@ -118,7 +118,7 @@
             font-family: inherit; font-size: 16px; font-weight: bold;
             position: relative; overflow: hidden; cursor: none;
             border-radius: 30px; backdrop-filter: blur(10px);
-            transition: 0.3s; display: inline-block;
+            transition: 0.3s; display: inline-block; text-decoration: none;
         }
         .btn-creative::before {
             content: ''; position: absolute; top: 0; left: -100%;
@@ -129,72 +129,126 @@
         .btn-creative:hover::before { left: 100%; }
         .btn-creative:hover { border-color: var(--primary); box-shadow: 0 0 20px rgba(74, 144, 226, 0.4); }
 
-        /* Tech Stack Section (Impossible Grid) */
-        .tech-section {
-            padding: 150px 10vw;
-            position: relative;
-        }
+        /* Shared Section Styles */
         .section-title {
             font-family: 'Syncopate', sans-serif; font-size: 40px;
             margin-bottom: 80px; text-align: center;
         }
-        
+
+        /* Work Section (Projects) */
+        .work-section { padding: 100px 10vw; position: relative; }
+        .projects-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+        }
+        .project-card {
+            height: 450px; position: relative; border-radius: 20px;
+            overflow: hidden; cursor: none;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .project-img {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover; background-position: center;
+            transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s;
+            filter: grayscale(80%) brightness(0.5);
+        }
+        .project-card:hover .project-img {
+            transform: scale(1.08); filter: grayscale(0%) brightness(0.9);
+        }
+        .project-info {
+            position: absolute; bottom: -120px; left: 0; width: 100%;
+            padding: 30px; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            transition: bottom 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .project-card:hover .project-info { bottom: 0; }
+        .project-info h3 { font-size: 24px; font-family: 'Syncopate', sans-serif; }
+        .project-info p { color: #ccc; font-size: 14px; }
+        .tech-tags { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+        .tech-tags span { padding: 6px 12px; background: rgba(255,255,255,0.1); border-radius: 20px; font-size: 12px; backdrop-filter: blur(5px); }
+
+        /* Tech Stack Section (Expertise) */
+        .tech-section { padding: 100px 10vw; position: relative; }
         .grid-3d {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 40px; perspective: 1000px;
         }
-
         .card-3d {
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255,255,255,0.05);
             border-radius: 20px; padding: 40px;
             backdrop-filter: blur(10px);
             transform-style: preserve-3d;
             transition: transform 0.1s;
-            position: relative;
-            overflow: hidden;
+            position: relative; overflow: hidden;
         }
         .card-3d::before {
             content: ''; position: absolute; top: var(--y, 0); left: var(--x, 0);
             width: 300px; height: 300px;
             background: radial-gradient(circle closest-side, rgba(74, 144, 226, 0.15), transparent);
             transform: translate(-50%, -50%);
-            transition: width 0.2s, height 0.2s;
-            pointer-events: none;
+            transition: width 0.2s, height 0.2s; pointer-events: none;
         }
         .card-3d h3 { font-size: 28px; margin-bottom: 15px; transform: translateZ(50px); }
-        .card-3d p { color: var(--text-muted); transform: translateZ(30px); }
+        .card-3d p { color: var(--text-muted); transform: translateZ(30px); line-height: 1.6;}
         .card-3d i { font-size: 50px; color: var(--secondary); margin-bottom: 20px; transform: translateZ(60px); }
+        .card-3d .tech-tags { transform: translateZ(40px); }
 
-        .tech-tags {
-            display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; transform: translateZ(40px);
+        /* Contact Section */
+        .contact-section { padding: 100px 10vw 150px; position: relative; }
+        .contact-container {
+            display: flex; gap: 60px; flex-wrap: wrap;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 60px; border-radius: 30px;
+            backdrop-filter: blur(10px);
         }
-        .tech-tags span {
-            padding: 8px 15px; background: rgba(255,255,255,0.1);
-            border-radius: 20px; font-size: 14px;
+        .contact-info { flex: 1; min-width: 300px; }
+        .contact-info h3 { font-size: 32px; font-family: 'Syncopate', sans-serif; margin-bottom: 20px; }
+        .contact-info p { color: var(--text-muted); line-height: 1.6; margin-bottom: 40px; }
+        
+        /* Magnetic Socials */
+        .social-links { display: flex; gap: 20px; }
+        .magnetic-btn {
+            width: 60px; height: 60px; border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.2);
+            display: flex; justify-content: center; align-items: center;
+            font-size: 20px; color: var(--text); text-decoration: none;
+            transition: background 0.3s, color 0.3s;
+            cursor: none;
         }
+        .magnetic-btn:hover { background: var(--text); color: var(--bg); }
+
+        /* Form */
+        .contact-form { flex: 1.5; min-width: 300px; display: flex; flex-direction: column; gap: 40px; }
+        .input-group { position: relative; }
+        .input-group input, .input-group textarea {
+            width: 100%; background: transparent; border: none;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+            color: var(--text); padding: 10px 0; font-family: inherit;
+            font-size: 16px; outline: none; transition: 0.3s;
+            resize: none;
+        }
+        .input-group label {
+            position: absolute; top: 10px; left: 0;
+            color: var(--text-muted); pointer-events: none; transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .input-group input:focus ~ label, .input-group input:valid ~ label,
+        .input-group textarea:focus ~ label, .input-group textarea:valid ~ label {
+            top: -20px; font-size: 12px; color: var(--primary); letter-spacing: 1px;
+        }
+        .input-group input:focus, .input-group textarea:focus { border-bottom-color: var(--primary); }
 
         /* Footer */
-        footer {
-            padding: 100px 10vw 50px;
-            text-align: center; font-family: 'Syncopate', sans-serif;
-        }
-        .massive-text {
-            font-size: 10vw; color: transparent;
-            -webkit-text-stroke: 1px rgba(255,255,255,0.1);
-            transition: 0.5s;
-        }
-        .massive-text:hover { color: var(--text); -webkit-text-stroke: 0; text-shadow: 0 0 40px rgba(255,255,255,0.3); }
+        footer { padding: 50px 10vw; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); }
 
     </style>
 </head>
 <body>
 
-    <!-- Custom Cursor Elements -->
     <div class="cursor"></div>
     <div class="cursor-follower"></div>
 
-    <!-- 3D Background Container -->
     <div id="webgl-container"></div>
 
     <div class="main-content">
@@ -219,10 +273,49 @@
             </div>
         </section>
 
-        <section class="tech-section" id="expertise">
-            <h2 class="section-title">Core Expertise</h2>
-            <div class="grid-3d">
+        <section class="work-section" id="work">
+            <h2 class="section-title reveal-text">Selected Works</h2>
+            <div class="projects-grid">
                 
+                <div class="project-card hover-target">
+                    <div class="project-img" style="background-image: url('https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=2070&auto=format&fit=crop');"></div>
+                    <div class="project-info">
+                        <h3>EduTech Platform</h3>
+                        <p>A full-stack learning management system with live streaming, gamification, and a custom dashboard.</p>
+                        <div class="tech-tags">
+                            <span>React</span> <span>Firebase</span> <span>Node.js</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="project-card hover-target">
+                    <div class="project-img" style="background-image: url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop');"></div>
+                    <div class="project-info">
+                        <h3>FinTech Dashboard</h3>
+                        <p>A high-performance financial analytics dashboard featuring real-time data visualization and secure auth.</p>
+                        <div class="tech-tags">
+                            <span>Next.js</span> <span>TypeScript</span> <span>Tailwind</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="project-card hover-target">
+                    <div class="project-img" style="background-image: url('https://images.unsplash.com/photo-1618761714954-0b8cd0026356?q=80&w=2070&auto=format&fit=crop');"></div>
+                    <div class="project-info">
+                        <h3>3D Web Experience</h3>
+                        <p>An immersive portfolio utilizing WebGL and Three.js to render complex 3D environments in the browser.</p>
+                        <div class="tech-tags">
+                            <span>Three.js</span> <span>GSAP</span> <span>WebGL</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="tech-section" id="expertise">
+            <h2 class="section-title reveal-text">Core Expertise</h2>
+            <div class="grid-3d">
                 <div class="card-3d hover-target">
                     <i class="fas fa-code"></i>
                     <h3>Frontend Engineering</h3>
@@ -231,7 +324,6 @@
                         <span>React.js</span> <span>JavaScript (ES6+)</span> <span>HTML/CSS</span>
                     </div>
                 </div>
-
                 <div class="card-3d hover-target">
                     <i class="fas fa-server"></i>
                     <h3>Backend & Architecture</h3>
@@ -240,7 +332,6 @@
                         <span>Firebase</span> <span>C++</span> <span>Algorithms</span>
                     </div>
                 </div>
-
                 <div class="card-3d hover-target">
                     <i class="fas fa-layer-group"></i>
                     <h3>UI / UX Design</h3>
@@ -249,20 +340,50 @@
                         <span>Figma</span> <span>Prototyping</span> <span>3D Integration</span>
                     </div>
                 </div>
+            </div>
+        </section>
 
+        <section class="contact-section" id="contact">
+            <h2 class="section-title reveal-text">Get In Touch</h2>
+            <div class="contact-container">
+                <div class="contact-info">
+                    <h3>Let's build something impossible.</h3>
+                    <p>Whether you have a project in mind, looking for a technical partner, or just want to say hi, feel free to drop a message.</p>
+                    
+                    <div class="social-links">
+                        <a href="#" class="magnetic-btn hover-target"><i class="fab fa-github"></i></a>
+                        <a href="#" class="magnetic-btn hover-target"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" class="magnetic-btn hover-target"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+
+                <form class="contact-form">
+                    <div class="input-group">
+                        <input type="text" required id="name">
+                        <label for="name">What's your name?</label>
+                    </div>
+                    <div class="input-group">
+                        <input type="email" required id="email">
+                        <label for="email">Your email address</label>
+                    </div>
+                    <div class="input-group">
+                        <textarea required id="message" rows="4"></textarea>
+                        <label for="message">Tell me about your project</label>
+                    </div>
+                    <div>
+                        <button type="submit" class="btn-creative hover-target">Send Message</button>
+                    </div>
+                </form>
             </div>
         </section>
 
         <footer>
-            <div class="massive-text hover-target">LET'S TALK</div>
-            <p style="margin-top: 40px; color: var(--text-muted);">© 2026 Mohammad Saleh. All rights reserved.</p>
+            <p style="color: var(--text-muted);">© 2026 Mohammad Saleh. Crafted with passion.</p>
         </footer>
     </div>
 
-    <!-- GSAP for Smooth Animations -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <!-- Three.js for 3D WebGL Background -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <script>
@@ -275,15 +396,11 @@
         let posX = 0, posY = 0;
 
         document.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-            
-            // Move main cursor instantly
+            mouseX = e.clientX; mouseY = e.clientY;
             cursor.style.left = e.clientX + 'px';
             cursor.style.top = e.clientY + 'px';
         });
 
-        // Smooth follow effect for the inner dot
         gsap.ticker.add(() => {
             posX += (mouseX - posX) * 0.1;
             posY += (mouseY - posY) * 0.1;
@@ -291,21 +408,37 @@
             follower.style.top = posY + 'px';
         });
 
-        // Cursor hover effect on links and cards
         hoverTargets.forEach(target => {
             target.addEventListener('mouseenter', () => {
-                cursor.style.width = '60px';
-                cursor.style.height = '60px';
+                cursor.style.width = '60px'; cursor.style.height = '60px';
                 cursor.style.backgroundColor = 'rgba(74, 144, 226, 0.1)';
             });
             target.addEventListener('mouseleave', () => {
-                cursor.style.width = '20px';
-                cursor.style.height = '20px';
+                cursor.style.width = '20px'; cursor.style.height = '20px';
                 cursor.style.backgroundColor = 'transparent';
             });
         });
 
-        // 2. Impossible 3D Tilt Effect for Cards
+        // 2. Magnetic Buttons Logic
+        const magneticBtns = document.querySelectorAll('.magnetic-btn');
+        magneticBtns.forEach(btn => {
+            btn.addEventListener('mousemove', function(e) {
+                const position = btn.getBoundingClientRect();
+                const x = e.pageX - position.left - position.width / 2;
+                const y = e.pageY - position.top - position.height / 2;
+                
+                // Pull effect
+                gsap.to(btn, { x: x * 0.4, y: y * 0.4, duration: 0.3, ease: "power2.out" });
+                // Move icon slightly more for parallax
+                gsap.to(btn.children[0], { x: x * 0.2, y: y * 0.2, duration: 0.3, ease: "power2.out" });
+            });
+            btn.addEventListener('mouseleave', function() {
+                gsap.to(btn, { x: 0, y: 0, duration: 0.5, ease: "elastic.out(1, 0.3)" });
+                gsap.to(btn.children[0], { x: 0, y: 0, duration: 0.5, ease: "elastic.out(1, 0.3)" });
+            });
+        });
+
+        // 3. Impossible 3D Tilt Effect for Cards
         const cards = document.querySelectorAll('.card-3d');
         cards.forEach(card => {
             card.addEventListener('mousemove', (e) => {
@@ -313,14 +446,12 @@
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
                 
-                // Glow effect position
                 card.style.setProperty('--x', `${x}px`);
                 card.style.setProperty('--y', `${y}px`);
 
-                // 3D Rotation Math
                 const centerX = rect.width / 2;
                 const centerY = rect.height / 2;
-                const rotateX = ((y - centerY) / centerY) * -15; // Max 15 deg tilt
+                const rotateX = ((y - centerY) / centerY) * -15; 
                 const rotateY = ((x - centerX) / centerX) * 15;
 
                 card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
@@ -331,32 +462,42 @@
             });
         });
 
-        // 3. GSAP Scroll Animations
+        // 4. GSAP Scroll Animations
         gsap.registerPlugin(ScrollTrigger);
 
-        // Hero text entrance
+        // Hero Init
         gsap.from('.hero-subtitle', { y: 50, opacity: 0, duration: 1, delay: 0.5 });
-        gsap.from('.hero-title span', { 
-            y: 100, opacity: 0, duration: 1.2, 
-            stagger: 0.2, ease: "power4.out", delay: 0.7 
-        });
+        gsap.from('.hero-title span', { y: 100, opacity: 0, duration: 1.2, stagger: 0.2, ease: "power4.out", delay: 0.7 });
         gsap.from('.hero-desc', { opacity: 0, duration: 1, delay: 1.2 });
         gsap.from('.btn-creative', { opacity: 0, scale: 0.8, duration: 1, delay: 1.5 });
 
-        // Cards appearing on scroll
-        gsap.from('.card-3d', {
-            scrollTrigger: {
-                trigger: '.tech-section',
-                start: "top 70%",
-            },
-            y: 100,
-            opacity: 0,
-            duration: 1,
-            stagger: 0.2,
-            ease: "back.out(1.7)"
+        // Section Titles
+        gsap.utils.toArray('.reveal-text').forEach(title => {
+            gsap.from(title, {
+                scrollTrigger: { trigger: title, start: "top 80%" },
+                y: 50, opacity: 0, duration: 1, ease: "power3.out"
+            });
         });
 
-        // 4. Three.js - Epic 3D Particle Network Background
+        // Project Cards
+        gsap.from('.project-card', {
+            scrollTrigger: { trigger: '.work-section', start: "top 70%" },
+            y: 100, opacity: 0, duration: 1, stagger: 0.2, ease: "power3.out"
+        });
+
+        // Expertise Cards
+        gsap.from('.card-3d', {
+            scrollTrigger: { trigger: '.tech-section', start: "top 70%" },
+            y: 100, opacity: 0, duration: 1, stagger: 0.2, ease: "back.out(1.7)"
+        });
+
+        // Contact Section
+        gsap.from('.contact-container', {
+            scrollTrigger: { trigger: '.contact-section', start: "top 75%" },
+            y: 50, opacity: 0, duration: 1, ease: "power3.out"
+        });
+
+        // 5. Three.js - 3D Particle Network Background
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
@@ -364,35 +505,26 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.getElementById('webgl-container').appendChild(renderer.domElement);
 
-        // Create Particles
         const geometry = new THREE.BufferGeometry();
         const particlesCount = 2000;
         const posArray = new Float32Array(particlesCount * 3);
 
         for(let i = 0; i < particlesCount * 3; i++) {
-            // Spread particles over a large 3D area
             posArray[i] = (Math.random() - 0.5) * 10;
         }
 
         geometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
 
-        // Custom Material for glowing stars
         const material = new THREE.PointsMaterial({
-            size: 0.015,
-            color: 0x4A90E2,
-            transparent: true,
-            opacity: 0.8,
-            blending: THREE.AdditiveBlending
+            size: 0.015, color: 0x4A90E2, transparent: true,
+            opacity: 0.8, blending: THREE.AdditiveBlending
         });
 
         const particlesMesh = new THREE.Points(geometry, material);
         scene.add(particlesMesh);
-
         camera.position.z = 3;
 
-        // Mouse interaction with WebGL
-        let targetX = 0;
-        let targetY = 0;
+        let targetX = 0; let targetY = 0;
         const windowHalfX = window.innerWidth / 2;
         const windowHalfY = window.innerHeight / 2;
 
@@ -401,42 +533,33 @@
             targetY = (event.clientY - windowHalfY) * 0.001;
         });
 
-        // Animation Loop
         const clock = new THREE.Clock();
-
         function animate() {
             requestAnimationFrame(animate);
             const elapsedTime = clock.getElapsedTime();
 
-            // Slow continuous rotation
             particlesMesh.rotation.y = elapsedTime * 0.05;
             particlesMesh.rotation.x = elapsedTime * 0.02;
 
-            // Follow mouse with a smooth ease
             particlesMesh.rotation.y += 0.5 * (targetX - particlesMesh.rotation.y);
             particlesMesh.rotation.x += 0.5 * (targetY - particlesMesh.rotation.x);
 
-            // Subtle wave effect on Z axis
             const positions = particlesMesh.geometry.attributes.position.array;
             for(let i = 0; i < particlesCount; i++) {
                 const i3 = i * 3;
-                // Move Z slightly based on time and X position
                 positions[i3 + 2] += Math.sin(elapsedTime + positions[i3]) * 0.002;
             }
             particlesMesh.geometry.attributes.position.needsUpdate = true;
 
             renderer.render(scene, camera);
         }
-
         animate();
 
-        // Handle Resize
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
-
     </script>
 </body>
 </html>
