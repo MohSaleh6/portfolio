@@ -112,22 +112,22 @@
             max-width: 500px; color: var(--text-muted);
             font-size: 18px; line-height: 1.6; margin-bottom: 40px;
         }
+        
+        /* Updated Solid Button for Safari/iOS compatibility */
         .btn-creative {
-            padding: 15px 40px; background: transparent;
-            border: 1px solid rgba(255,255,255,0.2); color: var(--text);
+            padding: 15px 40px; background: var(--primary);
+            border: none; color: #ffffff;
             font-family: inherit; font-size: 16px; font-weight: bold;
-            position: relative; overflow: hidden; cursor: none;
-            border-radius: 30px; backdrop-filter: blur(10px);
-            transition: 0.3s; display: inline-block; text-decoration: none;
+            position: relative; cursor: pointer;
+            border-radius: 30px; transition: 0.3s; 
+            display: inline-block; text-decoration: none;
+            z-index: 10;
         }
-        .btn-creative::before {
-            content: ''; position: absolute; top: 0; left: -100%;
-            width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: 0.5s;
+        .btn-creative:hover {
+            background: #357ABD;
+            box-shadow: 0 10px 25px rgba(74, 144, 226, 0.4);
+            transform: translateY(-3px);
         }
-        .btn-creative:hover::before { left: 100%; }
-        .btn-creative:hover { border-color: var(--primary); box-shadow: 0 0 20px rgba(74, 144, 226, 0.4); }
 
         /* Shared Section Styles */
         .section-title {
@@ -143,7 +143,7 @@
         }
         .project-card {
             height: 450px; position: relative; border-radius: 20px;
-            overflow: hidden; cursor: none;
+            overflow: hidden; cursor: pointer; /* fixed cursor for touch */
             border: 1px solid rgba(255,255,255,0.05);
         }
         .project-img {
@@ -215,9 +215,9 @@
             display: flex; justify-content: center; align-items: center;
             font-size: 20px; color: var(--text); text-decoration: none;
             transition: background 0.3s, color 0.3s;
-            cursor: none;
+            cursor: pointer; /* fixed cursor */
         }
-        .magnetic-btn:hover { background: var(--text); color: var(--bg); }
+        .magnetic-btn:hover { background: var(--primary); border-color: var(--primary); color: #fff; }
 
         /* Form */
         .contact-form { flex: 1.5; min-width: 300px; display: flex; flex-direction: column; gap: 40px; }
@@ -241,6 +241,12 @@
 
         /* Footer */
         footer { padding: 50px 10vw; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); }
+
+        /* تعطيل الماوس المخصص على أجهزة اللمس (الموبايل والآيباد) */
+        @media (hover: none) and (pointer: coarse) {
+            .cursor, .cursor-follower { display: none !important; }
+            body, .btn-creative, .project-card, .magnetic-btn, a { cursor: auto !important; }
+        }
 
     </style>
 </head>
@@ -276,7 +282,6 @@
         <section class="work-section" id="work">
             <h2 class="section-title reveal-text">Selected Works</h2>
             <div class="projects-grid">
-                
                 <div class="project-card hover-target">
                     <div class="project-img" style="background-image: url('https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=2070&auto=format&fit=crop');"></div>
                     <div class="project-info">
@@ -309,7 +314,6 @@
                         </div>
                     </div>
                 </div>
-
             </div>
         </section>
 
@@ -388,80 +392,85 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <script>
-        // 1. Custom Cursor Logic
-        const cursor = document.querySelector('.cursor');
-        const follower = document.querySelector('.cursor-follower');
-        const hoverTargets = document.querySelectorAll('.hover-target');
+        // التحقق إذا كان الجهاز يدعم الماوس الحقيقي (لإلغاء التأثيرات المزعجة على اللمس)
+        const isHoverDevice = window.matchMedia("(hover: hover)").matches;
 
-        let mouseX = 0, mouseY = 0;
-        let posX = 0, posY = 0;
+        if (isHoverDevice) {
+            // 1. Custom Cursor Logic (Only for Desktops)
+            const cursor = document.querySelector('.cursor');
+            const follower = document.querySelector('.cursor-follower');
+            const hoverTargets = document.querySelectorAll('.hover-target');
 
-        document.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX; mouseY = e.clientY;
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-        });
+            let mouseX = 0, mouseY = 0;
+            let posX = 0, posY = 0;
 
-        gsap.ticker.add(() => {
-            posX += (mouseX - posX) * 0.1;
-            posY += (mouseY - posY) * 0.1;
-            follower.style.left = posX + 'px';
-            follower.style.top = posY + 'px';
-        });
-
-        hoverTargets.forEach(target => {
-            target.addEventListener('mouseenter', () => {
-                cursor.style.width = '60px'; cursor.style.height = '60px';
-                cursor.style.backgroundColor = 'rgba(74, 144, 226, 0.1)';
-            });
-            target.addEventListener('mouseleave', () => {
-                cursor.style.width = '20px'; cursor.style.height = '20px';
-                cursor.style.backgroundColor = 'transparent';
-            });
-        });
-
-        // 2. Magnetic Buttons Logic
-        const magneticBtns = document.querySelectorAll('.magnetic-btn');
-        magneticBtns.forEach(btn => {
-            btn.addEventListener('mousemove', function(e) {
-                const position = btn.getBoundingClientRect();
-                const x = e.pageX - position.left - position.width / 2;
-                const y = e.pageY - position.top - position.height / 2;
-                
-                gsap.to(btn, { x: x * 0.4, y: y * 0.4, duration: 0.3, ease: "power2.out" });
-                gsap.to(btn.children[0], { x: x * 0.2, y: y * 0.2, duration: 0.3, ease: "power2.out" });
-            });
-            btn.addEventListener('mouseleave', function() {
-                gsap.to(btn, { x: 0, y: 0, duration: 0.5, ease: "elastic.out(1, 0.3)" });
-                gsap.to(btn.children[0], { x: 0, y: 0, duration: 0.5, ease: "elastic.out(1, 0.3)" });
-            });
-        });
-
-        // 3. Impossible 3D Tilt Effect for Cards
-        const cards = document.querySelectorAll('.card-3d');
-        cards.forEach(card => {
-            card.addEventListener('mousemove', (e) => {
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                
-                card.style.setProperty('--x', `${x}px`);
-                card.style.setProperty('--y', `${y}px`);
-
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-                const rotateX = ((y - centerY) / centerY) * -15; 
-                const rotateY = ((x - centerX) / centerX) * 15;
-
-                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX; mouseY = e.clientY;
+                cursor.style.left = e.clientX + 'px';
+                cursor.style.top = e.clientY + 'px';
             });
 
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+            gsap.ticker.add(() => {
+                posX += (mouseX - posX) * 0.1;
+                posY += (mouseY - posY) * 0.1;
+                follower.style.left = posX + 'px';
+                follower.style.top = posY + 'px';
             });
-        });
 
-        // 4. GSAP Scroll Animations
+            hoverTargets.forEach(target => {
+                target.addEventListener('mouseenter', () => {
+                    cursor.style.width = '60px'; cursor.style.height = '60px';
+                    cursor.style.backgroundColor = 'rgba(74, 144, 226, 0.1)';
+                });
+                target.addEventListener('mouseleave', () => {
+                    cursor.style.width = '20px'; cursor.style.height = '20px';
+                    cursor.style.backgroundColor = 'transparent';
+                });
+            });
+
+            // 2. Magnetic Buttons Logic
+            const magneticBtns = document.querySelectorAll('.magnetic-btn');
+            magneticBtns.forEach(btn => {
+                btn.addEventListener('mousemove', function(e) {
+                    const position = btn.getBoundingClientRect();
+                    const x = e.pageX - position.left - position.width / 2;
+                    const y = e.pageY - position.top - position.height / 2;
+                    
+                    gsap.to(btn, { x: x * 0.4, y: y * 0.4, duration: 0.3, ease: "power2.out" });
+                    gsap.to(btn.children[0], { x: x * 0.2, y: y * 0.2, duration: 0.3, ease: "power2.out" });
+                });
+                btn.addEventListener('mouseleave', function() {
+                    gsap.to(btn, { x: 0, y: 0, duration: 0.5, ease: "elastic.out(1, 0.3)" });
+                    gsap.to(btn.children[0], { x: 0, y: 0, duration: 0.5, ease: "elastic.out(1, 0.3)" });
+                });
+            });
+
+            // 3. Impossible 3D Tilt Effect for Cards
+            const cards = document.querySelectorAll('.card-3d');
+            cards.forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    card.style.setProperty('--x', `${x}px`);
+                    card.style.setProperty('--y', `${y}px`);
+
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    const rotateX = ((y - centerY) / centerY) * -15; 
+                    const rotateY = ((x - centerX) / centerX) * 15;
+
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
+                });
+
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+                });
+            });
+        }
+
+        // 4. GSAP Scroll Animations (Works on all devices)
         gsap.registerPlugin(ScrollTrigger);
 
         gsap.from('.hero-subtitle', { y: 50, opacity: 0, duration: 1, delay: 0.5 });
@@ -487,7 +496,7 @@
         });
 
         gsap.from('.contact-container', {
-            scrollTrigger: { trigger: '.contact-section', start: "top 75%" },
+            scrollTrigger: { trigger: '.contact-section', start: "top 85%" },
             y: 50, opacity: 0, duration: 1, ease: "power3.out"
         });
 
