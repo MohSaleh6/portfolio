@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>متجر Fatoom's - الصفحة الرئيسية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #333;
+            --accent-color: #d4af37; /* لون ذهبي للشعار والتفاصيل */
+            --bg-color: #fcfcfc;
+            --card-bg: #ffffff;
+            --text-dark: #222;
+            --text-muted: #777;
+            --discount-bg: #2c2c2c;
+            --border-color: #eaeaea;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+        }
+
+        /* ----- الشريط العلوي (Navbar) ----- */
+        .navbar {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--primary-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Arial', sans-serif; /* لتمييز الاسم الإنجليزي */
+        }
+
+        .navbar-brand span {
+            color: var(--accent-color);
+        }
+
+        .search-bar {
+            flex-grow: 1;
+            max-width: 400px;
+            margin: 0 20px;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 10px 40px 10px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 25px;
+            font-family: inherit;
+            background-color: #f9f9f9;
+            outline: none;
+        }
+
+        .search-bar i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .navbar-icons {
+            display: flex;
+            gap: 20px;
+            font-size: 20px;
+        }
+
+        .navbar-icons a {
+            color: var(--primary-color);
+            text-decoration: none;
+            position: relative;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -10px;
+            background-color: var(--accent-color);
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 50%;
+        }
+
+        /* ----- شريط الأقسام الدائري ----- */
+        .categories-scroll {
+            background-color: var(--card-bg);
+            padding: 20px 5%;
+            display: flex;
+            gap: 30px;
+            overflow-x: auto;
+            border-bottom: 1px solid var(--border-color);
+            justify-content: center;
+        }
+
+        .categories-scroll::-webkit-scrollbar { display: none; }
+
+        .category-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-dark);
+            min-width: 80px;
+            transition: transform 0.3s;
+        }
+
+        .category-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .category-img {
+            width: 75px;
+            height: 75px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--border-color);
+            margin-bottom: 10px;
+            background-color: #f0f0f0;
+        }
+
+        .category-item span {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* ----- قسم المنتجات (Grid) ----- */
+        .products-section {
+            padding: 40px 5%;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            background-color: #f0f0f0;
+            padding: 10px 20px;
+            border-radius: 10px;
+        }
+
+        .section-header h2 {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            transition: box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        }
+
+        .discount-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: var(--discount-bg);
+            color: white;
+            font-size: 13px;
+            font-weight: bold;
+            padding: 5px 8px;
+            border-radius: 50%;
+            z-index: 10;
+        }
+
+        .product-img {
+            width: 100%;
+            height: 320px;
+            object-fit: cover;
+            background-color: #f9f9f9;
+        }
+
+        .product-info {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .product-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+        }
+
+        .product-price-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: auto;
+        }
+
+        .price-wrapper {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+
+        .current-price {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        .old-price {
+            font-size: 14px;
+            color: var(--text-muted);
+            text-decoration: line-through;
+        }
+
+        .add-to-cart-btn {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--primary-color);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .add-to-cart-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* الفوتر (الأسفل) */
+        footer {
+            text-align: center;
+            padding: 30px;
+            background-color: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            margin-top: 40px;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar { flex-wrap: wrap; }
+            .search-bar { order: 3; max-width: 100%; margin: 15px 0 0 0; }
+            .categories-scroll { justify-content: flex-start; }
+            .product-img { height: 260px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="#" class="navbar-brand">
+            <i class="fas fa-crown" style="color: var(--accent-color);"></i> Fatoom's
+        </a>
+
+        <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="البحث عن المنتجات...">
+        </div>
+
+        <div class="navbar-icons">
+            <a href="#"><i class="far fa-user"></i></a>
+            <a href="#"><i class="far fa-heart"></i></a>
+            <a href="#" id="cart-icon">
+                <i class="fas fa-shopping-bag"></i>
+                <span class="cart-count" id="cart-counter">0</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="categories-scroll">
+        <a href="#" class="category-item">
+            <img src="https://images.unsplash.com/photo-1550614000-4b95d415d86c?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80" alt="أطقم" class="category-img">
+            <span>أطقم</span>
+        </a>
+        <a href="#" class="category-item">
+            <img src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80" alt="فساتين" class="category-img">
+            <span>فساتين</span>
+        </a>
+        <a href="#" class="category-item">
+            <img src="https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80" alt="بنطلونات" class="category-img">
+            <span>بنطلونات</span>
+        </a>
+        <a href="#" class="category-item">
+            <img src="https://images.unsplash.com/photo-1583496661160-c5dcb4c0f3f3?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80" alt="تنانير" class="category-img">
+            <span>تنانير</span>
+        </a>
+        <a href="#" class="category-item">
+            <img src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80" alt="جكيتات" class="category-img">
+            <span>جكيتات</span>
+        </a>
+    </div>
+
+    <section class="products-section">
+        <div class="section-header">
+            <h2>تشكيلة الفساتين</h2>
+            <span style="color: var(--text-muted); font-size: 14px;">21 منتج</span>
+        </div>
+
+        <div class="products-grid">
+            <div class="product-card">
+                <span class="discount-badge">-34%</span>
+                <img src="https://images.unsplash.com/photo-1539008835657-9e8e9680c956?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80" alt="فستان" class="product-img">
+                <div class="product-info">
+                    <h3 class="product-title">فستان Y-1859 أسود أنيق</h3>
+                    <div class="product-price-row">
+                        <div class="price-wrapper">
+                            <span class="current-price">₪209</span>
+                            <span class="old-price">₪317</span>
+                        </div>
+                        <button class="add-to-cart-btn" onclick="addToCart()"><i class="fas fa-cart-plus"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <span class="discount-badge">-37%</span>
+                <img src="https://images.unsplash.com/photo-1496747611176-843222e1e57c?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80" alt="فستان" class="product-img">
+                <div class="product-info">
+                    <h3 class="product-title">فستان 6997 زيتوني</h3>
+                    <div class="product-price-row">
+                        <div class="price-wrapper">
+                            <span class="current-price">₪158</span>
+                            <span class="old-price">₪250</span>
+                        </div>
+                        <button class="add-to-cart-btn" onclick="addToCart()"><i class="fas fa-cart-plus"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <span class="discount-badge">-37%</span>
+                <img src="https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80" alt="فستان" class="product-img">
+                <div class="product-info">
+                    <h3 class="product-title">فستان 8250 كلاسيك</h3>
+                    <div class="product-price-row">
+                        <div class="price-wrapper">
+                            <span class="current-price">₪189</span>
+                            <span class="old-price">₪300</span>
+                        </div>
+                        <button class="add-to-cart-btn" onclick="addToCart()"><i class="fas fa-cart-plus"></i></button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="product-card">
+                <span class="discount-badge">-37%</span>
+                <img src="https://images.unsplash.com/photo-1550639525-c97d455acf70?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80" alt="فستان" class="product-img">
+                <div class="product-info">
+                    <h3 class="product-title">فستان 8417 كحلي</h3>
+                    <div class="product-price-row">
+                        <div class="price-wrapper">
+                            <span class="current-price">₪207</span>
+                            <span class="old-price">₪328</span>
+                        </div>
+                        <button class="add-to-cart-btn" onclick="addToCart()"><i class="fas fa-cart-plus"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>جميع الحقوق محفوظة &copy; 2026 متجر Fatoom's للأزياء.</p>
+    </footer>
+
+    <script>
+        // سكريبت بسيط لمحاكاة إضافة المنتجات للسلة
+        let cartCount = 0;
+        const counterElement = document.getElementById('cart-counter');
+
+        function addToCart() {
+            cartCount++;
+            counterElement.innerText = cartCount;
+            
+            // إضافة حركة صغيرة للأيقونة عند الضغط
+            const icon = document.getElementById('cart-icon');
+            icon.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                icon.style.transform = 'scale(1)';
+            }, 200);
+        }
+    </script>
+</body>
+</html>
