@@ -3,498 +3,726 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ENG.MOHAMMAD | Creative Engineer</title>
+    <title>ENG.MOHAMMAD | Systems Architect</title>
     
+    <!-- Core Typography -->
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=Syncopate:wght@700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
+        /* --- CSS VARIABLES & THEME ENGINES --- */
         :root {
-            --bg: #020203; --primary: #4A90E2; --secondary: #FF9F1C;
-            --text: #ffffff; --text-muted: #7a8294; --grid-color: rgba(74, 144, 226, 0.05);
+            --bg-base: #010102;
+            --primary-core: #4A90E2;
+            --primary-glow: rgba(74, 144, 226, 0.4);
+            --secondary-core: #FF9F1C;
+            --text-main: #f0f4f8;
+            --text-muted: #64748b;
+            --grid-line: rgba(74, 144, 226, 0.04);
+            --glass-bg: rgba(10, 12, 16, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.05);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* --- CSS RESET & BASE --- */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
-            font-family: 'Space Grotesk', sans-serif; background-color: var(--bg);
-            color: var(--text); overflow-x: hidden; cursor: none; scroll-behavior: smooth;
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: var(--bg-base); color: var(--text-main);
+            overflow-x: hidden; scroll-behavior: smooth; cursor: none;
+            -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
         }
 
-        /* 1. CRT Scanlines & Blueprint Grid (GPU Accelerated, Zero CPU Load) */
-        body::before {
-            content: ''; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+        ::selection { background: var(--primary-core); color: #fff; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-base); }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary-core); }
+
+        /* --- BACKGROUND ENGINEERING GRID --- */
+        .blueprint-grid {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; pointer-events: none;
             background-image: 
-                linear-gradient(var(--grid-color) 1px, transparent 1px),
-                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
-            background-size: 40px 40px; z-index: 1; pointer-events: none;
-        }
-        body::after {
-            content: ''; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            background-size: 100% 2px, 3px 100%; z-index: 99; pointer-events: none; opacity: 0.3;
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 50px 50px;
+            mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
+            -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
         }
 
-        /* CAD Custom Cursor */
-        .cursor-crosshair, .cursor-dot {
-            position: fixed; pointer-events: none; z-index: 9999;
-            transform: translate(-50%, -50%); will-change: transform;
+        /* --- HARDWARE CURSOR --- */
+        .cursor-assembly { position: fixed; top: 0; left: 0; z-index: 9999; pointer-events: none; will-change: transform; mix-blend-mode: difference; }
+        .cursor-reticle {
+            width: 40px; height: 40px; border: 1px solid rgba(255,255,255,0.2); border-radius: 50%;
+            position: absolute; top: -20px; left: -20px; transition: width 0.3s, height 0.3s;
         }
-        .cursor-crosshair { width: 40px; height: 40px; }
-        .cursor-crosshair::before, .cursor-crosshair::after { content: ''; position: absolute; background: var(--primary); }
-        .cursor-crosshair::before { top: 50%; left: 0; width: 100%; height: 1px; transform: translateY(-50%); }
-        .cursor-crosshair::after { left: 50%; top: 0; height: 100%; width: 1px; transform: translateX(-50%); }
-        .cursor-dot { width: 6px; height: 6px; background: var(--secondary); border-radius: 50%; }
+        .cursor-reticle::before, .cursor-reticle::after { content: ''; position: absolute; background: var(--primary-core); }
+        .cursor-reticle::before { top: 50%; left: -5px; width: calc(100% + 10px); height: 1px; }
+        .cursor-reticle::after { left: 50%; top: -5px; height: calc(100% + 10px); width: 1px; }
+        .cursor-core { width: 4px; height: 4px; background: var(--secondary-core); position: absolute; top: -2px; left: -2px; border-radius: 50%; }
 
-        /* Performance HUD (Heads Up Display) */
-        #hud-container {
-            position: fixed; bottom: 20px; right: 30px;
-            font-family: 'Share Tech Mono', monospace; color: var(--primary); font-size: 12px;
-            z-index: 100; opacity: 0.8; pointer-events: none; letter-spacing: 1px;
-            display: flex; flex-direction: column; align-items: flex-end; gap: 5px;
+        /* --- SYSTEM HEADS-UP DISPLAY (HUD) --- */
+        .system-hud {
+            position: fixed; bottom: 30px; right: 40px; z-index: 100; pointer-events: none;
+            font-family: 'Share Tech Mono', monospace; font-size: 11px;
+            display: flex; flex-direction: column; gap: 6px; align-items: flex-end;
+            text-shadow: 0 0 5px rgba(0,0,0,0.8);
         }
-        .hud-line { background: rgba(0,0,0,0.5); padding: 2px 6px; border: 1px solid rgba(74, 144, 226, 0.2); }
-        .hud-highlight { color: var(--secondary); }
-
-        /* System Action Terminal */
-        #system-terminal {
-            position: fixed; bottom: 20px; left: 30px;
-            font-family: 'Share Tech Mono', monospace; color: var(--text-muted); font-size: 10px;
-            z-index: 100; opacity: 0.7; pointer-events: none;
-            display: flex; flex-direction: column; gap: 3px; max-height: 80px; overflow: hidden;
-            border-left: 2px solid var(--primary); padding-left: 10px;
+        .hud-panel { background: rgba(0,0,0,0.6); border: 1px solid var(--glass-border); padding: 4px 10px; backdrop-filter: blur(4px); }
+        .hud-value { color: var(--secondary-core); margin-left: 10px; }
+        
+        .system-logs {
+            position: fixed; bottom: 30px; left: 40px; z-index: 100; pointer-events: none;
+            font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--primary-core);
+            border-left: 2px solid var(--primary-core); padding-left: 15px; opacity: 0.8;
+            display: flex; flex-direction: column; justify-content: flex-end; height: 80px; overflow: hidden;
         }
+        .log-entry { margin-top: 4px; animation: typeIn 0.3s ease-out forwards; }
+        @keyframes typeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
 
-        #webgl-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; }
-        .main-content { position: relative; z-index: 10; }
+        /* --- WEBGL LAYER --- */
+        #webgl-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; }
+        .layout-wrapper { position: relative; z-index: 10; }
 
-        /* Navigation */
+        /* --- NAVIGATION --- */
         nav {
-            position: fixed; width: 100%; top: 0; padding: 30px 5vw;
-            display: flex; justify-content: space-between; align-items: center;
-            z-index: 100; transition: background 0.3s, padding 0.3s;
+            position: fixed; top: 0; width: 100%; padding: 35px 6vw; display: flex; justify-content: space-between; align-items: center;
+            z-index: 500; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        nav.scrolled {
-            background: rgba(2, 2, 3, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            padding: 15px 5vw; border-bottom: 1px solid rgba(255,255,255,0.05);
+        nav.nav-active { padding: 20px 6vw; background: rgba(2, 2, 3, 0.7); backdrop-filter: blur(16px); border-bottom: 1px solid var(--glass-border); }
+        .brand-logo { font-family: 'Syncopate', sans-serif; font-size: 22px; font-weight: 700; letter-spacing: 3px; color: #fff; text-decoration: none; }
+        .brand-logo span { color: var(--primary-core); }
+        .nav-menu { display: flex; gap: 50px; }
+        .nav-item {
+            font-family: 'Share Tech Mono', monospace; color: var(--text-main); text-decoration: none;
+            font-size: 13px; text-transform: uppercase; letter-spacing: 2px; position: relative; padding: 5px 0;
         }
-        .logo { font-family: 'Syncopate', sans-serif; font-size: 24px; font-weight: 700; letter-spacing: 2px; }
-        .logo span { color: var(--primary); }
-        .nav-links { display: flex; gap: 40px; }
-        .nav-links a { color: var(--text); text-decoration: none; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; position: relative; font-family: 'Share Tech Mono', monospace; }
-        .nav-links a::after { content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 2px; background: var(--secondary); transition: width 0.3s ease; }
-        .nav-links a:hover::after { width: 100%; }
+        .nav-item::before { content: '<'; position: absolute; left: -15px; color: var(--primary-core); opacity: 0; transition: 0.3s; }
+        .nav-item::after { content: '/>'; position: absolute; right: -20px; color: var(--primary-core); opacity: 0; transition: 0.3s; }
+        .nav-item:hover::before, .nav-item:hover::after { opacity: 1; }
 
-        /* Hero */
-        .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 0 10vw; }
-        .hero-subtitle { font-family: 'Share Tech Mono', monospace; color: var(--primary); font-size: 14px; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 20px; }
-        .hero-title { font-family: 'Syncopate', sans-serif; font-size: clamp(35px, 7vw, 90px); line-height: 1.1; text-transform: uppercase; margin-bottom: 30px; text-shadow: 0 0 20px rgba(74, 144, 226, 0.2); word-wrap: break-word; }
-        .hero-title .outline { color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.5); }
-        .hero-desc { max-width: 550px; color: var(--text-muted); font-size: 18px; line-height: 1.7; margin-bottom: 40px; }
+        /* --- HERO MODULE --- */
+        .module-hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 0 10vw; position: relative; }
+        .hero-sys-status { font-family: 'Share Tech Mono', monospace; color: var(--secondary-core); font-size: 13px; letter-spacing: 5px; margin-bottom: 25px; display: inline-flex; align-items: center; gap: 10px; }
+        .hero-sys-status::before { content: ''; width: 8px; height: 8px; background: var(--secondary-core); border-radius: 50%; box-shadow: 0 0 10px var(--secondary-core); animation: pulse 2s infinite; }
         
-        .btn-creative {
-            padding: 15px 40px; background: var(--primary); border: 1px solid var(--primary); color: #ffffff;
-            font-family: 'Share Tech Mono', monospace; font-size: 16px; font-weight: bold; position: relative; cursor: none; text-transform: uppercase;
-            transition: 0.3s; display: inline-block; text-decoration: none; box-shadow: 0 0 15px rgba(74, 144, 226, 0.2);
+        .hero-title {
+            font-family: 'Syncopate', sans-serif; font-size: clamp(40px, 8vw, 110px); font-weight: 700; line-height: 1.05;
+            text-transform: uppercase; margin-bottom: 35px; letter-spacing: -2px; word-wrap: break-word;
         }
-        .btn-creative:hover { background: #ffffff; color: var(--bg); box-shadow: 0 0 30px rgba(255, 255, 255, 0.6); transform: translateY(-3px); }
-
-        .section-title { font-family: 'Syncopate', sans-serif; font-size: clamp(25px, 5vw, 40px); margin-bottom: 80px; text-align: center; min-height: 50px; }
-        .section-title::before { content: '[ DATA_LOADED ]'; display: block; font-family: 'Share Tech Mono', monospace; font-size: 12px; color: var(--primary); letter-spacing: 2px; margin-bottom: 10px; }
-
-        /* Hardware Accelerated Tilt Card */
-        .tilt-card { position: relative; transform-style: preserve-3d; will-change: transform; }
-        .tilt-card::before, .tilt-card::after { content: ''; position: absolute; width: 20px; height: 20px; border: 1px solid var(--primary); z-index: 20; pointer-events: none; transition: 0.3s; }
-        .tilt-card::before { top: 0; left: 0; border-right: none; border-bottom: none; }
-        .tilt-card::after { bottom: 0; right: 0; border-left: none; border-top: none; }
-
-        /* Work Section */
-        .work-section { padding: 100px 10vw; }
-        .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 50px; }
-        .project-card { height: 400px; overflow: hidden; background: #0a0a0f; border: 1px solid rgba(255,255,255,0.05); cursor: none; }
+        .text-stroke { color: transparent; -webkit-text-stroke: 1.5px rgba(255,255,255,0.7); }
+        .hero-description { max-width: 600px; color: var(--text-muted); font-size: 1.15rem; line-height: 1.8; margin-bottom: 50px; }
         
-        /* Fixed Filter Bug for Safari */
-        .project-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; transition: transform 0.6s, opacity 0.6s; opacity: 0.5; transform: translateZ(-30px); }
-        .tilt-card:hover .project-img { opacity: 1; transform: scale(1.05) translateZ(-30px); }
+        .btn-deploy {
+            padding: 18px 45px; background: rgba(74, 144, 226, 0.1); border: 1px solid var(--primary-core);
+            color: var(--primary-core); font-family: 'Share Tech Mono', monospace; font-size: 15px; font-weight: bold;
+            text-transform: uppercase; letter-spacing: 2px; cursor: none; text-decoration: none; display: inline-flex;
+            align-items: center; gap: 15px; transition: all 0.3s ease; backdrop-filter: blur(5px);
+        }
+        .btn-deploy:hover { background: var(--primary-core); color: #fff; box-shadow: 0 0 30px var(--primary-glow); transform: translateX(10px); }
+
+        /* --- GLOBAL SECTION ARCHITECTURE --- */
+        .section-module { padding: 120px 10vw; position: relative; border-top: 1px solid rgba(255,255,255,0.02); }
+        .module-header { font-family: 'Syncopate', sans-serif; font-size: clamp(30px, 5vw, 50px); margin-bottom: 80px; display: flex; flex-direction: column; gap: 10px; }
+        .module-index { font-family: 'Share Tech Mono', monospace; font-size: 14px; color: var(--primary-core); letter-spacing: 3px; }
+
+        /* --- ADVANCED TILT ENGINE CARDS --- */
+        .tilt-chassis { transform-style: preserve-3d; will-change: transform; perspective: 1500px; }
         
-        .project-info { position: absolute; bottom: 0; left: 0; width: 100%; padding: 30px; background: linear-gradient(to top, rgba(0,0,0,0.95), transparent); transform: translateY(120px) translateZ(50px); transition: transform 0.5s; display: flex; flex-direction: column; gap: 10px; }
-        .tilt-card:hover .project-info { transform: translateY(0) translateZ(60px); }
-        .project-info h3 { font-size: 24px; font-family: 'Syncopate', sans-serif; }
-        .project-info p { color: #ccc; font-size: 14px; }
-        .tech-tags { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
-        .tech-tags span { padding: 4px 10px; background: rgba(74, 144, 226, 0.1); border: 1px solid rgba(74, 144, 226, 0.3); font-family: 'Share Tech Mono', monospace; font-size: 11px; }
-
-        /* Expertise Section */
-        .tech-section { padding: 100px 10vw; }
-        .grid-3d { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 50px; perspective: 1500px; }
-        .card-3d { background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255,255,255,0.05); padding: 40px; }
-        .card-3d h3 { font-size: 20px; font-family: 'Syncopate', sans-serif; margin-bottom: 15px; transform: translateZ(40px); }
-        .card-3d p { color: var(--text-muted); transform: translateZ(30px); line-height: 1.6;}
-        .card-3d i { font-size: 40px; color: var(--secondary); margin-bottom: 20px; transform: translateZ(50px); text-shadow: 0 0 15px rgba(255, 159, 28, 0.4); }
-        .card-3d .tech-tags { transform: translateZ(35px); margin-top: 20px;}
-
-        /* Contact Section */
-        .contact-section { padding: 100px 10vw 150px; }
-        .contact-container { display: flex; gap: 60px; flex-wrap: wrap; background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.05); padding: 60px; position: relative; overflow: hidden; }
-        .contact-info { flex: 1; min-width: 250px; }
-        .contact-info h3 { font-size: clamp(24px, 5vw, 40px); font-family: 'Syncopate', sans-serif; margin-bottom: 20px; word-wrap: break-word; line-height: 1.2;}
-        .contact-info p { color: var(--text-muted); line-height: 1.6; margin-bottom: 40px; }
-        .social-links { display: flex; gap: 20px; }
+        /* 1. Projects Matrix */
+        .project-matrix { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 50px; }
+        .matrix-card { height: 420px; border: 1px solid var(--glass-border); background: #050508; position: relative; overflow: hidden; cursor: none; }
+        .matrix-card::after { content: ''; position: absolute; top: 15px; right: 15px; width: 30px; height: 30px; border-top: 2px solid var(--primary-core); border-right: 2px solid var(--primary-core); opacity: 0.3; transition: 0.3s; }
+        .matrix-card:hover::after { opacity: 1; top: 20px; right: 20px; }
         
-        .magnetic-btn { width: 60px; height: 60px; border: 1px solid rgba(255,255,255,0.2); display: flex; justify-content: center; align-items: center; font-size: 20px; color: var(--text); text-decoration: none; transition: background 0.3s, color 0.3s, border-color 0.3s; }
-        .magnetic-btn:hover { background: var(--primary); border-color: var(--primary); color: #fff; }
+        .matrix-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; filter: grayscale(100%) opacity(0.4); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); transform: translateZ(-50px); }
+        .matrix-card:hover .matrix-image { filter: grayscale(0%) opacity(0.8); transform: scale(1.05) translateZ(-20px); }
+        
+        .matrix-data { position: absolute; bottom: 0; left: 0; width: 100%; padding: 35px; background: linear-gradient(to top, rgba(1,1,2,0.98) 20%, transparent); transform: translateY(30px) translateZ(40px); transition: all 0.5s ease; }
+        .matrix-card:hover .matrix-data { transform: translateY(0) translateZ(60px); }
+        .matrix-data h3 { font-family: 'Syncopate', sans-serif; font-size: 22px; margin-bottom: 12px; }
+        .matrix-data p { color: var(--text-muted); font-size: 14px; line-height: 1.6; margin-bottom: 20px; }
+        .tech-array { display: flex; flex-wrap: wrap; gap: 8px; }
+        .tech-array span { padding: 5px 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--primary-core); }
 
-        .contact-form { flex: 1.5; min-width: 250px; display: flex; flex-direction: column; gap: 35px; }
-        .input-group { position: relative; }
-        .input-group input, .input-group textarea { width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.2); color: var(--text); padding: 10px 0; font-family: 'Share Tech Mono', monospace; font-size: 16px; outline: none; transition: 0.3s; resize: none; }
-        .input-group label { position: absolute; top: 10px; left: 0; color: var(--text-muted); pointer-events: none; transition: 0.3s; font-family: 'Share Tech Mono', monospace; }
-        .input-group input:focus ~ label, .input-group input:valid ~ label, .input-group textarea:focus ~ label, .input-group textarea:valid ~ label { top: -20px; font-size: 12px; color: var(--primary); letter-spacing: 1px; }
-        .input-group input:focus, .input-group textarea:focus { border-bottom-color: var(--primary); }
+        /* --- INTERACTIVE ALGORITHMIC CANVAS SECTION --- */
+        .algo-section { display: flex; flex-wrap: wrap; gap: 50px; align-items: center; }
+        .algo-text { flex: 1; min-width: 300px; }
+        .algo-canvas-container { flex: 1; min-width: 300px; height: 400px; border: 1px solid var(--glass-border); position: relative; background: rgba(0,0,0,0.3); overflow: hidden; }
+        #math-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .canvas-overlay { position: absolute; top: 20px; left: 20px; font-family: 'Share Tech Mono', monospace; font-size: 12px; color: var(--secondary-core); pointer-events: none; }
 
-        footer { padding: 50px 10vw; text-align: center; border-top: 1px dashed rgba(255,255,255,0.1); font-family: 'Share Tech Mono', monospace; font-size: 12px; }
+        /* 2. Engineering Specs */
+        .specs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 40px; }
+        .spec-node { padding: 45px 35px; background: var(--glass-bg); border: 1px solid var(--glass-border); backdrop-filter: blur(10px); }
+        .spec-icon { font-size: 35px; color: var(--secondary-core); margin-bottom: 25px; transform: translateZ(50px); }
+        .spec-node h3 { font-family: 'Syncopate', sans-serif; font-size: 18px; margin-bottom: 15px; transform: translateZ(30px); }
+        .spec-node p { color: var(--text-muted); font-size: 14px; line-height: 1.7; transform: translateZ(20px); }
 
-        /* Mobile Optimization (Zero Lag) */
+        /* 3. Communication Interface */
+        .comms-interface { display: flex; flex-wrap: wrap; gap: 60px; background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 70px; position: relative; }
+        .comms-interface::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--primary-core); }
+        .comms-header { flex: 1; min-width: 250px; }
+        .comms-header h3 { font-family: 'Syncopate', sans-serif; font-size: clamp(28px, 4vw, 45px); line-height: 1.2; margin-bottom: 20px; }
+        .social-nodes { display: flex; gap: 20px; margin-top: 40px; }
+        .node-link { width: 55px; height: 55px; border: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: center; align-items: center; font-size: 20px; color: #fff; text-decoration: none; transition: 0.3s; cursor: none; }
+        .node-link:hover { background: var(--primary-core); border-color: var(--primary-core); transform: translateY(-5px); }
+
+        .comms-form { flex: 1.5; min-width: 250px; display: flex; flex-direction: column; gap: 40px; }
+        .form-field { position: relative; }
+        .form-field input, .form-field textarea { width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 15px 0; font-family: 'Share Tech Mono', monospace; font-size: 15px; outline: none; transition: 0.3s; resize: none; }
+        .form-field label { position: absolute; top: 15px; left: 0; color: var(--text-muted); pointer-events: none; transition: 0.3s; font-family: 'Share Tech Mono', monospace; }
+        .form-field input:focus ~ label, .form-field input:valid ~ label, .form-field textarea:focus ~ label, .form-field textarea:valid ~ label { top: -15px; font-size: 11px; color: var(--primary-core); }
+        .form-field input:focus, .form-field textarea:focus { border-bottom-color: var(--primary-core); }
+        .btn-submit { background: transparent; border: 1px solid var(--primary-core); color: var(--primary-core); padding: 20px; font-family: 'Syncopate', sans-serif; font-size: 14px; letter-spacing: 2px; cursor: none; transition: 0.3s; }
+        .btn-submit:hover { background: var(--primary-core); color: #fff; }
+
+        footer { padding: 40px; text-align: center; border-top: 1px dashed rgba(255,255,255,0.1); font-family: 'Share Tech Mono', monospace; font-size: 12px; color: var(--text-muted); }
+
+        /* --- MOBILE ENGINEERING --- */
         @media (max-width: 900px) {
-            nav { flex-direction: column; gap: 15px; padding: 20px; }
-            nav.scrolled { padding: 15px; }
-            .project-info { transform: translateY(0) translateZ(20px); background: linear-gradient(to top, rgba(0,0,0,1), rgba(0,0,0,0.6)); }
-            .project-img { opacity: 0.4; }
-            .contact-container { padding: 30px; }
-            
-            body, .btn-creative, .project-card, .magnetic-btn, a, input, textarea { cursor: auto !important; }
-            .cursor-crosshair, .cursor-dot { display: none !important; }
-            #hud-container, #system-terminal { display: none !important; } /* Hide HUD on mobile to save space/CPU */
+            nav { padding: 20px; flex-direction: column; gap: 20px; background: rgba(1,1,2,0.9); }
+            nav.nav-active { padding: 20px; }
+            .hero-title { font-size: 12vw; }
+            .matrix-image { opacity: 0.7; }
+            .matrix-data { transform: translateY(0) translateZ(30px); background: linear-gradient(to top, rgba(1,1,2,1) 40%, rgba(1,1,2,0.5)); }
+            .comms-interface { padding: 40px 20px; }
+            /* Disable custom cursor & force auto on mobile */
+            body, .btn-deploy, .btn-submit, .matrix-card, a, input, textarea { cursor: auto !important; }
+            .cursor-assembly { display: none !important; }
         }
+        
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 159, 28, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(255, 159, 28, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 159, 28, 0); } }
     </style>
 </head>
 <body>
 
-    <div class="cursor-crosshair"></div>
-    <div class="cursor-dot"></div>
-    
-    <!-- Engineering System Monitors -->
-    <div id="hud-container">
-        <div class="hud-line">SYS_FPS: <span id="fps-meter" class="hud-highlight">60</span></div>
-        <div class="hud-line">SCR_POS: <span id="scroll-meter" class="hud-highlight">0000</span></div>
-        <div class="hud-line">PTR_LOC: <span id="coord-tracker" class="hud-highlight">X:000 Y:000</span></div>
+    <!-- 1. Blueprint & Grid Backgrounds -->
+    <div class="blueprint-grid"></div>
+
+    <!-- 2. Hardware Accelerated Cursor -->
+    <div class="cursor-assembly">
+        <div class="cursor-core"></div>
+        <div class="cursor-reticle"></div>
     </div>
 
-    <div id="system-terminal">
-        <span>> INITIALIZING SYSTEM...</span>
-        <span>> KERNEL LOADED.</span>
+    <!-- 3. System HUD -->
+    <div class="system-hud">
+        <div class="hud-panel">MEM_ALLOC: <span class="hud-value">OPTIMAL</span></div>
+        <div class="hud-panel">RENDER_FPS: <span id="fps-monitor" class="hud-value">60.0</span></div>
+        <div class="hud-panel">SCROLL_Y: <span id="scroll-monitor" class="hud-value">0000</span></div>
+        <div class="hud-panel">SYS_UPTIME: <span id="uptime-monitor" class="hud-value">0x00</span></div>
     </div>
 
-    <div id="webgl-container"></div>
+    <!-- 4. System Terminal Log -->
+    <div class="system-logs" id="terminal-logs">
+        <div class="log-entry">> KERNEL INITIALIZED</div>
+    </div>
 
-    <div class="main-content">
-        <nav id="navbar">
-            <div class="logo">ENG.MOHAMMAD</div>
-            <div class="nav-links">
-                <a href="#work" class="hover-target">Projects</a>
-                <a href="#expertise" class="hover-target">Skills</a>
-                <a href="#contact" class="hover-target">Comms</a>
+    <!-- 5. WebGL Canvas -->
+    <div id="webgl-canvas"></div>
+
+    <div class="layout-wrapper">
+        <nav id="main-nav">
+            <a href="#" class="brand-logo hover-trigger">ENG.<span>MOHAMMAD</span></a>
+            <div class="nav-menu">
+                <a href="#projects" class="nav-item hover-trigger">Projects</a>
+                <a href="#algorithms" class="nav-item hover-trigger">Algorithms</a>
+                <a href="#specs" class="nav-item hover-trigger">Specs</a>
+                <a href="#comms" class="nav-item hover-trigger">Comms</a>
             </div>
         </nav>
 
-        <section class="hero">
-            <div class="hero-subtitle">SYSTEM.INIT // AMMAN_JO</div>
-            <h1 class="hero-title glitch-text" data-value="Creative Engineer"><span class="outline">Creative</span><br><span>Engineer</span></h1>
-            <p class="hero-desc">Merging complex algorithmic logic with precision-driven aesthetic design. I architect scalable, high-performance web systems utilizing cutting-edge rendering technologies.</p>
-            <div><a href="#work" class="btn-creative hover-target">Deploy Projects</a></div>
+        <section class="module-hero">
+            <div class="hero-sys-status">SECURE CONNECTION ESTABLISHED</div>
+            <h1 class="hero-title cipher-text" data-original="Creative Engineer">
+                <span class="text-stroke">Creative</span><br>
+                <span>Engineer</span>
+            </h1>
+            <p class="hero-desc">Architecting robust full-stack systems and engineering mathematically precise, high-performance digital interfaces using advanced WebGL physics and logic.</p>
+            <div><a href="#projects" class="btn-deploy hover-trigger">Deploy Projects <i class="fas fa-terminal"></i></a></div>
         </section>
 
-        <section class="work-section" id="work">
-            <h2 class="section-title glitch-text" data-value="Architected Works">Architected Works</h2>
-            <div class="projects-grid">
+        <section class="section-module" id="projects">
+            <div class="module-header">
+                <span class="module-index">01 //</span>
+                <h2 class="cipher-text" data-original="Architected Works">Architected Works</h2>
+            </div>
+            <div class="project-matrix">
                 
-                <div class="tilt-card project-card hover-target">
-                    <div class="project-img" style="background-image: url('https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=2070&auto=format&fit=crop');"></div>
-                    <div class="project-info">
+                <div class="matrix-card tilt-chassis hover-trigger">
+                    <div class="matrix-image" style="background-image: url('https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=2070&auto=format&fit=crop');"></div>
+                    <div class="matrix-data">
                         <h3>EduTech Matrix</h3>
                         <p>A full-stack learning management ecosystem with live streaming, logic-based gamification, and analytics.</p>
-                        <div class="tech-tags"><span>REACT.JS</span> <span>FIREBASE_DB</span> <span>NODE.ENV</span></div>
+                        <div class="tech-array"><span>REACT.JS</span> <span>FIREBASE_DB</span> <span>NODE.ENV</span></div>
                     </div>
                 </div>
 
-                <div class="tilt-card project-card hover-target">
-                    <div class="project-img" style="background-image: url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop');"></div>
-                    <div class="project-info">
+                <div class="matrix-card tilt-chassis hover-trigger">
+                    <div class="matrix-image" style="background-image: url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop');"></div>
+                    <div class="matrix-data">
                         <h3>FinTech Core</h3>
                         <p>High-frequency data visualization dashboard featuring real-time socket connections and secure authentication.</p>
-                        <div class="tech-tags"><span>NEXT.JS</span> <span>TYPESCRIPT</span> <span>D3.JS</span></div>
+                        <div class="tech-array"><span>NEXT.JS</span> <span>TYPESCRIPT</span> <span>D3.JS</span></div>
                     </div>
                 </div>
 
-                <div class="tilt-card project-card hover-target">
-                    <div class="project-img" style="background-image: url('https://images.unsplash.com/photo-1618761714954-0b8cd0026356?q=80&w=2070&auto=format&fit=crop');"></div>
-                    <div class="project-info">
+                <div class="matrix-card tilt-chassis hover-trigger">
+                    <div class="matrix-image" style="background-image: url('https://images.unsplash.com/photo-1618761714954-0b8cd0026356?q=80&w=2070&auto=format&fit=crop');"></div>
+                    <div class="matrix-data">
                         <h3>WebGL Engine</h3>
                         <p>Immersive browser experiences utilizing WebGL shaders and Three.js to render complex 3D environments.</p>
-                        <div class="tech-tags"><span>THREE.JS</span> <span>GLSL</span> <span>GSAP_CORE</span></div>
+                        <div class="tech-array"><span>THREE.JS</span> <span>GLSL</span> <span>GSAP_CORE</span></div>
                     </div>
                 </div>
 
             </div>
         </section>
 
-        <section class="tech-section" id="expertise">
-            <h2 class="section-title glitch-text" data-value="Technical Specs">Technical Specs</h2>
-            <div class="grid-3d">
-                <div class="tilt-card card-3d hover-target">
-                    <i class="fas fa-code-branch"></i>
+        <section class="section-module" id="algorithms">
+            <div class="module-header">
+                <span class="module-index">02 //</span>
+                <h2 class="cipher-text" data-original="Signal Processing">Signal Processing</h2>
+            </div>
+            <div class="algo-section">
+                <div class="algo-text">
+                    <h3 style="font-family: 'Syncopate', sans-serif; font-size: 24px; margin-bottom: 20px;">Algorithmic Visualization</h3>
+                    <p style="color: var(--text-muted); line-height: 1.8; margin-bottom: 20px;">
+                        Engineering isn't just about code; it's about mathematics. This canvas renders real-time <strong style="color: var(--primary-core);">Lissajous Curves</strong>, 
+                        calculating complex harmonic motion equations at 60 FPS based on your scroll velocity and time deltas.
+                    </p>
+                    <p style="font-family: 'Share Tech Mono', monospace; font-size: 13px; color: var(--secondary-core);">
+                        x = A sin(at + δ)<br>
+                        y = B sin(bt)
+                    </p>
+                </div>
+                <div class="algo-canvas-container tilt-chassis hover-trigger">
+                    <canvas id="math-canvas"></canvas>
+                    <div class="canvas-overlay">
+                        FREQ_A: <span id="freq-a">0.00</span><br>
+                        FREQ_B: <span id="freq-b">0.00</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section-module" id="specs">
+            <div class="module-header">
+                <span class="module-index">03 //</span>
+                <h2 class="cipher-text" data-original="Technical Specs">Technical Specs</h2>
+            </div>
+            <div class="specs-grid">
+                <div class="spec-node tilt-chassis hover-trigger">
+                    <i class="fas fa-microchip spec-icon"></i>
                     <h3>Frontend Logic</h3>
-                    <p>Crafting precision-engineered interfaces, state machines, and GPU-accelerated complex animations.</p>
-                    <div class="tech-tags"><span>React</span> <span>JS(ES6+)</span> <span>Tailwind</span></div>
+                    <p>Crafting precision-engineered interfaces, custom state machines, and hardware-accelerated rendering algorithms.</p>
                 </div>
-                <div class="tilt-card card-3d hover-target">
-                    <i class="fas fa-server"></i>
+                <div class="spec-node tilt-chassis hover-trigger">
+                    <i class="fas fa-database spec-icon"></i>
                     <h3>Backend Arch</h3>
-                    <p>Designing secure, normalized databases, cloud functions, and scalable algorithmic logic systems.</p>
-                    <div class="tech-tags"><span>Firebase</span> <span>Node.js</span> <span>C++ Core</span></div>
+                    <p>Designing normalized, scalable NoSQL/SQL databases and secure algorithmic cloud functions.</p>
                 </div>
-                <div class="tilt-card card-3d hover-target">
-                    <i class="fas fa-vector-square"></i>
+                <div class="spec-node tilt-chassis hover-trigger">
+                    <i class="fas fa-cubes spec-icon"></i>
                     <h3>System Design</h3>
-                    <p>Translating user metrics into robust wireframes, focusing on topology and glassmorphic rendering.</p>
-                    <div class="tech-tags"><span>Figma</span> <span>Topology</span> <span>WebGL</span></div>
+                    <p>Translating abstract requirements into robust architectural patterns, focusing on modularity and OOD.</p>
                 </div>
             </div>
         </section>
 
-        <section class="contact-section" id="contact">
-            <h2 class="section-title glitch-text" data-value="Establish Link">Establish Link</h2>
-            <div class="contact-container tilt-card hover-target">
-                <div class="contact-info">
-                    <h3 class="glitch-text" data-value="Let's engineer the IMPOSSIBLE.">Let's engineer the IMPOSSIBLE.</h3>
-                    <p>Open for complex technical challenges, architecture consultations, or full-stack partnerships.</p>
-                    <div class="social-links">
-                        <a href="https://www.linkedin.com/in/mohammad-saleh-104927373" target="_blank" class="magnetic-btn"><i class="fab fa-linkedin-in"></i></a>
-                        <a href="mailto:mohalisal1@hotmail.com" class="magnetic-btn"><i class="fas fa-envelope"></i></a>
+        <section class="section-module" id="comms">
+            <div class="module-header">
+                <span class="module-index">04 //</span>
+                <h2 class="cipher-text" data-original="Establish Link">Establish Link</h2>
+            </div>
+            <div class="comms-interface tilt-chassis hover-trigger">
+                <div class="comms-header">
+                    <h3 class="cipher-text" data-original="Engineer the IMPOSSIBLE.">Engineer the IMPOSSIBLE.</h3>
+                    <p>Ready to deploy scalable solutions or tackle complex technical challenges? Initialize a connection protocol.</p>
+                    <div class="social-nodes">
+                        <a href="https://www.linkedin.com/in/mohammad-saleh-104927373" target="_blank" class="node-link hover-trigger"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="mailto:mohalisal1@hotmail.com" class="node-link hover-trigger"><i class="fas fa-envelope"></i></a>
                     </div>
                 </div>
-                <form action="https://formsubmit.co/mohalisal1@hotmail.com" method="POST" class="contact-form">
+                <form action="https://formsubmit.co/mohalisal1@hotmail.com" method="POST" class="comms-form">
                     <input type="hidden" name="_captcha" value="false">
-                    <div class="input-group">
+                    <div class="form-field">
                         <input type="text" name="name" required id="name">
                         <label for="name">Identifier (Name)</label>
                     </div>
-                    <div class="input-group">
+                    <div class="form-field">
                         <input type="email" name="email" required id="email">
                         <label for="email">Comms Link (Email)</label>
                     </div>
-                    <div class="input-group">
-                        <textarea name="message" required id="message" rows="4"></textarea>
-                        <label for="message">Project Parameters (Details)</label>
+                    <div class="form-field">
+                        <textarea name="message" required id="message" rows="3"></textarea>
+                        <label for="message">Execution Parameters (Details)</label>
                     </div>
-                    <div style="margin-top: 10px;">
-                        <button type="submit" class="btn-creative" style="width: 100%; text-align: center;">Execute Sequence</button>
-                    </div>
+                    <button type="submit" class="btn-submit hover-trigger">EXECUTE SEQUENCE</button>
                 </form>
             </div>
         </section>
 
-        <footer><p>SYSTEM TERMINAL v2.0 © 2026 ENG. MOHAMMAD SALEH. END OF LINE.</p></footer>
+        <footer>
+            <p>SYSTEM KERNEL v3.1.4 © 2026 ENG. MOHAMMAD SALEH. COMPILED SUCCESSFULLY.</p>
+        </footer>
     </div>
 
-    <!-- Scripts -->
+    <!-- EXTERNAL LIBRARIES -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <script>
-        const isTouch = window.matchMedia("(max-width: 900px)").matches;
+        /**
+         * ENGINE CONFIGURATION & UTILITIES
+         * Engineered by Mohammad Saleh
+         */
+        const Config = {
+            isTouch: window.matchMedia("(max-width: 900px) or (pointer: coarse)").matches,
+            lerp: (start, end, factor) => start + (end - start) * factor,
+            clamp: (val, min, max) => Math.min(Math.max(val, min), max)
+        };
 
-        // --- 1. Optimized Tech Scramble Effect (Zero Lag Layout) ---
-        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*";
-        
-        document.querySelectorAll('.glitch-text').forEach(element => {
-            let originalText = element.dataset.value;
-            if(!originalText) return;
-            
-            ScrollTrigger.create({
-                trigger: element,
-                start: "top 90%",
-                onEnter: () => {
-                    let iteration = 0;
-                    // استخدام requestAnimationFrame بدلاً من setInterval لتخفيف العبء على المعالج
-                    const scramble = () => {
-                        element.innerText = originalText.split("")
-                        .map((letter, index) => {
-                            if(index < iteration) return originalText[index];
-                            return letters[Math.floor(Math.random() * 42)];
-                        }).join("");
-                        
-                        if(iteration < originalText.length) {
-                            iteration += 1/2; // سرعة الفك
-                            requestAnimationFrame(scramble);
+        /**
+         * CLASS: System Logger
+         * Handles terminal outputs and HUD updates
+         */
+        class SystemMonitor {
+            constructor() {
+                this.terminal = document.getElementById('terminal-logs');
+                this.fpsEl = document.getElementById('fps-monitor');
+                this.scrollEl = document.getElementById('scroll-monitor');
+                this.uptimeEl = document.getElementById('uptime-monitor');
+                this.frames = 0;
+                this.lastTime = performance.now();
+                this.startTime = Date.now();
+                
+                this.initUptime();
+            }
+
+            log(message) {
+                if(Config.isTouch) return;
+                const entry = document.createElement('div');
+                entry.className = 'log-entry';
+                const timeStr = new Date().toISOString().substring(11, 19);
+                entry.innerText = `[${timeStr}] > ${message}`;
+                this.terminal.appendChild(entry);
+                if(this.terminal.children.length > 5) this.terminal.removeChild(this.terminal.firstChild);
+            }
+
+            updateScroll(y) {
+                this.scrollEl.innerText = Math.round(y).toString().padStart(4, '0');
+            }
+
+            updateFPS() {
+                this.frames++;
+                const now = performance.now();
+                if (now - this.lastTime >= 1000) {
+                    const fps = Math.round((this.frames * 1000) / (now - this.lastTime));
+                    this.fpsEl.innerText = fps.toFixed(1);
+                    this.frames = 0;
+                    this.lastTime = now;
+                }
+            }
+
+            initUptime() {
+                setInterval(() => {
+                    const elapsed = Math.floor((Date.now() - this.startTime) / 1000);
+                    this.uptimeEl.innerText = `0x${elapsed.toString(16).toUpperCase().padStart(4, '0')}`;
+                }, 1000);
+            }
+        }
+        const Monitor = new SystemMonitor();
+
+        /**
+         * CLASS: Advanced Tilt Engine (Custom Physics)
+         * Solves mobile layout thrashing by using direct pointer events and LERP
+         */
+        class TiltEngine {
+            constructor(selector) {
+                this.cards = document.querySelectorAll(selector);
+                this.init();
+            }
+
+            init() {
+                this.cards.forEach(card => {
+                    let state = { tx: 0, ty: 0, cx: 0, cy: 0, active: false };
+
+                    const onMove = (clientX, clientY) => {
+                        const rect = card.getBoundingClientRect();
+                        const x = clientX - rect.left;
+                        const y = clientY - rect.top;
+                        if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
+                            state.tx = ((y - rect.height / 2) / (rect.height / 2)) * -12; 
+                            state.ty = ((x - rect.width / 2) / (rect.width / 2)) * 12;
+                            state.active = true;
+                        } else {
+                            state.active = false;
+                            state.tx = 0; state.ty = 0;
                         }
                     };
-                    requestAnimationFrame(scramble);
-                }
-            });
-        });
 
-        // --- 2. System Terminal Logger & Scroll Meter ---
-        const terminal = document.getElementById('system-terminal');
-        const scrollMeter = document.getElementById('scroll-meter');
-        
-        function logAction(msg) {
-            if(isTouch) return;
-            const span = document.createElement('span');
-            span.innerText = `> ${msg}`;
-            terminal.appendChild(span);
-            if(terminal.children.length > 4) terminal.removeChild(terminal.firstChild);
-        }
+                    const onLeave = () => { state.tx = 0; state.ty = 0; state.active = false; };
 
-        window.addEventListener('scroll', () => {
-            const nav = document.getElementById('navbar');
-            const sy = window.scrollY;
-            if (sy > 50) nav.classList.add('scrolled');
-            else nav.classList.remove('scrolled');
-            
-            if(!isTouch) scrollMeter.innerText = Math.round(sy).toString().padStart(4, '0');
-        });
-
-        // Log sections as they appear
-        gsap.utils.toArray('section').forEach(sec => {
-            ScrollTrigger.create({ trigger: sec, start: "top 50%", onEnter: () => logAction(`RENDERING NODE: ${sec.id.toUpperCase()}`) });
-        });
-
-        // --- 3. Pointer & Coordinate Tracking ---
-        const cursor = document.querySelector('.cursor-crosshair');
-        const follower = document.querySelector('.cursor-dot');
-        const tracker = document.getElementById('coord-tracker');
-        
-        let mouseX = window.innerWidth / 2; let mouseY = window.innerHeight / 2;
-        let posX = window.innerWidth / 2; let posY = window.innerHeight / 2;
-
-        function updatePointer(x, y) {
-            mouseX = x; mouseY = y;
-            if(!isTouch) {
-                cursor.style.left = x + 'px'; cursor.style.top = y + 'px';
-                tracker.innerText = `X:${Math.round(x).toString().padStart(3, '0')} Y:${Math.round(y).toString().padStart(3, '0')}`;
-            }
-        }
-        window.addEventListener('pointermove', (e) => updatePointer(e.clientX, e.clientY));
-
-        // --- 4. Desktop Only Tilt Logic (Saves Mobile CPU) ---
-        if (!isTouch) {
-            document.querySelectorAll('.tilt-card').forEach(card => {
-                card.addEventListener('mousemove', (e) => {
-                    const rect = card.getBoundingClientRect();
-                    const x = e.clientX - rect.left; const y = e.clientY - rect.top;
-                    const rotateX = ((y - rect.height / 2) / (rect.height / 2)) * -10; 
-                    const rotateY = ((x - rect.width / 2) / (rect.width / 2)) * 10;
-                    card.style.transform = `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
-                });
-                card.addEventListener('mouseleave', () => card.style.transform = `perspective(1200px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`);
-            });
-        }
-
-        // Basic GSAP Reveals
-        gsap.from('.hero-subtitle', { y: 30, opacity: 0, duration: 1, delay: 0.2 });
-        gsap.from('.hero-title span', { y: 50, opacity: 0, duration: 1, stagger: 0.1, delay: 0.4 });
-        gsap.from('.hero-desc', { opacity: 0, duration: 1, delay: 0.6 });
-        gsap.from('.project-card', { scrollTrigger: { trigger: '.work-section', start: "top 80%" }, y: 50, opacity: 0, duration: 0.8, stagger: 0.1 });
-        gsap.from('.card-3d', { scrollTrigger: { trigger: '.tech-section', start: "top 80%" }, y: 50, opacity: 0, duration: 0.8, stagger: 0.1 });
-        gsap.from('.contact-container', { scrollTrigger: { trigger: '.contact-section', start: "top 85%" }, y: 30, opacity: 0, duration: 0.8 });
-
-        // --- 5. Highly Optimized Three.js (Smart Device Detection) ---
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: !isTouch }); // No antialias on mobile for speed
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.getElementById('webgl-container').appendChild(renderer.domElement);
-
-        const structureGroup = new THREE.Group();
-        scene.add(structureGroup);
-
-        const knotGeo = new THREE.TorusGeometry(1.5, 0.4, 16, isTouch ? 50 : 100); // Lower poly on mobile
-        const wireMat = new THREE.MeshBasicMaterial({ color: 0x4A90E2, wireframe: true, transparent: true, opacity: 0.12 });
-        const torus = new THREE.Mesh(knotGeo, wireMat);
-        structureGroup.add(torus);
-
-        const icoGeo = new THREE.IcosahedronGeometry(0.8, 1);
-        const icoMat = new THREE.MeshBasicMaterial({ color: 0xFF9F1C, wireframe: true, transparent: true, opacity: 0.18 });
-        const icosahedron = new THREE.Mesh(icoGeo, icoMat);
-        structureGroup.add(icosahedron);
-
-        const particlesGeo = new THREE.BufferGeometry();
-        const particlesCount = isTouch ? 200 : 1000; // Massive reduction for mobile battery/performance
-        const posArray = new Float32Array(particlesCount * 3);
-        const baseArray = new Float32Array(particlesCount * 3);
-        
-        for(let i = 0; i < particlesCount * 3; i++) {
-            const val = (Math.random() - 0.5) * 12;
-            posArray[i] = val; baseArray[i] = val;
-        }
-        
-        particlesGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-        const particlesMat = new THREE.PointsMaterial({ size: 0.02, color: 0xffffff, transparent: true, opacity: 0.2, blending: THREE.AdditiveBlending });
-        const particlesMesh = new THREE.Points(particlesGeo, particlesMat);
-        scene.add(particlesMesh);
-        camera.position.z = 3;
-
-        const clock = new THREE.Clock();
-        const fpsMeter = document.getElementById('fps-meter');
-        let frameCount = 0; let lastFpsTime = performance.now();
-        
-        function animate() {
-            requestAnimationFrame(animate);
-            const t = clock.getElapsedTime();
-            const scrollY = window.scrollY;
-
-            // Live FPS Calculation
-            if(!isTouch) {
-                frameCount++;
-                const now = performance.now();
-                if(now - lastFpsTime >= 1000) {
-                    fpsMeter.innerText = Math.round((frameCount * 1000) / (now - lastFpsTime));
-                    frameCount = 0; lastFpsTime = now;
-                }
-            }
-
-            posX += (mouseX - posX) * 0.25; posY += (mouseY - posY) * 0.25;
-            if(!isTouch) follower.style.transform = `translate(calc(-50% + ${posX}px), calc(-50% + ${posY}px))`;
-
-            torus.rotation.x = t * 0.1; torus.rotation.y = t * 0.2;
-            icosahedron.rotation.x = t * -0.2; icosahedron.rotation.y = t * -0.1;
-            structureGroup.position.y = (scrollY * -0.002) + Math.sin(t * 0.5) * 0.1;
-            structureGroup.rotation.z = scrollY * 0.001;
-            
-            // Only do expensive Vertex Physics on Desktop!
-            if(!isTouch) {
-                const webglX = (posX / window.innerWidth) * 2 - 1;
-                const webglY = -(posY / window.innerHeight) * 2 + 1;
-                const positions = particlesMesh.geometry.attributes.position.array;
-                
-                for(let i = 0; i < particlesCount; i++) {
-                    const i3 = i * 3;
-                    const dx = positions[i3] - (webglX * 5); 
-                    const dy = positions[i3+1] - (webglY * 5);
-                    const distance = Math.sqrt(dx*dx + dy*dy);
-                    
-                    if (distance < 1.5) {
-                        positions[i3] += dx * 0.02; positions[i3+1] += dy * 0.02;
-                    } else {
-                        positions[i3] += (baseArray[i3] - positions[i3]) * 0.05;
-                        positions[i3+1] += (baseArray[i3+1] - positions[i3+1]) * 0.05;
+                    // Bind Universal Pointer Events
+                    card.addEventListener('pointermove', (e) => onMove(e.clientX, e.clientY));
+                    card.addEventListener('pointerleave', onLeave);
+                    if(Config.isTouch) {
+                        card.addEventListener('touchstart', (e) => onMove(e.touches[0].clientX, e.touches[0].clientY), {passive: true});
+                        card.addEventListener('touchmove', (e) => onMove(e.touches[0].clientX, e.touches[0].clientY), {passive: true});
+                        card.addEventListener('touchend', onLeave);
                     }
-                    positions[i3+2] = baseArray[i3+2] + Math.sin(t * 2 + positions[i3]) * 0.1;
-                }
-                particlesMesh.geometry.attributes.position.needsUpdate = true;
-            }
-            
-            particlesMesh.rotation.y = t * 0.02; particlesMesh.rotation.x = t * 0.01;
-            renderer.render(scene, camera);
-        }
-        animate();
 
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
+                    // Render Loop for Physics
+                    const render = () => {
+                        state.cx = Config.lerp(state.cx, state.tx, 0.1);
+                        state.cy = Config.lerp(state.cy, state.ty, 0.1);
+                        
+                        if (Math.abs(state.cx) > 0.01 || Math.abs(state.cy) > 0.01 || state.active) {
+                            const scale = state.active ? 1.02 : 1;
+                            card.style.transform = `rotateX(${state.cx}deg) rotateY(${state.cy}deg) scale3d(${scale}, ${scale}, ${scale})`;
+                        }
+                        requestAnimationFrame(render);
+                    };
+                    render();
+                });
+            }
+        }
+        new TiltEngine('.tilt-chassis');
+
+        /**
+         * CLASS: Hardware Cursor Tracker
+         */
+        class CursorTracker {
+            constructor() {
+                if(Config.isTouch) return;
+                this.cursor = document.querySelector('.cursor-assembly');
+                this.reticle = document.querySelector('.cursor-reticle');
+                this.cx = window.innerWidth/2; this.cy = window.innerHeight/2;
+                this.tx = this.cx; this.ty = this.cy;
+                
+                document.addEventListener('pointermove', (e) => { this.tx = e.clientX; this.ty = e.clientY; });
+                
+                document.querySelectorAll('.hover-trigger').forEach(el => {
+                    el.addEventListener('mouseenter', () => { this.reticle.style.transform = 'scale(1.5)'; });
+                    el.addEventListener('mouseleave', () => { this.reticle.style.transform = 'scale(1)'; });
+                });
+
+                this.animate();
+            }
+            animate() {
+                this.cx = Config.lerp(this.cx, this.tx, 0.3);
+                this.cy = Config.lerp(this.cy, this.ty, 0.3);
+                this.cursor.style.transform = `translate(${this.cx}px, ${this.cy}px)`;
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+        new CursorTracker();
+
+        /**
+         * CLASS: Mathematical Signal Canvas (Lissajous Curves)
+         */
+        class SignalCanvas {
+            constructor() {
+                this.canvas = document.getElementById('math-canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.freqA_el = document.getElementById('freq-a');
+                this.freqB_el = document.getElementById('freq-b');
+                this.time = 0;
+                
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+                this.animate();
+            }
+            resize() {
+                const rect = this.canvas.parentElement.getBoundingClientRect();
+                this.canvas.width = rect.width;
+                this.canvas.height = rect.height;
+            }
+            animate() {
+                this.ctx.fillStyle = 'rgba(0, 0, 0, 0.1)'; // Fade effect
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                const cx = this.canvas.width / 2;
+                const cy = this.canvas.height / 2;
+                const amplitude = Math.min(cx, cy) - 20;
+
+                // Dynamic frequencies based on scroll position to show interactivity
+                const scrollFactor = window.scrollY * 0.001;
+                const freqA = 3 + Math.sin(scrollFactor) * 2;
+                const freqB = 2 + Math.cos(scrollFactor) * 1;
+                
+                this.freqA_el.innerText = freqA.toFixed(2);
+                this.freqB_el.innerText = freqB.toFixed(2);
+
+                this.ctx.beginPath();
+                this.ctx.strokeStyle = `rgba(74, 144, 226, 0.8)`;
+                this.ctx.lineWidth = 1.5;
+
+                for (let i = 0; i <= Math.PI * 2; i += 0.05) {
+                    const x = cx + amplitude * Math.sin(freqA * i + this.time);
+                    const y = cy + amplitude * Math.sin(freqB * i);
+                    if (i === 0) this.ctx.moveTo(x, y);
+                    else this.ctx.lineTo(x, y);
+                }
+                this.ctx.stroke();
+                
+                this.time += 0.02;
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+        setTimeout(() => new SignalCanvas(), 500); // Init delay
+
+        /**
+         * CLASS: Cipher Text Decoder
+         * Safe, non-blocking string manipulation
+         */
+        class CipherEngine {
+            constructor() {
+                this.chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*";
+                this.init();
+            }
+            init() {
+                document.querySelectorAll('.cipher-text').forEach(el => {
+                    const original = el.dataset.original;
+                    if(!original) return;
+                    
+                    ScrollTrigger.create({
+                        trigger: el, start: "top 90%",
+                        onEnter: () => this.decode(el, original)
+                    });
+                });
+            }
+            decode(element, text) {
+                let iteration = 0;
+                // Preserve inner span structures if needed, but for simplicity we replace text
+                // Check if element has child elements (like hero title)
+                const hasHTML = element.innerHTML.includes('<');
+                if(hasHTML) return; // Skip complex HTML nodes for basic glitch
+
+                const loop = () => {
+                    element.innerText = text.split("").map((char, index) => {
+                        if(char === " ") return " ";
+                        if(index < iteration) return text[index];
+                        return this.chars[Math.floor(Math.random() * this.chars.length)];
+                    }).join("");
+                    
+                    if(iteration < text.length) {
+                        iteration += 1/3;
+                        requestAnimationFrame(loop);
+                    }
+                };
+                requestAnimationFrame(loop);
+            }
+        }
+        new CipherEngine();
+
+        /**
+         * SCROLL & GSAP LOGIC
+         */
+        gsap.registerPlugin(ScrollTrigger);
+        
+        const nav = document.getElementById('main-nav');
+        window.addEventListener('scroll', () => {
+            const sy = window.scrollY;
+            if (sy > 50) nav.classList.add('nav-active');
+            else nav.classList.remove('nav-active');
+            Monitor.updateScroll(sy);
         });
+
+        gsap.utils.toArray('.section-module').forEach(sec => {
+            ScrollTrigger.create({ trigger: sec, start: "top 60%", onEnter: () => Monitor.log(`MOUNTED_NODE: ${sec.id.toUpperCase()}`) });
+        });
+
+        // Entrance Animations
+        gsap.from('.hero-sys-status', { y: 20, opacity: 0, duration: 1, delay: 0.2 });
+        gsap.from('.hero-title span', { y: 40, opacity: 0, duration: 1, stagger: 0.1, delay: 0.3 });
+        gsap.from('.hero-desc', { opacity: 0, duration: 1, delay: 0.5 });
+        gsap.from('.btn-deploy', { opacity: 0, y: 20, duration: 1, delay: 0.7 });
+        
+        gsap.utils.toArray('.module-header').forEach(header => {
+            gsap.from(header, { scrollTrigger: { trigger: header, start: "top 85%" }, x: -30, opacity: 0, duration: 0.8 });
+        });
+        gsap.from('.matrix-card', { scrollTrigger: { trigger: '.project-matrix', start: "top 80%" }, y: 50, opacity: 0, duration: 0.8, stagger: 0.1 });
+        gsap.from('.spec-node', { scrollTrigger: { trigger: '.specs-grid', start: "top 80%" }, y: 50, opacity: 0, duration: 0.8, stagger: 0.1 });
+        gsap.from('.comms-interface', { scrollTrigger: { trigger: '#comms', start: "top 80%" }, y: 30, opacity: 0, duration: 0.8 });
+
+        /**
+         * 3D WEBGL ENGINE (THREE.JS)
+         * Golden Ratio / Fibonacci Particle Distribution
+         */
+        class WebGLEngine {
+            constructor() {
+                this.scene = new THREE.Scene();
+                this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false, powerPreference: "high-performance" });
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                document.getElementById('webgl-canvas').appendChild(this.renderer.domElement);
+
+                this.particles = null;
+                this.clock = new THREE.Clock();
+                this.initGeometry();
+                
+                this.camera.position.z = 40;
+                
+                window.addEventListener('resize', () => this.resize());
+                this.animate();
+            }
+
+            initGeometry() {
+                const count = Config.isTouch ? 500 : 1500;
+                const geometry = new THREE.BufferGeometry();
+                const posArray = new Float32Array(count * 3);
+                
+                // Fibonacci sphere math for structured particle layout
+                const phi = Math.PI * (3. - Math.sqrt(5.));  
+                
+                for(let i = 0; i < count; i++) {
+                    const y = 1 - (i / (count - 1)) * 2; 
+                    const radius = Math.sqrt(1 - y * y);
+                    const theta = phi * i;
+
+                    // Scale up the sphere
+                    const scale = 25;
+                    posArray[i * 3] = Math.cos(theta) * radius * scale;
+                    posArray[i * 3 + 1] = y * scale;
+                    posArray[i * 3 + 2] = Math.sin(theta) * radius * scale;
+                }
+
+                geometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+                const material = new THREE.PointsMaterial({ size: 0.15, color: 0x4A90E2, transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending });
+                
+                this.particles = new THREE.Points(geometry, material);
+                this.scene.add(this.particles);
+            }
+
+            resize() {
+                this.camera.aspect = window.innerWidth / window.innerHeight;
+                this.camera.updateProjectionMatrix();
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+
+            animate() {
+                requestAnimationFrame(() => this.animate());
+                const time = this.clock.getElapsedTime();
+                const scrollY = window.scrollY;
+
+                Monitor.updateFPS(); // Log FPS to HUD
+
+                // Elegant rotation linked to time and slightly to scroll
+                if(this.particles) {
+                    this.particles.rotation.y = time * 0.05 + (scrollY * 0.0005);
+                    this.particles.rotation.x = (scrollY * 0.0002);
+                }
+
+                this.renderer.render(this.scene, this.camera);
+            }
+        }
+        // Initialize WebGL if not on a very constrained device, else fallback safely
+        try { new WebGLEngine(); } catch(e) { Monitor.log("WEBGL_INIT_FAILED"); }
+
     </script>
 </body>
 </html>
