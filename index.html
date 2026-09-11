@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mohammad Saleh | Creative Engineer</title>
     
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=Syncopate:wght@700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -29,7 +30,7 @@
             scroll-behavior: smooth;
         }
 
-        /* 1. Engineering Blueprint Grid Background */
+        /* Blueprint Grid Background */
         body::before {
             content: '';
             position: fixed;
@@ -42,18 +43,15 @@
             pointer-events: none;
         }
 
-        /* 2. CAD Style Custom Cursor */
+        /* CAD Style Custom Cursor */
         .cursor-crosshair, .cursor-dot {
             position: fixed;
             pointer-events: none;
             z-index: 9999;
             transform: translate(-50%, -50%);
-            transition: opacity 0.5s ease;
-            will-change: transform, opacity;
+            will-change: transform;
         }
-        .cursor-crosshair {
-            width: 40px; height: 40px;
-        }
+        .cursor-crosshair { width: 40px; height: 40px; }
         .cursor-crosshair::before, .cursor-crosshair::after {
             content: ''; position: absolute; background: var(--primary);
         }
@@ -64,21 +62,17 @@
             width: 6px; height: 6px;
             background: var(--secondary);
             border-radius: 50%;
-            transition: transform 0.1s ease-out, opacity 0.5s ease;
         }
-        
-        .cursor-crosshair.fade-out, .cursor-dot.fade-out { opacity: 0 !important; }
 
         /* Engineering Coordinate Tracker */
         #coord-tracker {
             position: fixed; bottom: 20px; right: 30px;
             font-family: 'Share Tech Mono', monospace;
             color: var(--primary); font-size: 12px;
-            z-index: 100; opacity: 0.6; pointer-events: none;
+            z-index: 100; opacity: 0.8; pointer-events: none;
             letter-spacing: 1px;
         }
 
-        /* 3D WebGL Background */
         #webgl-container {
             position: fixed; top: 0; left: 0;
             width: 100vw; height: 100vh;
@@ -159,7 +153,7 @@
             color: var(--primary); letter-spacing: 2px; margin-bottom: 10px;
         }
 
-        /* Engineering Corner Brackets & Tilt Container */
+        /* Tilt Card */
         .tilt-card {
             position: relative; transform-style: preserve-3d;
             transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -171,8 +165,6 @@
         }
         .tilt-card::before { top: 0; left: 0; border-right: none; border-bottom: none; }
         .tilt-card::after { bottom: 0; right: 0; border-left: none; border-top: none; }
-        .tilt-card:hover::before { top: -10px; left: -10px; }
-        .tilt-card:hover::after { bottom: -10px; right: -10px; }
 
         /* Work Section */
         .work-section { padding: 100px 10vw; }
@@ -186,16 +178,14 @@
             background-size: cover; background-position: center;
             transition: transform 0.8s, filter 0.8s;
             filter: grayscale(80%) contrast(1.2);
-            transform: translateZ(-20px); /* Parallax depth */
+            transform: translateZ(-20px);
         }
-        .tilt-card:hover .project-img { transform: scale(1.1) translateZ(-20px); filter: grayscale(0%); }
         .project-info {
             position: absolute; bottom: 0; left: 0; width: 100%;
             padding: 30px; background: linear-gradient(to top, rgba(0,0,0,0.95), transparent);
-            transform: translateY(120px) translateZ(40px); /* Pop out 3D effect */
-            transition: transform 0.5s; display: flex; flex-direction: column; gap: 10px;
+            transform: translateY(20px) translateZ(40px);
+            display: flex; flex-direction: column; gap: 10px;
         }
-        .tilt-card:hover .project-info { transform: translateY(0) translateZ(50px); }
         .project-info h3 { font-size: 24px; font-family: 'Syncopate', sans-serif; }
         .project-info p { color: #ccc; font-size: 14px; }
         .tech-tags { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
@@ -255,27 +245,25 @@
 
         footer { padding: 50px 10vw; text-align: center; border-top: 1px dashed rgba(255,255,255,0.1); font-family: 'Share Tech Mono', monospace; font-size: 12px; }
 
-        /* Mobile Adjustments */
         @media (max-width: 900px) {
             nav { flex-direction: column; gap: 15px; padding: 20px; }
             nav.scrolled { padding: 15px; }
             .hero-title { font-size: 11vw; }
             .section-title { font-size: 28px; }
-            /* Show project info permanently on touch */
-            .project-info { transform: translateY(0) translateZ(20px); background: linear-gradient(to top, rgba(0,0,0,1), rgba(0,0,0,0.6)); }
-            .project-img { filter: grayscale(30%) brightness(0.6); }
             .contact-container { padding: 30px; }
-            body, .btn-creative, .project-card, .magnetic-btn, a, input, textarea { cursor: auto !important; }
         }
     </style>
 </head>
 <body>
 
-    <div class="cursor-crosshair fade-out"></div>
-    <div class="cursor-dot fade-out"></div>
+    <!-- CAD Crosshair Cursor -->
+    <div class="cursor-crosshair"></div>
+    <div class="cursor-dot"></div>
     
+    <!-- Coordinate Tracker -->
     <div id="coord-tracker">X: 000 | Y: 000</div>
 
+    <!-- 3D WebGL Background -->
     <div id="webgl-container"></div>
 
     <div class="main-content">
@@ -355,7 +343,7 @@
 
         <section class="contact-section" id="contact">
             <h2 class="section-title reveal-text">Establish Link</h2>
-            <div class="contact-container tilt-card hover-target" style="cursor: auto;">
+            <div class="contact-container tilt-card hover-target">
                 <div class="contact-info">
                     <h3>Let's engineer the impossible.</h3>
                     <p>Open for complex technical challenges, architecture consultations, or full-stack partnerships.</p>
@@ -388,6 +376,7 @@
         <footer><p>SYSTEM TERMINAL v2.0 © 2026 ENG. MOHAMMAD SALEH. END OF LINE.</p></footer>
     </div>
 
+    <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -400,50 +389,39 @@
             else nav.classList.remove('scrolled');
         });
 
-        // Smart CAD Cursor & Coordinate Tracker
+        // Universal Pointer Tracker (Works instantly on Mouse, Touch & iPad)
         const cursor = document.querySelector('.cursor-crosshair');
         const follower = document.querySelector('.cursor-dot');
         const tracker = document.getElementById('coord-tracker');
-        const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
         
         let mouseX = window.innerWidth / 2; let mouseY = window.innerHeight / 2;
         let posX = window.innerWidth / 2; let posY = window.innerHeight / 2;
-        let fadeTimeout;
 
         function updatePointer(x, y) {
             mouseX = x; mouseY = y;
             cursor.style.left = x + 'px'; cursor.style.top = y + 'px';
-            cursor.classList.remove('fade-out'); follower.classList.remove('fade-out');
-            
-            // Update Tracker
             tracker.innerText = `X: ${Math.round(x).toString().padStart(4, '0')} | Y: ${Math.round(y).toString().padStart(4, '0')}`;
-            
-            clearTimeout(fadeTimeout);
-            if (isTouchDevice) {
-                fadeTimeout = setTimeout(() => {
-                    cursor.classList.add('fade-out'); follower.classList.add('fade-out');
-                }, 2000);
-            }
         }
 
-        document.addEventListener('pointermove', (e) => updatePointer(e.clientX, e.clientY));
+        window.addEventListener('pointermove', (e) => updatePointer(e.clientX, e.clientY));
+        window.addEventListener('pointerdown', (e) => updatePointer(e.clientX, e.clientY));
 
         gsap.ticker.add(() => {
-            posX += (mouseX - posX) * 0.2; posY += (mouseY - posY) * 0.2;
+            posX += (mouseX - posX) * 0.25; 
+            posY += (mouseY - posY) * 0.25;
             follower.style.transform = `translate(calc(-50% + ${posX}px), calc(-50% + ${posY}px))`;
         });
 
-        // 3D Tilt Effect - Restored & Optimized for Touch via PointerEvents
+        // 3D Tilt Effect for Cards & Containers (Optimized for both Mouse & Touch)
         document.querySelectorAll('.tilt-card').forEach(card => {
             card.addEventListener('pointermove', (e) => {
                 const rect = card.getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
                 
-                // Only tilt if pointer is actually inside the card boundaries
                 if(x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
-                    const rotateX = ((y - rect.height / 2) / (rect.height / 2)) * -12; 
-                    const rotateY = ((x - rect.width / 2) / (rect.width / 2)) * 12;
+                    const rotateX = ((y - rect.height / 2) / (rect.height / 2)) * -10; 
+                    const rotateY = ((x - rect.width / 2) / (rect.width / 2)) * 10;
                     card.style.transform = `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
                 }
             });
@@ -451,23 +429,6 @@
                 card.style.transform = `perspective(1200px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
             });
         });
-
-        if (!isTouchDevice) {
-            // Magnetic Buttons (Desktop Only)
-            document.querySelectorAll('.magnetic-btn').forEach(btn => {
-                btn.addEventListener('mousemove', function(e) {
-                    const position = btn.getBoundingClientRect();
-                    const x = e.clientX - position.left - position.width / 2;
-                    const y = e.clientY - position.top - position.height / 2;
-                    gsap.to(btn, { x: x * 0.4, y: y * 0.4, duration: 0.3 });
-                    gsap.to(btn.children[0], { x: x * 0.2, y: y * 0.2, duration: 0.3 });
-                });
-                btn.addEventListener('mouseleave', function() {
-                    gsap.to(btn, { x: 0, y: 0, duration: 0.5, ease: "elastic.out(1, 0.3)" });
-                    gsap.to(btn.children[0], { x: 0, y: 0, duration: 0.5, ease: "elastic.out(1, 0.3)" });
-                });
-            });
-        }
 
         // GSAP Animations
         gsap.registerPlugin(ScrollTrigger);
@@ -482,32 +443,28 @@
         gsap.from('.card-3d', { scrollTrigger: { trigger: '.tech-section', start: "top 80%" }, y: 50, opacity: 0, duration: 0.8, stagger: 0.1 });
         gsap.from('.contact-container', { scrollTrigger: { trigger: '.contact-section', start: "top 85%" }, y: 30, opacity: 0, duration: 0.8 });
 
-        // Three.js - Engineering Structural Background
+        // Three.js Background
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.getElementById('webgl-container').appendChild(renderer.domElement);
 
-        // Group for structural complex geometry
         const structureGroup = new THREE.Group();
         scene.add(structureGroup);
 
-        // Outer Torus Wireframe
         const knotGeo = new THREE.TorusGeometry(1.5, 0.4, 16, 100);
-        const wireMat = new THREE.MeshBasicMaterial({ color: 0x4A90E2, wireframe: true, transparent: true, opacity: 0.1 });
+        const wireMat = new THREE.MeshBasicMaterial({ color: 0x4A90E2, wireframe: true, transparent: true, opacity: 0.12 });
         const torus = new THREE.Mesh(knotGeo, wireMat);
         structureGroup.add(torus);
 
-        // Inner Icosahedron (Geometric structural core)
         const icoGeo = new THREE.IcosahedronGeometry(0.8, 1);
-        const icoMat = new THREE.MeshBasicMaterial({ color: 0xFF9F1C, wireframe: true, transparent: true, opacity: 0.15 });
+        const icoMat = new THREE.MeshBasicMaterial({ color: 0xFF9F1C, wireframe: true, transparent: true, opacity: 0.18 });
         const icosahedron = new THREE.Mesh(icoGeo, icoMat);
         structureGroup.add(icosahedron);
 
-        // Particles Data points
         const particlesGeo = new THREE.BufferGeometry();
-        const particlesCount = window.innerWidth < 768 ? 400 : 1200;
+        const particlesCount = 1000;
         const posArray = new Float32Array(particlesCount * 3);
         for(let i = 0; i < particlesCount * 3; i++) posArray[i] = (Math.random() - 0.5) * 12;
         particlesGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
@@ -518,7 +475,7 @@
         camera.position.z = 3;
 
         let targetX = 0; let targetY = 0;
-        document.addEventListener('pointermove', (e) => {
+        window.addEventListener('pointermove', (e) => {
             targetX = (e.clientX - window.innerWidth / 2) * 0.0015; 
             targetY = (e.clientY - window.innerHeight / 2) * 0.0015;
         });
@@ -529,15 +486,12 @@
             const t = clock.getElapsedTime();
             const scrollY = window.scrollY;
 
-            // Structural Rotations
             torus.rotation.x = t * 0.1; torus.rotation.y = t * 0.2;
             icosahedron.rotation.x = t * -0.2; icosahedron.rotation.y = t * -0.1;
             
-            // Link group to scroll
             structureGroup.position.y = (scrollY * -0.002) + Math.sin(t * 0.5) * 0.1;
             structureGroup.rotation.z = scrollY * 0.001;
             
-            // Particles follow pointer
             particlesMesh.rotation.y = t * 0.03 + targetX;
             particlesMesh.rotation.x = t * 0.02 + targetY;
 
