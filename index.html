@@ -3,37 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mohammad Saleh | Creative Engineer</title>
+    <title>ENG.MOHAMMAD | Creative Engineer</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=Syncopate:wght@700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
         :root {
-            --bg: #020203;
-            --primary: #4A90E2;
-            --secondary: #FF9F1C;
-            --text: #ffffff;
-            --text-muted: #7a8294;
-            --grid-color: rgba(74, 144, 226, 0.05);
+            --bg: #020203; --primary: #4A90E2; --secondary: #FF9F1C;
+            --text: #ffffff; --text-muted: #7a8294; --grid-color: rgba(74, 144, 226, 0.05);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
-            font-family: 'Space Grotesk', sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            overflow-x: hidden;
-            cursor: none; 
-            scroll-behavior: smooth;
+            font-family: 'Space Grotesk', sans-serif; background-color: var(--bg);
+            color: var(--text); overflow-x: hidden; cursor: none; scroll-behavior: smooth;
         }
 
-        /* Blueprint Grid */
+        /* 1. CRT Scanlines & Blueprint Grid (GPU Accelerated, Zero CPU Load) */
         body::before {
             content: ''; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background-image: linear-gradient(var(--grid-color) 1px, transparent 1px), linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-image: 
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
             background-size: 40px 40px; z-index: 1; pointer-events: none;
+        }
+        body::after {
+            content: ''; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%; z-index: 99; pointer-events: none; opacity: 0.3;
         }
 
         /* CAD Custom Cursor */
@@ -47,11 +46,23 @@
         .cursor-crosshair::after { left: 50%; top: 0; height: 100%; width: 1px; transform: translateX(-50%); }
         .cursor-dot { width: 6px; height: 6px; background: var(--secondary); border-radius: 50%; }
 
-        /* Coordinates Tracker */
-        #coord-tracker {
+        /* Performance HUD (Heads Up Display) */
+        #hud-container {
             position: fixed; bottom: 20px; right: 30px;
             font-family: 'Share Tech Mono', monospace; color: var(--primary); font-size: 12px;
             z-index: 100; opacity: 0.8; pointer-events: none; letter-spacing: 1px;
+            display: flex; flex-direction: column; align-items: flex-end; gap: 5px;
+        }
+        .hud-line { background: rgba(0,0,0,0.5); padding: 2px 6px; border: 1px solid rgba(74, 144, 226, 0.2); }
+        .hud-highlight { color: var(--secondary); }
+
+        /* System Action Terminal */
+        #system-terminal {
+            position: fixed; bottom: 20px; left: 30px;
+            font-family: 'Share Tech Mono', monospace; color: var(--text-muted); font-size: 10px;
+            z-index: 100; opacity: 0.7; pointer-events: none;
+            display: flex; flex-direction: column; gap: 3px; max-height: 80px; overflow: hidden;
+            border-left: 2px solid var(--primary); padding-left: 10px;
         }
 
         #webgl-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; }
@@ -64,7 +75,7 @@
             z-index: 100; transition: background 0.3s, padding 0.3s;
         }
         nav.scrolled {
-            background: rgba(2, 2, 3, 0.85); backdrop-filter: blur(12px);
+            background: rgba(2, 2, 3, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
             padding: 15px 5vw; border-bottom: 1px solid rgba(255,255,255,0.05);
         }
         .logo { font-family: 'Syncopate', sans-serif; font-size: 24px; font-weight: 700; letter-spacing: 2px; }
@@ -77,7 +88,7 @@
         /* Hero */
         .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 0 10vw; }
         .hero-subtitle { font-family: 'Share Tech Mono', monospace; color: var(--primary); font-size: 14px; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 20px; }
-        .hero-title { font-family: 'Syncopate', sans-serif; font-size: clamp(40px, 8vw, 100px); line-height: 1.1; text-transform: uppercase; margin-bottom: 30px; text-shadow: 0 0 20px rgba(74, 144, 226, 0.2); word-wrap: break-word; }
+        .hero-title { font-family: 'Syncopate', sans-serif; font-size: clamp(35px, 7vw, 90px); line-height: 1.1; text-transform: uppercase; margin-bottom: 30px; text-shadow: 0 0 20px rgba(74, 144, 226, 0.2); word-wrap: break-word; }
         .hero-title .outline { color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.5); }
         .hero-desc { max-width: 550px; color: var(--text-muted); font-size: 18px; line-height: 1.7; margin-bottom: 40px; }
         
@@ -88,14 +99,11 @@
         }
         .btn-creative:hover { background: #ffffff; color: var(--bg); box-shadow: 0 0 30px rgba(255, 255, 255, 0.6); transform: translateY(-3px); }
 
-        .section-title { font-family: 'Syncopate', sans-serif; font-size: clamp(28px, 5vw, 40px); margin-bottom: 80px; text-align: center; }
+        .section-title { font-family: 'Syncopate', sans-serif; font-size: clamp(25px, 5vw, 40px); margin-bottom: 80px; text-align: center; min-height: 50px; }
         .section-title::before { content: '[ DATA_LOADED ]'; display: block; font-family: 'Share Tech Mono', monospace; font-size: 12px; color: var(--primary); letter-spacing: 2px; margin-bottom: 10px; }
 
-        /* Advanced Hardware Accelerated Tilt Card */
-        .tilt-card {
-            position: relative; transform-style: preserve-3d;
-            will-change: transform; /* Hint for GPU acceleration */
-        }
+        /* Hardware Accelerated Tilt Card */
+        .tilt-card { position: relative; transform-style: preserve-3d; will-change: transform; }
         .tilt-card::before, .tilt-card::after { content: ''; position: absolute; width: 20px; height: 20px; border: 1px solid var(--primary); z-index: 20; pointer-events: none; transition: 0.3s; }
         .tilt-card::before { top: 0; left: 0; border-right: none; border-bottom: none; }
         .tilt-card::after { bottom: 0; right: 0; border-left: none; border-top: none; }
@@ -104,8 +112,11 @@
         .work-section { padding: 100px 10vw; }
         .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 50px; }
         .project-card { height: 400px; overflow: hidden; background: #0a0a0f; border: 1px solid rgba(255,255,255,0.05); cursor: none; }
-        .project-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; transition: filter 0.8s; filter: grayscale(80%) contrast(1.2); transform: translateZ(-30px); }
-        .tilt-card:hover .project-img { filter: grayscale(0%); }
+        
+        /* Fixed Filter Bug for Safari */
+        .project-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; transition: transform 0.6s, opacity 0.6s; opacity: 0.5; transform: translateZ(-30px); }
+        .tilt-card:hover .project-img { opacity: 1; transform: scale(1.05) translateZ(-30px); }
+        
         .project-info { position: absolute; bottom: 0; left: 0; width: 100%; padding: 30px; background: linear-gradient(to top, rgba(0,0,0,0.95), transparent); transform: translateY(120px) translateZ(50px); transition: transform 0.5s; display: flex; flex-direction: column; gap: 10px; }
         .tilt-card:hover .project-info { transform: translateY(0) translateZ(60px); }
         .project-info h3 { font-size: 24px; font-family: 'Syncopate', sans-serif; }
@@ -116,7 +127,7 @@
         /* Expertise Section */
         .tech-section { padding: 100px 10vw; }
         .grid-3d { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 50px; perspective: 1500px; }
-        .card-3d { background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255,255,255,0.05); padding: 40px; backdrop-filter: blur(5px); }
+        .card-3d { background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255,255,255,0.05); padding: 40px; }
         .card-3d h3 { font-size: 20px; font-family: 'Syncopate', sans-serif; margin-bottom: 15px; transform: translateZ(40px); }
         .card-3d p { color: var(--text-muted); transform: translateZ(30px); line-height: 1.6;}
         .card-3d i { font-size: 40px; color: var(--secondary); margin-bottom: 20px; transform: translateZ(50px); text-shadow: 0 0 15px rgba(255, 159, 28, 0.4); }
@@ -124,10 +135,9 @@
 
         /* Contact Section */
         .contact-section { padding: 100px 10vw 150px; }
-        .contact-container { display: flex; gap: 60px; flex-wrap: wrap; background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.05); padding: 60px; backdrop-filter: blur(10px); position: relative; overflow: hidden; }
+        .contact-container { display: flex; gap: 60px; flex-wrap: wrap; background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.05); padding: 60px; position: relative; overflow: hidden; }
         .contact-info { flex: 1; min-width: 250px; }
-        /* Fix applied here: clamp + word-break to prevent overflow on "IMPOSSIBLE" */
-        .contact-info h3 { font-size: clamp(28px, 6vw, 45px); font-family: 'Syncopate', sans-serif; margin-bottom: 20px; word-wrap: break-word; overflow-wrap: break-word; hyphens: auto; line-height: 1.2;}
+        .contact-info h3 { font-size: clamp(24px, 5vw, 40px); font-family: 'Syncopate', sans-serif; margin-bottom: 20px; word-wrap: break-word; line-height: 1.2;}
         .contact-info p { color: var(--text-muted); line-height: 1.6; margin-bottom: 40px; }
         .social-links { display: flex; gap: 20px; }
         
@@ -143,15 +153,17 @@
 
         footer { padding: 50px 10vw; text-align: center; border-top: 1px dashed rgba(255,255,255,0.1); font-family: 'Share Tech Mono', monospace; font-size: 12px; }
 
-        /* Responsive */
+        /* Mobile Optimization (Zero Lag) */
         @media (max-width: 900px) {
             nav { flex-direction: column; gap: 15px; padding: 20px; }
             nav.scrolled { padding: 15px; }
             .project-info { transform: translateY(0) translateZ(20px); background: linear-gradient(to top, rgba(0,0,0,1), rgba(0,0,0,0.6)); }
-            .project-img { filter: grayscale(30%) brightness(0.6); }
+            .project-img { opacity: 0.4; }
             .contact-container { padding: 30px; }
+            
             body, .btn-creative, .project-card, .magnetic-btn, a, input, textarea { cursor: auto !important; }
             .cursor-crosshair, .cursor-dot { display: none !important; }
+            #hud-container, #system-terminal { display: none !important; } /* Hide HUD on mobile to save space/CPU */
         }
     </style>
 </head>
@@ -159,12 +171,24 @@
 
     <div class="cursor-crosshair"></div>
     <div class="cursor-dot"></div>
-    <div id="coord-tracker">X: 000 | Y: 000</div>
+    
+    <!-- Engineering System Monitors -->
+    <div id="hud-container">
+        <div class="hud-line">SYS_FPS: <span id="fps-meter" class="hud-highlight">60</span></div>
+        <div class="hud-line">SCR_POS: <span id="scroll-meter" class="hud-highlight">0000</span></div>
+        <div class="hud-line">PTR_LOC: <span id="coord-tracker" class="hud-highlight">X:000 Y:000</span></div>
+    </div>
+
+    <div id="system-terminal">
+        <span>> INITIALIZING SYSTEM...</span>
+        <span>> KERNEL LOADED.</span>
+    </div>
+
     <div id="webgl-container"></div>
 
     <div class="main-content">
         <nav id="navbar">
-            <div class="logo">ENG.SALEH</div>
+            <div class="logo">ENG.MOHAMMAD</div>
             <div class="nav-links">
                 <a href="#work" class="hover-target">Projects</a>
                 <a href="#expertise" class="hover-target">Skills</a>
@@ -272,13 +296,15 @@
         <footer><p>SYSTEM TERMINAL v2.0 © 2026 ENG. MOHAMMAD SALEH. END OF LINE.</p></footer>
     </div>
 
+    <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <script>
-        // --- 1. Advanced Tech Scramble Effect (Hacker Text Decoder) ---
-        // يظهر للمبرمجين قدرتك على التلاعب بالـ Strings والـ DOM بشكل معقد
+        const isTouch = window.matchMedia("(max-width: 900px)").matches;
+
+        // --- 1. Optimized Tech Scramble Effect (Zero Lag Layout) ---
         const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*";
         
         document.querySelectorAll('.glitch-text').forEach(element => {
@@ -287,31 +313,54 @@
             
             ScrollTrigger.create({
                 trigger: element,
-                start: "top 85%",
+                start: "top 90%",
                 onEnter: () => {
-                    let iterations = 0;
-                    const interval = setInterval(() => {
+                    let iteration = 0;
+                    // استخدام requestAnimationFrame بدلاً من setInterval لتخفيف العبء على المعالج
+                    const scramble = () => {
                         element.innerText = originalText.split("")
                         .map((letter, index) => {
-                            if(index < iterations) return originalText[index];
+                            if(index < iteration) return originalText[index];
                             return letters[Math.floor(Math.random() * 42)];
                         }).join("");
                         
-                        if(iterations >= originalText.length) clearInterval(interval);
-                        iterations += 1 / 3; 
-                    }, 30);
+                        if(iteration < originalText.length) {
+                            iteration += 1/2; // سرعة الفك
+                            requestAnimationFrame(scramble);
+                        }
+                    };
+                    requestAnimationFrame(scramble);
                 }
             });
         });
 
-        // Nav blur effect
+        // --- 2. System Terminal Logger & Scroll Meter ---
+        const terminal = document.getElementById('system-terminal');
+        const scrollMeter = document.getElementById('scroll-meter');
+        
+        function logAction(msg) {
+            if(isTouch) return;
+            const span = document.createElement('span');
+            span.innerText = `> ${msg}`;
+            terminal.appendChild(span);
+            if(terminal.children.length > 4) terminal.removeChild(terminal.firstChild);
+        }
+
         window.addEventListener('scroll', () => {
             const nav = document.getElementById('navbar');
-            if (window.scrollY > 50) nav.classList.add('scrolled');
+            const sy = window.scrollY;
+            if (sy > 50) nav.classList.add('scrolled');
             else nav.classList.remove('scrolled');
+            
+            if(!isTouch) scrollMeter.innerText = Math.round(sy).toString().padStart(4, '0');
         });
 
-        // --- 2. Advanced Global Pointer & Coordinate Tracking ---
+        // Log sections as they appear
+        gsap.utils.toArray('section').forEach(sec => {
+            ScrollTrigger.create({ trigger: sec, start: "top 50%", onEnter: () => logAction(`RENDERING NODE: ${sec.id.toUpperCase()}`) });
+        });
+
+        // --- 3. Pointer & Coordinate Tracking ---
         const cursor = document.querySelector('.cursor-crosshair');
         const follower = document.querySelector('.cursor-dot');
         const tracker = document.getElementById('coord-tracker');
@@ -321,79 +370,46 @@
 
         function updatePointer(x, y) {
             mouseX = x; mouseY = y;
-            if(window.innerWidth > 900) {
+            if(!isTouch) {
                 cursor.style.left = x + 'px'; cursor.style.top = y + 'px';
-                tracker.innerText = `X: ${Math.round(x).toString().padStart(4, '0')} | Y: ${Math.round(y).toString().padStart(4, '0')}`;
+                tracker.innerText = `X:${Math.round(x).toString().padStart(3, '0')} Y:${Math.round(y).toString().padStart(3, '0')}`;
             }
         }
-
         window.addEventListener('pointermove', (e) => updatePointer(e.clientX, e.clientY));
-        window.addEventListener('pointerdown', (e) => updatePointer(e.clientX, e.clientY));
 
-        // --- 3. Custom Physics Engine for 3D Tilt (LERP Algorithm) ---
-        // يحل مشكلة الجوال بالكامل؛ حيث يحسب اللمس مباشرة بدقة بدون الحاجة للسحب
-        const tiltCards = document.querySelectorAll('.tilt-card');
-        
-        tiltCards.forEach(card => {
-            // State for each card
-            let state = {
-                targetX: 0, targetY: 0,
-                currentX: 0, currentY: 0,
-                isHovering: false
-            };
+        // --- 4. Desktop Only Tilt Logic (Saves Mobile CPU) ---
+        if (!isTouch) {
+            document.querySelectorAll('.tilt-card').forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left; const y = e.clientY - rect.top;
+                    const rotateX = ((y - rect.height / 2) / (rect.height / 2)) * -10; 
+                    const rotateY = ((x - rect.width / 2) / (rect.width / 2)) * 10;
+                    card.style.transform = `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+                });
+                card.addEventListener('mouseleave', () => card.style.transform = `perspective(1200px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`);
+            });
+        }
 
-            const updateTarget = (clientX, clientY) => {
-                const rect = card.getBoundingClientRect();
-                const x = clientX - rect.left;
-                const y = clientY - rect.top;
-                // Only calculate if inside bounds
-                if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
-                    state.targetX = ((y - rect.height / 2) / (rect.height / 2)) * -12; 
-                    state.targetY = ((x - rect.width / 2) / (rect.width / 2)) * 12;
-                    state.isHovering = true;
-                }
-            };
+        // Basic GSAP Reveals
+        gsap.from('.hero-subtitle', { y: 30, opacity: 0, duration: 1, delay: 0.2 });
+        gsap.from('.hero-title span', { y: 50, opacity: 0, duration: 1, stagger: 0.1, delay: 0.4 });
+        gsap.from('.hero-desc', { opacity: 0, duration: 1, delay: 0.6 });
+        gsap.from('.project-card', { scrollTrigger: { trigger: '.work-section', start: "top 80%" }, y: 50, opacity: 0, duration: 0.8, stagger: 0.1 });
+        gsap.from('.card-3d', { scrollTrigger: { trigger: '.tech-section', start: "top 80%" }, y: 50, opacity: 0, duration: 0.8, stagger: 0.1 });
+        gsap.from('.contact-container', { scrollTrigger: { trigger: '.contact-section', start: "top 85%" }, y: 30, opacity: 0, duration: 0.8 });
 
-            // Touch events specifically mapped for direct screen taps (iOS Safari Fix)
-            card.addEventListener('touchstart', (e) => updateTarget(e.touches[0].clientX, e.touches[0].clientY), {passive: true});
-            card.addEventListener('touchmove', (e) => updateTarget(e.touches[0].clientX, e.touches[0].clientY), {passive: true});
-            card.addEventListener('pointermove', (e) => updateTarget(e.clientX, e.clientY));
-            
-            const resetTilt = () => {
-                state.targetX = 0; state.targetY = 0;
-                state.isHovering = false;
-            };
-            card.addEventListener('touchend', resetTilt);
-            card.addEventListener('pointerleave', resetTilt);
-
-            // Physics Animation Loop for this card
-            const renderTilt = () => {
-                // Lerp (Linear Interpolation) for buttery smooth spring effect
-                state.currentX += (state.targetX - state.currentX) * 0.15;
-                state.currentY += (state.targetY - state.currentY) * 0.15;
-                
-                // Only apply transform if there's significant tilt to save CPU
-                if(Math.abs(state.currentX) > 0.01 || Math.abs(state.currentY) > 0.01 || state.isHovering) {
-                    const scale = state.isHovering ? 1.02 : 1;
-                    card.style.transform = `perspective(1200px) rotateX(${state.currentX}deg) rotateY(${state.currentY}deg) scale3d(${scale}, ${scale}, ${scale})`;
-                }
-                requestAnimationFrame(renderTilt);
-            };
-            renderTilt();
-        });
-
-        // --- 4. WebGL Advanced Magnetic Particles (Three.js Vertex Math) ---
-        // الجسيمات ستتجاوب وتهرب من الماوس عند الاقتراب (Physics Repulsion)
+        // --- 5. Highly Optimized Three.js (Smart Device Detection) ---
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: "high-performance" });
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: !isTouch }); // No antialias on mobile for speed
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.getElementById('webgl-container').appendChild(renderer.domElement);
 
         const structureGroup = new THREE.Group();
         scene.add(structureGroup);
 
-        const knotGeo = new THREE.TorusGeometry(1.5, 0.4, 16, 100);
+        const knotGeo = new THREE.TorusGeometry(1.5, 0.4, 16, isTouch ? 50 : 100); // Lower poly on mobile
         const wireMat = new THREE.MeshBasicMaterial({ color: 0x4A90E2, wireframe: true, transparent: true, opacity: 0.12 });
         const torus = new THREE.Mesh(knotGeo, wireMat);
         structureGroup.add(torus);
@@ -404,77 +420,72 @@
         structureGroup.add(icosahedron);
 
         const particlesGeo = new THREE.BufferGeometry();
-        const particlesCount = window.innerWidth < 768 ? 600 : 1200;
-        
-        // Storing Base positions for physics calculations
+        const particlesCount = isTouch ? 200 : 1000; // Massive reduction for mobile battery/performance
         const posArray = new Float32Array(particlesCount * 3);
         const baseArray = new Float32Array(particlesCount * 3);
         
         for(let i = 0; i < particlesCount * 3; i++) {
             const val = (Math.random() - 0.5) * 12;
-            posArray[i] = val;
-            baseArray[i] = val;
+            posArray[i] = val; baseArray[i] = val;
         }
         
         particlesGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
         const particlesMat = new THREE.PointsMaterial({ size: 0.02, color: 0xffffff, transparent: true, opacity: 0.2, blending: THREE.AdditiveBlending });
         const particlesMesh = new THREE.Points(particlesGeo, particlesMat);
         scene.add(particlesMesh);
-        
         camera.position.z = 3;
 
         const clock = new THREE.Clock();
+        const fpsMeter = document.getElementById('fps-meter');
+        let frameCount = 0; let lastFpsTime = performance.now();
         
         function animate() {
             requestAnimationFrame(animate);
             const t = clock.getElapsedTime();
             const scrollY = window.scrollY;
 
-            // Global Cursor Lerp
-            posX += (mouseX - posX) * 0.25; 
-            posY += (mouseY - posY) * 0.25;
-            if(window.innerWidth > 900) follower.style.transform = `translate(calc(-50% + ${posX}px), calc(-50% + ${posY}px))`;
+            // Live FPS Calculation
+            if(!isTouch) {
+                frameCount++;
+                const now = performance.now();
+                if(now - lastFpsTime >= 1000) {
+                    fpsMeter.innerText = Math.round((frameCount * 1000) / (now - lastFpsTime));
+                    frameCount = 0; lastFpsTime = now;
+                }
+            }
 
-            // Structural Rotations
+            posX += (mouseX - posX) * 0.25; posY += (mouseY - posY) * 0.25;
+            if(!isTouch) follower.style.transform = `translate(calc(-50% + ${posX}px), calc(-50% + ${posY}px))`;
+
             torus.rotation.x = t * 0.1; torus.rotation.y = t * 0.2;
             icosahedron.rotation.x = t * -0.2; icosahedron.rotation.y = t * -0.1;
             structureGroup.position.y = (scrollY * -0.002) + Math.sin(t * 0.5) * 0.1;
             structureGroup.rotation.z = scrollY * 0.001;
             
-            // Mouse Coordinates mapped to WebGL Space (-1 to 1)
-            const webglX = (posX / window.innerWidth) * 2 - 1;
-            const webglY = -(posY / window.innerHeight) * 2 + 1;
-            
-            // Advanced Particle Magnetic Repulsion Logic
-            const positions = particlesMesh.geometry.attributes.position.array;
-            for(let i = 0; i < particlesCount; i++) {
-                const i3 = i * 3;
+            // Only do expensive Vertex Physics on Desktop!
+            if(!isTouch) {
+                const webglX = (posX / window.innerWidth) * 2 - 1;
+                const webglY = -(posY / window.innerHeight) * 2 + 1;
+                const positions = particlesMesh.geometry.attributes.position.array;
                 
-                // Calculate distance from particle to mouse in 3D space
-                const dx = positions[i3] - (webglX * 5); // Scale mouse to scene width
-                const dy = positions[i3+1] - (webglY * 5);
-                const distance = Math.sqrt(dx*dx + dy*dy);
-                
-                // If close, push away. Otherwise return to base position.
-                if (distance < 1.5) {
-                    positions[i3] += dx * 0.02;
-                    positions[i3+1] += dy * 0.02;
-                } else {
-                    // Lerp back to base position smoothly
-                    positions[i3] += (baseArray[i3] - positions[i3]) * 0.05;
-                    positions[i3+1] += (baseArray[i3+1] - positions[i3+1]) * 0.05;
+                for(let i = 0; i < particlesCount; i++) {
+                    const i3 = i * 3;
+                    const dx = positions[i3] - (webglX * 5); 
+                    const dy = positions[i3+1] - (webglY * 5);
+                    const distance = Math.sqrt(dx*dx + dy*dy);
+                    
+                    if (distance < 1.5) {
+                        positions[i3] += dx * 0.02; positions[i3+1] += dy * 0.02;
+                    } else {
+                        positions[i3] += (baseArray[i3] - positions[i3]) * 0.05;
+                        positions[i3+1] += (baseArray[i3+1] - positions[i3+1]) * 0.05;
+                    }
+                    positions[i3+2] = baseArray[i3+2] + Math.sin(t * 2 + positions[i3]) * 0.1;
                 }
-                
-                // Gentle floating wave effect on Z axis
-                positions[i3+2] = baseArray[i3+2] + Math.sin(t * 2 + positions[i3]) * 0.1;
+                particlesMesh.geometry.attributes.position.needsUpdate = true;
             }
             
-            particlesMesh.geometry.attributes.position.needsUpdate = true;
-            
-            // Rotate the entire particle cloud slowly
-            particlesMesh.rotation.y = t * 0.02;
-            particlesMesh.rotation.x = t * 0.01;
-
+            particlesMesh.rotation.y = t * 0.02; particlesMesh.rotation.x = t * 0.01;
             renderer.render(scene, camera);
         }
         animate();
@@ -484,14 +495,6 @@
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
-
-        // Basic GSAP Reveals
-        gsap.from('.hero-subtitle', { y: 30, opacity: 0, duration: 1, delay: 0.2 });
-        gsap.from('.hero-title span', { y: 50, opacity: 0, duration: 1, stagger: 0.1, delay: 0.4 });
-        gsap.from('.hero-desc', { opacity: 0, duration: 1, delay: 0.6 });
-        gsap.from('.project-card', { scrollTrigger: { trigger: '.work-section', start: "top 80%" }, y: 50, opacity: 0, duration: 0.8, stagger: 0.1 });
-        gsap.from('.card-3d', { scrollTrigger: { trigger: '.tech-section', start: "top 80%" }, y: 50, opacity: 0, duration: 0.8, stagger: 0.1 });
-        gsap.from('.contact-container', { scrollTrigger: { trigger: '.contact-section', start: "top 85%" }, y: 30, opacity: 0, duration: 0.8 });
     </script>
 </body>
 </html>
