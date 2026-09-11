@@ -28,26 +28,28 @@
             scroll-behavior: smooth;
         }
 
-        /* Custom Cursor */
-        .cursor {
-            width: 20px; height: 20px;
-            border: 2px solid var(--primary);
-            border-radius: 50%;
+        /* Custom Cursor with Fade Logic */
+        .cursor, .cursor-follower {
             position: fixed;
             pointer-events: none;
             z-index: 9999;
             transform: translate(-50%, -50%);
-            transition: width 0.3s, height 0.3s, background-color 0.3s;
+            transition: width 0.3s, height 0.3s, background-color 0.3s, opacity 0.5s ease;
+            will-change: transform, opacity;
+        }
+        .cursor {
+            width: 20px; height: 20px;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
         }
         .cursor-follower {
             width: 8px; height: 8px;
             background: var(--secondary);
             border-radius: 50%;
-            position: fixed;
-            pointer-events: none;
-            z-index: 9999;
-            transform: translate(-50%, -50%);
-            transition: 0.1s ease-out;
+            transition: transform 0.1s ease-out, opacity 0.5s ease;
+        }
+        .cursor.fade-out, .cursor-follower.fade-out {
+            opacity: 0 !important;
         }
 
         /* 3D WebGL Background */
@@ -59,24 +61,27 @@
             pointer-events: none;
         }
 
-        /* Content Wrapper */
-        .main-content {
-            position: relative;
-            z-index: 10;
-        }
+        .main-content { position: relative; z-index: 10; }
 
         /* Navigation */
         nav {
             position: fixed; width: 100%; top: 0;
-            padding: 30px 50px;
+            padding: 30px 5vw;
             display: flex; justify-content: space-between; align-items: center;
-            mix-blend-mode: difference;
             z-index: 100;
+            transition: background 0.3s, padding 0.3s;
+        }
+        nav.scrolled {
+            background: rgba(3, 3, 5, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 15px 5vw;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
         .logo { font-family: 'Syncopate', sans-serif; font-size: 24px; font-weight: 700; letter-spacing: 2px; }
         .logo span { color: var(--primary); }
+        .nav-links { display: flex; gap: 40px; }
         .nav-links a {
-            color: var(--text); text-decoration: none; margin-left: 40px;
+            color: var(--text); text-decoration: none;
             font-size: 14px; text-transform: uppercase; letter-spacing: 1px;
             position: relative;
         }
@@ -96,7 +101,6 @@
         .hero-subtitle {
             color: var(--primary); font-size: 18px; letter-spacing: 4px;
             text-transform: uppercase; margin-bottom: 20px;
-            overflow: hidden;
         }
         .hero-title {
             font-family: 'Syncopate', sans-serif;
@@ -104,15 +108,11 @@
             margin-bottom: 30px;
         }
         .hero-title span { display: inline-block; }
-        .hero-title .outline {
-            color: transparent;
-            -webkit-text-stroke: 1px rgba(255,255,255,0.3);
-        }
+        .hero-title .outline { color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.3); }
         .hero-desc {
             max-width: 500px; color: var(--text-muted);
             font-size: 18px; line-height: 1.6; margin-bottom: 40px;
         }
-        
         .btn-creative {
             padding: 15px 40px; background: var(--primary);
             border: none; color: #ffffff;
@@ -120,15 +120,9 @@
             position: relative; cursor: none;
             border-radius: 30px; transition: 0.3s; 
             display: inline-block; text-decoration: none;
-            z-index: 10;
         }
-        .btn-creative:hover {
-            background: #357ABD;
-            box-shadow: 0 10px 25px rgba(74, 144, 226, 0.4);
-            transform: translateY(-3px);
-        }
+        .btn-creative:hover { background: #357ABD; box-shadow: 0 10px 25px rgba(74, 144, 226, 0.4); transform: translateY(-3px); }
 
-        /* Shared Section Styles */
         .section-title {
             font-family: 'Syncopate', sans-serif; font-size: 40px;
             margin-bottom: 80px; text-align: center;
@@ -136,31 +130,23 @@
         }
 
         /* Work Section */
-        .work-section { padding: 100px 10vw; position: relative; }
-        .projects-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 40px;
-        }
+        .work-section { padding: 100px 10vw; }
+        .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
         .project-card {
-            height: 450px; position: relative; border-radius: 20px;
-            overflow: hidden; cursor: none;
-            border: 1px solid rgba(255,255,255,0.05);
-            background: #111;
+            height: 400px; position: relative; border-radius: 20px;
+            overflow: hidden; border: 1px solid rgba(255,255,255,0.05); background: #111;
         }
         .project-img {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background-size: cover; background-position: center;
-            transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s;
+            transition: transform 0.8s, filter 0.8s;
             filter: grayscale(80%) brightness(0.5);
         }
-        .project-card:hover .project-img {
-            transform: scale(1.08); filter: grayscale(0%) brightness(0.9);
-        }
+        .project-card:hover .project-img { transform: scale(1.08); filter: grayscale(0%) brightness(0.9); }
         .project-info {
             position: absolute; bottom: -120px; left: 0; width: 100%;
-            padding: 30px; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
-            transition: bottom 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-            display: flex; flex-direction: column; gap: 10px;
+            padding: 30px; background: linear-gradient(to top, rgba(0,0,0,0.95), transparent);
+            transition: bottom 0.5s; display: flex; flex-direction: column; gap: 10px;
         }
         .project-card:hover .project-info { bottom: 0; }
         .project-info h3 { font-size: 24px; font-family: 'Syncopate', sans-serif; }
@@ -168,72 +154,48 @@
         .tech-tags { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
         .tech-tags span { padding: 6px 12px; background: rgba(255,255,255,0.1); border-radius: 20px; font-size: 12px; backdrop-filter: blur(5px); }
 
-        /* Tech Stack Section */
-        .tech-section { padding: 100px 10vw; position: relative; }
-        .grid-3d {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 40px; perspective: 1000px;
-        }
+        /* Expertise Section */
+        .tech-section { padding: 100px 10vw; }
+        .grid-3d { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 40px; perspective: 1000px; }
         .card-3d {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255,255,255,0.05);
             border-radius: 20px; padding: 40px;
             backdrop-filter: blur(10px);
-            transform-style: preserve-3d;
-            transition: transform 0.1s;
+            transform-style: preserve-3d; transition: transform 0.1s;
             position: relative; overflow: hidden;
         }
-        .card-3d::before {
-            content: ''; position: absolute; top: var(--y, 0); left: var(--x, 0);
-            width: 300px; height: 300px;
-            background: radial-gradient(circle closest-side, rgba(74, 144, 226, 0.15), transparent);
-            transform: translate(-50%, -50%);
-            transition: width 0.2s, height 0.2s; pointer-events: none;
-        }
-        .card-3d h3 { font-size: 28px; margin-bottom: 15px; transform: translateZ(50px); }
-        .card-3d p { color: var(--text-muted); transform: translateZ(30px); line-height: 1.6;}
-        .card-3d i { font-size: 50px; color: var(--secondary); margin-bottom: 20px; transform: translateZ(60px); }
-        .card-3d .tech-tags { transform: translateZ(40px); }
+        .card-3d h3 { font-size: 24px; margin-bottom: 15px; transform: translateZ(30px); }
+        .card-3d p { color: var(--text-muted); transform: translateZ(20px); line-height: 1.6;}
+        .card-3d i { font-size: 40px; color: var(--secondary); margin-bottom: 20px; transform: translateZ(40px); }
+        .card-3d .tech-tags { transform: translateZ(20px); margin-top: 20px;}
 
         /* Contact Section */
-        .contact-section { padding: 100px 10vw 150px; position: relative; }
+        .contact-section { padding: 100px 10vw 150px; }
         .contact-container {
             display: flex; gap: 60px; flex-wrap: wrap;
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.05);
-            padding: 60px; border-radius: 30px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
+            padding: 60px; border-radius: 30px; backdrop-filter: blur(10px);
         }
-        .contact-info { flex: 1; min-width: 300px; }
+        .contact-info { flex: 1; min-width: 250px; }
         .contact-info h3 { font-size: 32px; font-family: 'Syncopate', sans-serif; margin-bottom: 20px; }
         .contact-info p { color: var(--text-muted); line-height: 1.6; margin-bottom: 40px; }
-        
-        /* Magnetic Socials */
         .social-links { display: flex; gap: 20px; }
         .magnetic-btn {
-            width: 60px; height: 60px; border-radius: 50%;
-            border: 1px solid rgba(255,255,255,0.2);
-            display: flex; justify-content: center; align-items: center;
-            font-size: 20px; color: var(--text); text-decoration: none;
+            width: 60px; height: 60px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2);
+            display: flex; justify-content: center; align-items: center; font-size: 20px; color: var(--text); text-decoration: none;
             transition: background 0.3s, color 0.3s, border-color 0.3s;
-            cursor: none;
         }
         .magnetic-btn:hover { background: var(--primary); border-color: var(--primary); color: #fff; }
 
-        /* Form Fixes */
-        .contact-form { flex: 1.5; min-width: 300px; display: flex; flex-direction: column; gap: 35px; }
+        .contact-form { flex: 1.5; min-width: 250px; display: flex; flex-direction: column; gap: 35px; }
         .input-group { position: relative; }
         .input-group input, .input-group textarea {
-            width: 100%; background: transparent; border: none;
-            border-bottom: 2px solid rgba(255,255,255,0.2);
-            color: var(--text); padding: 10px 0; font-family: inherit;
-            font-size: 16px; outline: none; transition: 0.3s;
-            resize: none;
+            width: 100%; background: transparent; border: none; border-bottom: 2px solid rgba(255,255,255,0.2);
+            color: var(--text); padding: 10px 0; font-family: inherit; font-size: 16px; outline: none; transition: 0.3s; resize: none;
         }
         .input-group label {
-            position: absolute; top: 10px; left: 0;
-            color: var(--text-muted); pointer-events: none; transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: absolute; top: 10px; left: 0; color: var(--text-muted); pointer-events: none; transition: 0.3s;
         }
         .input-group input:focus ~ label, .input-group input:valid ~ label,
         .input-group textarea:focus ~ label, .input-group textarea:valid ~ label {
@@ -241,26 +203,37 @@
         }
         .input-group input:focus, .input-group textarea:focus { border-bottom-color: var(--primary); }
 
-        /* Fixed Button Container */
-        .submit-wrapper {
-            margin-top: 10px; /* ضمان المسافة تحت ال textarea مباشرة */
-            display: flex;
-        }
-
-        /* Footer */
         footer { padding: 50px 10vw; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); }
 
+        /* Mobile & Tablet Specific Fixes */
+        @media (max-width: 900px) {
+            nav { flex-direction: column; gap: 15px; padding: 20px; }
+            nav.scrolled { padding: 15px; }
+            .nav-links { gap: 20px; }
+            
+            .hero { text-align: center; align-items: center; padding: 0 5vw; }
+            .hero-title { font-size: 12vw; }
+            .section-title { font-size: 30px; margin-bottom: 50px; }
+            
+            /* Keep project info visible on mobile */
+            .project-info { bottom: 0; background: linear-gradient(to top, rgba(0,0,0,1), rgba(0,0,0,0.4)); }
+            .project-card:hover .project-img { transform: none; filter: grayscale(50%) brightness(0.6); }
+            
+            .contact-container { padding: 30px; gap: 40px; }
+            
+            /* Reset specific cursor properties for mobile */
+            body, .btn-creative, .project-card, .magnetic-btn, a, input, textarea { cursor: auto !important; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="cursor"></div>
-    <div class="cursor-follower"></div>
-
+    <div class="cursor fade-out"></div>
+    <div class="cursor-follower fade-out"></div>
     <div id="webgl-container"></div>
 
     <div class="main-content">
-        <nav>
+        <nav id="navbar">
             <div class="logo">MOHAMMAD<span>.</span></div>
             <div class="nav-links">
                 <a href="#work" class="hover-target">Work</a>
@@ -271,14 +244,9 @@
 
         <section class="hero">
             <div class="hero-subtitle">Based in Amman, Jordan</div>
-            <h1 class="hero-title">
-                <span class="outline">Creative</span><br>
-                <span>Developer</span>
-            </h1>
+            <h1 class="hero-title"><span class="outline">Creative</span><br><span>Developer</span></h1>
             <p class="hero-desc">Bridging the gap between engineering logic and aesthetic design. I build immersive, high-performance web applications using modern technologies.</p>
-            <div>
-                <a href="#work" class="btn-creative hover-target">Explore Projects</a>
-            </div>
+            <div><a href="#work" class="btn-creative hover-target">Explore Projects</a></div>
         </section>
 
         <section class="work-section" id="work">
@@ -289,31 +257,23 @@
                     <div class="project-info">
                         <h3>EduTech Platform</h3>
                         <p>A full-stack learning management system with live streaming, gamification, and a custom dashboard.</p>
-                        <div class="tech-tags">
-                            <span>React</span> <span>Firebase</span> <span>Node.js</span>
-                        </div>
+                        <div class="tech-tags"><span>React</span> <span>Firebase</span> <span>Node.js</span></div>
                     </div>
                 </div>
-
                 <div class="project-card hover-target">
                     <div class="project-img" style="background-image: url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop');"></div>
                     <div class="project-info">
                         <h3>FinTech Dashboard</h3>
                         <p>A high-performance financial analytics dashboard featuring real-time data visualization and secure auth.</p>
-                        <div class="tech-tags">
-                            <span>Next.js</span> <span>TypeScript</span> <span>Tailwind</span>
-                        </div>
+                        <div class="tech-tags"><span>Next.js</span> <span>TypeScript</span> <span>Tailwind</span></div>
                     </div>
                 </div>
-
                 <div class="project-card hover-target">
                     <div class="project-img" style="background-image: url('https://images.unsplash.com/photo-1618761714954-0b8cd0026356?q=80&w=2070&auto=format&fit=crop');"></div>
                     <div class="project-info">
                         <h3>3D Web Experience</h3>
                         <p>An immersive portfolio utilizing WebGL and Three.js to render complex 3D environments in the browser.</p>
-                        <div class="tech-tags">
-                            <span>Three.js</span> <span>GSAP</span> <span>WebGL</span>
-                        </div>
+                        <div class="tech-tags"><span>Three.js</span> <span>GSAP</span> <span>WebGL</span></div>
                     </div>
                 </div>
             </div>
@@ -324,27 +284,21 @@
             <div class="grid-3d">
                 <div class="card-3d hover-target">
                     <i class="fas fa-code"></i>
-                    <h3>Frontend Engineering</h3>
-                    <p>Crafting pixel-perfect, highly interactive interfaces with complex animations and state management.</p>
-                    <div class="tech-tags">
-                        <span>React.js</span> <span>JavaScript (ES6+)</span> <span>HTML/CSS</span>
-                    </div>
+                    <h3>Frontend</h3>
+                    <p>Crafting pixel-perfect, highly interactive interfaces with complex animations.</p>
+                    <div class="tech-tags"><span>React.js</span> <span>JavaScript</span> <span>HTML/CSS</span></div>
                 </div>
                 <div class="card-3d hover-target">
                     <i class="fas fa-server"></i>
-                    <h3>Backend & Architecture</h3>
-                    <p>Designing secure, scalable databases and logic systems that power robust applications.</p>
-                    <div class="tech-tags">
-                        <span>Firebase</span> <span>Node.js</span> <span>Algorithms</span>
-                    </div>
+                    <h3>Backend</h3>
+                    <p>Designing secure, scalable databases and logic systems that power robust apps.</p>
+                    <div class="tech-tags"><span>Firebase</span> <span>Node.js</span> <span>C++</span></div>
                 </div>
                 <div class="card-3d hover-target">
                     <i class="fas fa-layer-group"></i>
-                    <h3>UI / UX Design</h3>
-                    <p>Translating user needs into intuitive digital experiences focusing on modern trends like glassmorphism.</p>
-                    <div class="tech-tags">
-                        <span>Figma</span> <span>Prototyping</span> <span>3D Integration</span>
-                    </div>
+                    <h3>UI/UX</h3>
+                    <p>Translating user needs into intuitive digital experiences and modern trends.</p>
+                    <div class="tech-tags"><span>Figma</span> <span>Prototyping</span> <span>3D</span></div>
                 </div>
             </div>
         </section>
@@ -355,16 +309,13 @@
                 <div class="contact-info">
                     <h3>Let's build something impossible.</h3>
                     <p>Whether you have a project in mind, looking for a technical partner, or just want to say hi, feel free to drop a message.</p>
-                    
                     <div class="social-links">
-                        <a href="https://www.linkedin.com/in/mohammad-saleh-104927373?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank" class="magnetic-btn hover-target"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="https://www.linkedin.com/in/mohammad-saleh-104927373" target="_blank" class="magnetic-btn hover-target"><i class="fab fa-linkedin-in"></i></a>
                         <a href="mailto:mohalisal1@hotmail.com" class="magnetic-btn hover-target"><i class="fas fa-envelope"></i></a>
                     </div>
                 </div>
-
                 <form action="https://formsubmit.co/mohalisal1@hotmail.com" method="POST" class="contact-form">
                     <input type="hidden" name="_captcha" value="false">
-                    
                     <div class="input-group">
                         <input type="text" name="name" required id="name">
                         <label for="name">What's your name?</label>
@@ -377,17 +328,14 @@
                         <textarea name="message" required id="message" rows="4"></textarea>
                         <label for="message">Tell me about your project</label>
                     </div>
-                    
-                    <div class="submit-wrapper">
+                    <div style="margin-top: 10px;">
                         <button type="submit" class="btn-creative hover-target" style="width: 100%; text-align: center;">Send Message</button>
                     </div>
                 </form>
             </div>
         </section>
 
-        <footer>
-            <p style="color: var(--text-muted);">© 2026 Mohammad Saleh. Crafted with passion.</p>
-        </footer>
+        <footer><p style="color: var(--text-muted);">© 2026 Mohammad Saleh. Crafted with passion.</p></footer>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -395,176 +343,135 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <script>
-        // 1. Custom Cursor Logic (Restored for all devices)
+        // Nav blur effect on scroll
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 50) nav.classList.add('scrolled');
+            else nav.classList.remove('scrolled');
+        });
+
+        // Smart Cursor Logic
         const cursor = document.querySelector('.cursor');
         const follower = document.querySelector('.cursor-follower');
         const hoverTargets = document.querySelectorAll('.hover-target');
+        const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
+        
+        let mouseX = window.innerWidth / 2; let mouseY = window.innerHeight / 2;
+        let posX = window.innerWidth / 2; let posY = window.innerHeight / 2;
+        let fadeTimeout;
 
-        let mouseX = window.innerWidth / 2;
-        let mouseY = window.innerHeight / 2;
-        let posX = window.innerWidth / 2;
-        let posY = window.innerHeight / 2;
+        function wakeCursor(x, y) {
+            mouseX = x; mouseY = y;
+            cursor.style.left = x + 'px'; cursor.style.top = y + 'px';
+            cursor.classList.remove('fade-out'); follower.classList.remove('fade-out');
+            
+            clearTimeout(fadeTimeout);
+            if (isTouchDevice) {
+                fadeTimeout = setTimeout(() => {
+                    cursor.classList.add('fade-out'); follower.classList.add('fade-out');
+                }, 2000);
+            }
+        }
 
-        document.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX; mouseY = e.clientY;
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-        });
+        document.addEventListener('mousemove', (e) => wakeCursor(e.clientX, e.clientY));
+        document.addEventListener('touchmove', (e) => wakeCursor(e.touches[0].clientX, e.touches[0].clientY));
 
         gsap.ticker.add(() => {
-            posX += (mouseX - posX) * 0.1;
-            posY += (mouseY - posY) * 0.1;
-            follower.style.left = posX + 'px';
-            follower.style.top = posY + 'px';
+            posX += (mouseX - posX) * 0.1; posY += (mouseY - posY) * 0.1;
+            follower.style.transform = `translate(calc(-50% + ${posX}px), calc(-50% + ${posY}px))`;
         });
 
-        hoverTargets.forEach(target => {
-            target.addEventListener('mouseenter', () => {
-                cursor.style.width = '60px'; cursor.style.height = '60px';
-                cursor.style.backgroundColor = 'rgba(74, 144, 226, 0.1)';
-            });
-            target.addEventListener('mouseleave', () => {
-                cursor.style.width = '20px'; cursor.style.height = '20px';
-                cursor.style.backgroundColor = 'transparent';
-            });
-        });
-
-        // 2. Magnetic Buttons Logic (Restored)
-        const magneticBtns = document.querySelectorAll('.magnetic-btn');
-        magneticBtns.forEach(btn => {
-            btn.addEventListener('mousemove', function(e) {
-                const position = btn.getBoundingClientRect();
-                const x = e.clientX - position.left - position.width / 2;
-                const y = e.clientY - position.top - position.height / 2;
-                
-                gsap.to(btn, { x: x * 0.4, y: y * 0.4, duration: 0.3, ease: "power2.out" });
-                gsap.to(btn.children[0], { x: x * 0.2, y: y * 0.2, duration: 0.3, ease: "power2.out" });
-            });
-            btn.addEventListener('mouseleave', function() {
-                gsap.to(btn, { x: 0, y: 0, duration: 0.5, ease: "elastic.out(1, 0.3)" });
-                gsap.to(btn.children[0], { x: 0, y: 0, duration: 0.5, ease: "elastic.out(1, 0.3)" });
-            });
-        });
-
-        // 3. Impossible 3D Tilt Effect for Cards
-        const cards = document.querySelectorAll('.card-3d');
-        cards.forEach(card => {
-            card.addEventListener('mousemove', (e) => {
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                
-                card.style.setProperty('--x', `${x}px`);
-                card.style.setProperty('--y', `${y}px`);
-
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-                const rotateX = ((y - centerY) / centerY) * -15; 
-                const rotateY = ((x - centerX) / centerX) * 15;
-
-                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
+        if (!isTouchDevice) {
+            hoverTargets.forEach(target => {
+                target.addEventListener('mouseenter', () => {
+                    cursor.style.width = '60px'; cursor.style.height = '60px'; cursor.style.backgroundColor = 'rgba(74, 144, 226, 0.1)';
+                });
+                target.addEventListener('mouseleave', () => {
+                    cursor.style.width = '20px'; cursor.style.height = '20px'; cursor.style.backgroundColor = 'transparent';
+                });
             });
 
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+            // 3D Tilt for Desktop
+            document.querySelectorAll('.card-3d').forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left; const y = e.clientY - rect.top;
+                    const rotateX = ((y - rect.height / 2) / (rect.height / 2)) * -10; 
+                    const rotateY = ((x - rect.width / 2) / (rect.width / 2)) * 10;
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+                });
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+                });
             });
-        });
 
-        // 4. GSAP Scroll Animations
+            // Magnetic Buttons for Desktop
+            document.querySelectorAll('.magnetic-btn').forEach(btn => {
+                btn.addEventListener('mousemove', function(e) {
+                    const position = btn.getBoundingClientRect();
+                    const x = e.clientX - position.left - position.width / 2;
+                    const y = e.clientY - position.top - position.height / 2;
+                    gsap.to(btn, { x: x * 0.4, y: y * 0.4, duration: 0.3 });
+                    gsap.to(btn.children[0], { x: x * 0.2, y: y * 0.2, duration: 0.3 });
+                });
+                btn.addEventListener('mouseleave', function() {
+                    gsap.to(btn, { x: 0, y: 0, duration: 0.5, ease: "elastic.out(1, 0.3)" });
+                    gsap.to(btn.children[0], { x: 0, y: 0, duration: 0.5, ease: "elastic.out(1, 0.3)" });
+                });
+            });
+        }
+
+        // GSAP Scroll Animations
         gsap.registerPlugin(ScrollTrigger);
-
-        gsap.from('.hero-subtitle', { y: 50, opacity: 0, duration: 1, delay: 0.5 });
-        gsap.from('.hero-title span', { y: 100, opacity: 0, duration: 1.2, stagger: 0.2, ease: "power4.out", delay: 0.7 });
-        gsap.from('.hero-desc', { opacity: 0, duration: 1, delay: 1.2 });
-        gsap.from('.btn-creative', { opacity: 0, scale: 0.8, duration: 1, delay: 1.5 });
-
+        gsap.from('.hero-subtitle', { y: 30, opacity: 0, duration: 1, delay: 0.2 });
+        gsap.from('.hero-title span', { y: 50, opacity: 0, duration: 1, stagger: 0.1, delay: 0.4 });
+        gsap.from('.hero-desc', { opacity: 0, duration: 1, delay: 0.6 });
+        
         gsap.utils.toArray('.reveal-text').forEach(title => {
-            gsap.from(title, {
-                scrollTrigger: { trigger: title, start: "top 80%" },
-                y: 50, opacity: 0, duration: 1, ease: "power3.out"
-            });
+            gsap.from(title, { scrollTrigger: { trigger: title, start: "top 85%" }, y: 30, opacity: 0, duration: 0.8 });
         });
+        gsap.from('.project-card', { scrollTrigger: { trigger: '.work-section', start: "top 80%" }, y: 50, opacity: 0, duration: 0.8, stagger: 0.1 });
+        gsap.from('.card-3d', { scrollTrigger: { trigger: '.tech-section', start: "top 80%" }, y: 50, opacity: 0, duration: 0.8, stagger: 0.1 });
+        gsap.from('.contact-container', { scrollTrigger: { trigger: '.contact-section', start: "top 85%" }, y: 30, opacity: 0, duration: 0.8 });
 
-        gsap.from('.project-card', {
-            scrollTrigger: { trigger: '.work-section', start: "top 70%" },
-            y: 100, opacity: 0, duration: 1, stagger: 0.2, ease: "power3.out"
-        });
-
-        gsap.from('.card-3d', {
-            scrollTrigger: { trigger: '.tech-section', start: "top 70%" },
-            y: 100, opacity: 0, duration: 1, stagger: 0.2, ease: "back.out(1.7)"
-        });
-
-        gsap.from('.contact-container', {
-            scrollTrigger: { trigger: '.contact-section', start: "top 85%" },
-            y: 50, opacity: 0, duration: 1, ease: "power3.out"
-        });
-
-        // 5. Three.js - Advanced Scene with Particles & Torus Knot
+        // Three.js Background
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-        
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.getElementById('webgl-container').appendChild(renderer.domElement);
 
-        // -- Add Advanced 3D Object (Torus Knot) --
-        const knotGeometry = new THREE.TorusKnotGeometry(1.2, 0.3, 100, 16);
-        const knotMaterial = new THREE.MeshBasicMaterial({ 
-            color: 0x4A90E2, 
-            wireframe: true, 
-            transparent: true, 
-            opacity: 0.15 
-        });
-        const torusKnot = new THREE.Mesh(knotGeometry, knotMaterial);
+        const knotGeo = new THREE.TorusKnotGeometry(1.2, 0.3, 100, 16);
+        const knotMat = new THREE.MeshBasicMaterial({ color: 0x4A90E2, wireframe: true, transparent: true, opacity: 0.15 });
+        const torusKnot = new THREE.Mesh(knotGeo, knotMat);
         scene.add(torusKnot);
 
-        // -- Add Background Particles --
         const particlesGeo = new THREE.BufferGeometry();
-        const particlesCount = 1500;
+        const particlesCount = window.innerWidth < 768 ? 500 : 1500; // Less particles on mobile for performance
         const posArray = new Float32Array(particlesCount * 3);
-
-        for(let i = 0; i < particlesCount * 3; i++) {
-            posArray[i] = (Math.random() - 0.5) * 12;
-        }
+        for(let i = 0; i < particlesCount * 3; i++) posArray[i] = (Math.random() - 0.5) * 12;
         particlesGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-        const particlesMat = new THREE.PointsMaterial({
-            size: 0.015, color: 0xffffff, transparent: true,
-            opacity: 0.3, blending: THREE.AdditiveBlending
-        });
+        const particlesMat = new THREE.PointsMaterial({ size: 0.015, color: 0xffffff, transparent: true, opacity: 0.3, blending: THREE.AdditiveBlending });
         const particlesMesh = new THREE.Points(particlesGeo, particlesMat);
         scene.add(particlesMesh);
-
         camera.position.z = 3;
 
         let targetX = 0; let targetY = 0;
-        const windowHalfX = window.innerWidth / 2;
-        const windowHalfY = window.innerHeight / 2;
-
-        document.addEventListener('mousemove', (event) => {
-            targetX = (event.clientX - windowHalfX) * 0.002;
-            targetY = (event.clientY - windowHalfY) * 0.002;
+        document.addEventListener('mousemove', (e) => {
+            targetX = (e.clientX - window.innerWidth / 2) * 0.002; targetY = (e.clientY - window.innerHeight / 2) * 0.002;
         });
 
         const clock = new THREE.Clock();
-        
         function animate() {
             requestAnimationFrame(animate);
-            const elapsedTime = clock.getElapsedTime();
-            const scrollY = window.scrollY; // Get current scroll position
+            const t = clock.getElapsedTime();
+            const scrollY = window.scrollY;
 
-            // Animate Torus Knot (Rotation + React to Mouse + React to Scroll Depth)
-            torusKnot.rotation.x = elapsedTime * 0.2;
-            torusKnot.rotation.y = elapsedTime * 0.3;
-            // The magic trick: Link scroll to the object's Y position and rotation
-            torusKnot.position.y = (scrollY * -0.003) + Math.sin(elapsedTime) * 0.1;
-            torusKnot.rotation.z = scrollY * 0.002;
-
-            // Animate Particles
-            particlesMesh.rotation.y = elapsedTime * 0.05;
-            particlesMesh.rotation.x = elapsedTime * 0.02;
-            particlesMesh.rotation.y += 0.5 * (targetX - particlesMesh.rotation.y);
-            particlesMesh.rotation.x += 0.5 * (targetY - particlesMesh.rotation.x);
+            torusKnot.rotation.x = t * 0.2; torusKnot.rotation.y = t * 0.3;
+            torusKnot.position.y = (scrollY * -0.002) + Math.sin(t) * 0.1;
+            
+            particlesMesh.rotation.y = t * 0.05 + (targetX * 0.5);
+            particlesMesh.rotation.x = t * 0.02 + (targetY * 0.5);
 
             renderer.render(scene, camera);
         }
