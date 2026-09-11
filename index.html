@@ -351,23 +351,24 @@
                     <p>Whether you have a project in mind, looking for a technical partner, or just want to say hi, feel free to drop a message.</p>
                     
                     <div class="social-links">
-                        <a href="#" class="magnetic-btn hover-target"><i class="fab fa-github"></i></a>
-                        <a href="#" class="magnetic-btn hover-target"><i class="fab fa-linkedin-in"></i></a>
-                        <a href="#" class="magnetic-btn hover-target"><i class="fab fa-twitter"></i></a>
+                        <a href="https://www.linkedin.com/in/mohammad-saleh-104927373?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank" class="magnetic-btn hover-target"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="mailto:mohalisal1@hotmail.com" class="magnetic-btn hover-target"><i class="fas fa-envelope"></i></a>
                     </div>
                 </div>
 
-                <form class="contact-form">
+                <form action="https://formsubmit.co/mohalisal1@hotmail.com" method="POST" class="contact-form">
+                    <input type="hidden" name="_captcha" value="false">
+                    
                     <div class="input-group">
-                        <input type="text" required id="name">
+                        <input type="text" name="name" required id="name">
                         <label for="name">What's your name?</label>
                     </div>
                     <div class="input-group">
-                        <input type="email" required id="email">
+                        <input type="email" name="email" required id="email">
                         <label for="email">Your email address</label>
                     </div>
                     <div class="input-group">
-                        <textarea required id="message" rows="4"></textarea>
+                        <textarea name="message" required id="message" rows="4"></textarea>
                         <label for="message">Tell me about your project</label>
                     </div>
                     <div>
@@ -427,9 +428,7 @@
                 const x = e.pageX - position.left - position.width / 2;
                 const y = e.pageY - position.top - position.height / 2;
                 
-                // Pull effect
                 gsap.to(btn, { x: x * 0.4, y: y * 0.4, duration: 0.3, ease: "power2.out" });
-                // Move icon slightly more for parallax
                 gsap.to(btn.children[0], { x: x * 0.2, y: y * 0.2, duration: 0.3, ease: "power2.out" });
             });
             btn.addEventListener('mouseleave', function() {
@@ -465,13 +464,11 @@
         // 4. GSAP Scroll Animations
         gsap.registerPlugin(ScrollTrigger);
 
-        // Hero Init
         gsap.from('.hero-subtitle', { y: 50, opacity: 0, duration: 1, delay: 0.5 });
         gsap.from('.hero-title span', { y: 100, opacity: 0, duration: 1.2, stagger: 0.2, ease: "power4.out", delay: 0.7 });
         gsap.from('.hero-desc', { opacity: 0, duration: 1, delay: 1.2 });
         gsap.from('.btn-creative', { opacity: 0, scale: 0.8, duration: 1, delay: 1.5 });
 
-        // Section Titles
         gsap.utils.toArray('.reveal-text').forEach(title => {
             gsap.from(title, {
                 scrollTrigger: { trigger: title, start: "top 80%" },
@@ -479,19 +476,16 @@
             });
         });
 
-        // Project Cards
         gsap.from('.project-card', {
             scrollTrigger: { trigger: '.work-section', start: "top 70%" },
             y: 100, opacity: 0, duration: 1, stagger: 0.2, ease: "power3.out"
         });
 
-        // Expertise Cards
         gsap.from('.card-3d', {
             scrollTrigger: { trigger: '.tech-section', start: "top 70%" },
             y: 100, opacity: 0, duration: 1, stagger: 0.2, ease: "back.out(1.7)"
         });
 
-        // Contact Section
         gsap.from('.contact-container', {
             scrollTrigger: { trigger: '.contact-section', start: "top 75%" },
             y: 50, opacity: 0, duration: 1, ease: "power3.out"
