@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinTech Core | Live Telemetry</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <style>
+        :root {
+            --bg-dark: #0a0f18; --panel-bg: rgba(17, 24, 39, 0.7); --border-color: rgba(74, 144, 226, 0.15);
+            --primary: #3b82f6; --success: #10b981; --danger: #ef4444; --text-main: #f8fafc; --text-muted: #94a3b8;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Space Grotesk', sans-serif; background-color: var(--bg-dark); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+
+        /* Sidebar Architecture */
+        .sidebar { width: 260px; background: rgba(10, 15, 24, 0.95); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 30px 20px; z-index: 100; }
+        .brand { font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 50px; display: flex; align-items: center; gap: 10px; }
+        .brand i { color: var(--primary); }
+        .nav-item { display: flex; align-items: center; gap: 15px; padding: 15px; color: var(--text-muted); text-decoration: none; border-radius: 10px; transition: 0.3s; margin-bottom: 10px; }
+        .nav-item:hover, .nav-item.active { background: rgba(59, 130, 246, 0.1); color: var(--primary); }
+        .return-btn { margin-top: auto; padding: 15px; text-align: center; border: 1px solid var(--primary); color: var(--primary); border-radius: 10px; text-decoration: none; transition: 0.3s; font-family: 'Share Tech Mono', monospace; }
+        .return-btn:hover { background: var(--primary); color: #fff; box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
+
+        /* Main Dashboard Area */
+        .main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow-y: auto; padding: 30px; }
+        
+        /* Header */
+        .top-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .header-title h1 { font-size: 28px; font-weight: 700; }
+        .header-title p { color: var(--text-muted); font-family: 'Share Tech Mono', monospace; font-size: 13px; margin-top: 5px; }
+        .sys-status { display: flex; align-items: center; gap: 10px; background: rgba(16, 185, 129, 0.1); padding: 8px 15px; border-radius: 20px; color: var(--success); font-family: 'Share Tech Mono', monospace; font-size: 12px; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .sys-status i { animation: blink 1.5s infinite; }
+
+        /* Telemetry Grid (Stats) */
+        .telemetry-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 25px; margin-bottom: 30px; }
+        .stat-card { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 25px; backdrop-filter: blur(10px); position: relative; overflow: hidden; }
+        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--primary); }
+        .stat-card.success::before { background: var(--success); }
+        .stat-card.danger::before { background: var(--danger); }
+        .stat-label { color: var(--text-muted); font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+        .stat-value { font-size: 32px; font-weight: 700; display: flex; align-items: baseline; gap: 10px; font-family: 'Share Tech Mono', monospace; }
+        .stat-change { font-size: 14px; border-radius: 4px; padding: 2px 6px; }
+        .change-up { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .change-down { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+
+        /* Charts Layout */
+        .charts-container { display: grid; grid-template-columns: 2fr 1fr; gap: 25px; margin-bottom: 30px; }
+        .chart-panel { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 25px; backdrop-filter: blur(10px); }
+        .panel-header { display: flex; justify-content: space-between; margin-bottom: 20px; color: var(--text-main); font-weight: 600; }
+        .chart-wrapper { width: 100%; height: 300px; position: relative; }
+
+        /* Live Transactions Table */
+        .table-panel { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 25px; backdrop-filter: blur(10px); }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { color: var(--text-muted); font-weight: 600; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); font-size: 13px; text-transform: uppercase; }
+        td { padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.02); font-family: 'Share Tech Mono', monospace; font-size: 14px; }
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-family: 'Space Grotesk', sans-serif; font-weight: bold; }
+        .status-completed { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .status-pending { background: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
+
+        /* Loading Overlay */
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-dark); z-index: 9999; display: flex; justify-content: center; align-items: center; color: var(--primary); font-family: 'Share Tech Mono', monospace; font-size: 20px; transition: 0.5s; }
+
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        @media (max-width: 1024px) { .charts-container { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .telemetry-grid { grid-template-columns: 1fr; }
+            .top-header { flex-direction: column; align-items: flex-start; gap: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Loading Screen -->
+    <div id="loader"><i class="fas fa-circle-notch fa-spin"></i> &nbsp; ESTABLISHING SOCKET CONNECTION...</div>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="brand"><i class="fas fa-layer-group"></i> FinTech Core</div>
+        <a href="#" class="nav-item active"><i class="fas fa-chart-line"></i> Dashboard</a>
+        <a href="#" class="nav-item"><i class="fas fa-wallet"></i> Portfolios</a>
+        <a href="#" class="nav-item"><i class="fas fa-exchange-alt"></i> Transactions</a>
+        <a href="#" class="nav-item"><i class="fas fa-shield-alt"></i> Security</a>
+        <a href="#" class="nav-item"><i class="fas fa-terminal"></i> API Logs</a>
+        
+        <a href="index.html" class="return-btn"><i class="fas fa-arrow-left"></i> RETURN TO MAIN</a>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="top-header">
+            <div class="header-title">
+                <h1>Global Telemetry</h1>
+                <p>SERVER: NODE-7 | LATENCY: <span id="ping" style="color: var(--success);">12ms</span></p>
+            </div>
+            <div class="sys-status">
+                <i class="fas fa-circle"></i> LIVE MARKET DATA
+            </div>
+        </header>
+
+        <!-- Stats Grid -->
+        <div class="telemetry-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Volume (24H)</div>
+                <div class="stat-value">$<span id="vol-val">4,289,102.55</span> <span class="stat-change change-up" id="vol-change">+2.4% <i class="fas fa-arrow-up"></i></span></div>
+            </div>
+            <div class="stat-card success">
+                <div class="stat-label">Active Nodes</div>
+                <div class="stat-value"><span id="nodes-val">1,842</span> <span class="stat-change change-up">+12 <i class="fas fa-arrow-up"></i></span></div>
+            </div>
+            <div class="stat-card danger">
+                <div class="stat-label">Network Load</div>
+                <div class="stat-value"><span id="load-val">84.2</span>% <span class="stat-change change-down" id="load-change">-1.5% <i class="fas fa-arrow-down"></i></span></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Transactions/Sec</div>
+                <div class="stat-value"><span id="tps-val">3,492</span> <span class="stat-change change-up">+8.1% <i class="fas fa-arrow-up"></i></span></div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-container">
+            <div class="chart-panel">
+                <div class="panel-header"><span>Liquidity Flow (USD)</span> <span><i class="fas fa-expand"></i></span></div>
+                <div class="chart-wrapper"><canvas id="mainChart"></canvas></div>
+            </div>
+            <div class="chart-panel">
+                <div class="panel-header"><span>Asset Distribution</span></div>
+                <div class="chart-wrapper"><canvas id="doughnutChart"></canvas></div>
+            </div>
+        </div>
+
+        <!-- Data Table -->
+        <div class="table-panel">
+            <div class="panel-header"><span>Recent Executions (Real-Time)</span></div>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr><th>Tx Hash</th><th>Timestamp</th><th>Type</th><th>Amount (USD)</th><th>Status</th></tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <tr><td>0x8f...4a2b</td><td>2026-09-12 10:42:01</td><td>Smart Contract</td><td>$14,500.00</td><td><span class="status-badge status-completed">CONFIRMED</span></td></tr>
+                        <tr><td>0x3c...9d1f</td><td>2026-09-12 10:41:45</td><td>Liquidity Pool</td><td>$8,230.50</td><td><span class="status-badge status-pending">PROCESSING</span></td></tr>
+                        <tr><td>0x1a...7e8c</td><td>2026-09-12 10:40:12</td><td>P2P Transfer</td><td>$1,150.25</td><td><span class="status-badge status-completed">CONFIRMED</span></td></tr>
+                        <tr><td>0x9b...2c4d</td><td>2026-09-12 10:39:55</td><td>Arbitrage</td><td>$42,100.80</td><td><span class="status-badge status-completed">CONFIRMED</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Remove Loader & Play Animations
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loader').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('loader').style.display = 'none';
+                    // GSAP Reveal Animations
+                    gsap.from('.sidebar', { x: -100, opacity: 0, duration: 0.8, ease: "power3.out" });
+                    gsap.from('.top-header', { y: -20, opacity: 0, duration: 0.8, delay: 0.2 });
+                    gsap.from('.stat-card', { y: 30, opacity: 0, duration: 0.6, stagger: 0.1, delay: 0.3 });
+                    gsap.from('.chart-panel', { scale: 0.95, opacity: 0, duration: 0.6, stagger: 0.2, delay: 0.5 });
+                    gsap.from('.table-panel', { y: 30, opacity: 0, duration: 0.6, delay: 0.8 });
+                }, 500);
+            }, 1000);
+        });
+
+        // Setup Chart.js Defaults for Dark Mode
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.font.family = "'Share Tech Mono', monospace";
+
+        // Main Line Chart
+        const ctxMain = document.getElementById('mainChart').getContext('2d');
+        let gradient = ctxMain.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, 'rgba(59, 130, 246, 0.5)');
+        gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
+
+        const mainChart = new Chart(ctxMain, {
+            type: 'line',
+            data: {
+                labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '24:00'],
+                datasets: [{
+                    label: 'Volume',
+                    data: [12000, 19000, 15000, 28000, 22000, 34000, 31000],
+                    borderColor: '#3b82f6',
+                    backgroundColor: gradient,
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#10b981',
+                    pointBorderColor: '#fff',
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: false, grid: { color: 'rgba(255,255,255,0.05)' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // Doughnut Chart
+        const ctxDoughnut = document.getElementById('doughnutChart').getContext('2d');
+        const doughnutChart = new Chart(ctxDoughnut, {
+            type: 'doughnut',
+            data: {
+                labels: ['Crypto', 'Stocks', 'Bonds', 'Cash'],
+                datasets: [{
+                    data: [45, 25, 20, 10],
+                    backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#6366f1'],
+                    borderWidth: 0,
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '75%',
+                plugins: {
+                    legend: { position: 'bottom', labels: { padding: 20, color: '#f8fafc', font: { family: 'Space Grotesk' } } }
+                }
+            }
+        });
+
+        // Live Data Simulator (Engineering Magic)
+        setInterval(() => {
+            // Update Volume
+            const volEl = document.getElementById('vol-val');
+            const currentVol = parseFloat(volEl.innerText.replace(/,/g, ''));
+            const newVol = currentVol + (Math.random() * 1000 - 400);
+            volEl.innerText = newVol.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            
+            // Update TPS
+            document.getElementById('tps-val').innerText = Math.floor(Math.random() * (4000 - 3000 + 1) + 3000).toLocaleString();
+
+            // Simulate Ping
+            document.getElementById('ping').innerText = Math.floor(Math.random() * (25 - 8 + 1) + 8) + 'ms';
+
+            // Animate Chart Data
+            if(Math.random() > 0.5) {
+                const dataArray = mainChart.data.datasets[0].data;
+                const lastVal = dataArray[dataArray.length - 1];
+                dataArray.push(lastVal + (Math.random() * 2000 - 1000));
+                dataArray.shift();
+                mainChart.update('none'); // Update without full animation for performance
+            }
+        }, 2000);
+    </script>
+</body>
+</html>
