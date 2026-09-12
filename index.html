@@ -756,6 +756,20 @@
         setTimeout(() => new NeuralMesh(), 1500);
         try { new WebGLEngine(); } catch(e) { console.warn("WebGL unsupported."); }
 
+
+    // --- SAFARI BAFCACHE FIX ---
+// هذا الكود يضمن إخفاء شاشة التشفير إذا استخدم الزائر زر "الرجوع" في المتصفح
+window.addEventListener("pageshow", function (event) {
+    if (event.persisted) {
+        const overlay = document.getElementById('transition-protocol');
+        const text = document.getElementById('trans-text');
+        if (overlay) {
+            overlay.classList.remove('active');
+            text.innerText = "ESTABLISHING SECURE LINK...";
+        }
+    }
+});
+
     </script>
 </body>
 </html>
