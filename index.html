@@ -123,7 +123,7 @@
         .nav-item:hover { color: var(--primary-core); }
 
         /* =========================================
-           07. HERO MODULE (FIXED BUTTONS)
+           07. HERO MODULE
            ========================================= */
         .module-hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 100px 10vw 0; position: relative; }
         .hero-sys-status { font-family: 'Share Tech Mono', monospace; color: var(--secondary-core); font-size: 12px; letter-spacing: 4px; margin-bottom: 25px; display: inline-flex; align-items: center; gap: 10px; }
@@ -133,16 +133,14 @@
         .text-stroke { color: transparent; -webkit-text-stroke: 1.5px rgba(255,255,255,0.8); }
         .hero-desc { max-width: 600px; color: var(--text-muted); font-size: 1.1rem; line-height: 1.8; margin-bottom: 50px; }
         
-        /* 🚨 THE ULTIMATE BUTTON FIX 🚨 */
-        .btn-container { display: flex; gap: 20px; flex-wrap: wrap; z-index: 50; position: relative; opacity: 1 !important; visibility: visible !important; }
+        .btn-container { display: flex; gap: 20px; flex-wrap: wrap; z-index: 50; position: relative; }
         .btn-system {
             padding: 16px 40px; background: rgba(74, 144, 226, 0.1); border: 1px solid var(--primary-core);
             color: #fff; font-family: 'Share Tech Mono', monospace; font-size: 14px; font-weight: bold;
             text-transform: uppercase; letter-spacing: 2px; cursor: none; text-decoration: none;
             display: inline-flex; align-items: center; gap: 12px; transition: all 0.3s ease;
             box-shadow: inset 0 0 10px rgba(74, 144, 226, 0.2), 0 0 20px rgba(74, 144, 226, 0.2);
-            backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); /* Safari Fix */
-            opacity: 1 !important; /* Force visibility */
+            backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
         }
         .btn-system:hover { background: var(--primary-core); color: #fff; box-shadow: 0 0 30px var(--primary-glow); transform: translateY(-3px); }
 
@@ -166,15 +164,17 @@
 
         /* --- PROJECTS MATRIX --- */
         .project-matrix { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
-        .matrix-card { height: 420px; border: 1px solid var(--glass-border); background: #050508; position: relative; overflow: hidden; cursor: none; }
+        .matrix-card { height: 450px; border: 1px solid var(--glass-border); background: #050508; position: relative; overflow: hidden; cursor: none; }
         .matrix-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; filter: grayscale(100%) opacity(0.3); transition: all 0.6s; transform: translateZ(-30px); }
         .matrix-card:hover .matrix-image { filter: grayscale(0%) opacity(0.8); transform: scale(1.05) translateZ(-10px); }
-        .matrix-data { position: absolute; bottom: 0; left: 0; width: 100%; padding: 30px; background: linear-gradient(to top, rgba(1,1,2,0.98) 20%, transparent); transform: translateY(30px) translateZ(40px); transition: 0.5s; }
+        .matrix-data { position: absolute; bottom: 0; left: 0; width: 100%; padding: 30px; background: linear-gradient(to top, rgba(1,1,2,0.98) 20%, transparent); transform: translateY(30px) translateZ(40px); transition: 0.5s; display: flex; flex-direction: column; justify-content: flex-end; }
         .matrix-card:hover .matrix-data { transform: translateY(0) translateZ(50px); }
         .matrix-data h3 { font-family: 'Syncopate', sans-serif; font-size: 22px; margin-bottom: 12px; }
         .matrix-data p { color: #cbd5e1; font-size: 13px; line-height: 1.6; margin-bottom: 20px; }
         .tech-array { display: flex; flex-wrap: wrap; gap: 8px; }
         .tech-array span { padding: 4px 10px; background: rgba(74, 144, 226, 0.1); border: 1px solid rgba(74, 144, 226, 0.2); font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--primary-core); }
+        
+        .rtl-badge { display: inline-block; margin-top: 8px; font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--secondary-core); border: 1px dashed var(--secondary-core); padding: 3px 8px; }
 
         /* --- LIVE TELEMETRY COUNTERS --- */
         .telemetry-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; }
@@ -200,7 +200,7 @@
         .spec-node h3 { font-family: 'Syncopate', sans-serif; font-size: 18px; margin-bottom: 15px; transform: translateZ(30px); }
         .spec-node p { color: var(--text-muted); font-size: 14px; line-height: 1.7; transform: translateZ(20px); }
 
-        /* --- COMMUNICATION INTERFACE (IPAD FIXED) --- */
+        /* --- COMMS INTERFACE --- */
         .comms-interface {
             display: flex; flex-wrap: wrap; gap: 50px; background: var(--glass-bg);
             border: 1px solid var(--glass-border); padding: 60px; position: relative;
@@ -237,7 +237,6 @@
             .matrix-data { transform: translateY(0) translateZ(30px); background: linear-gradient(to top, rgba(1,1,2,1) 50%, rgba(1,1,2,0.5)); }
             .comms-interface { padding: 40px 20px; }
             
-            /* FORCE AUTO CURSOR ON TOUCH */
             body, .btn-system, .matrix-card, a, input, textarea, button { cursor: auto !important; }
             .cursor-assembly { display: none !important; }
             .system-hud { display: none; } 
@@ -293,10 +292,10 @@
             </h1>
             <p class="hero-desc">Architecting robust full-stack systems and engineering mathematically precise, high-performance digital interfaces using advanced WebGL physics and algorithmic logic.</p>
             
-            <!-- 🚨 FIXED VISIBLE BUTTONS 🚨 -->
             <div class="btn-container">
-                <a href="javascript:void(0)" onclick="SystemArchitect.initiateTransfer('dashboard.html')" class="btn-system hover-trigger">
-                    DEPLOY PROJECTS <i class="fas fa-satellite-dish"></i>
+                <!-- ينزل برفق لقسم المشاريع بدلاً من التوجيه لصفحة وهمية -->
+                <a href="#projects" class="btn-system hover-trigger">
+                    EXPLORE ARCHITECTURE <i class="fas fa-layer-group"></i>
                 </a>
                 <a href="#comms" class="btn-system hover-trigger" style="background: transparent;">
                     ESTABLISH LINK <i class="fas fa-terminal"></i>
@@ -343,16 +342,19 @@
             </div>
             <div class="project-matrix">
                 
-                <div class="matrix-card tilt-chassis hover-trigger" onclick="SystemArchitect.initiateTransfer('project1.html')">
+                <!-- المشروع الأول: تم الربط بمنصة التعليم الحقيقية مع توضيح ميزة الـ RTL للمطورين الأجانب -->
+                <div class="matrix-card tilt-chassis hover-trigger" onclick="SystemArchitect.initiateTransfer('https://tuition-platform.mohalisal1.workers.dev/')">
                     <div class="matrix-image" style="background-image: url('https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=2070&auto=format&fit=crop');"></div>
                     <div class="matrix-data">
-                        <h3>EduTech Matrix</h3>
+                        <h3>EduTech Platform</h3>
                         <p>A full-stack learning management ecosystem with live streaming, logic-based gamification, and analytics.</p>
                         <div class="tech-array"><span>REACT.JS</span> <span>FIREBASE_DB</span> <span>NODE.ENV</span></div>
+                        <div class="rtl-badge"><i class="fas fa-globe"></i> Engineered with Native RTL/i18n Localization</div>
                     </div>
                 </div>
 
-                <div class="matrix-card tilt-chassis hover-trigger">
+                <!-- المشروع الثاني: تم الربط بملف الفينتيك الذي أنشأناه -->
+                <div class="matrix-card tilt-chassis hover-trigger" onclick="SystemArchitect.initiateTransfer('fintech.html')">
                     <div class="matrix-image" style="background-image: url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop');"></div>
                     <div class="matrix-data">
                         <h3>FinTech Core</h3>
@@ -361,7 +363,8 @@
                     </div>
                 </div>
 
-                <div class="matrix-card tilt-chassis hover-trigger">
+                <!-- المشروع الثالث: تم الربط بملف جيت هب لعرض الأكواد كمهندس حقيقي -->
+                <div class="matrix-card tilt-chassis hover-trigger" onclick="SystemArchitect.initiateTransfer('https://github.com')">
                     <div class="matrix-image" style="background-image: url('https://images.unsplash.com/photo-1618761714954-0b8cd0026356?q=80&w=2070&auto=format&fit=crop');"></div>
                     <div class="matrix-data">
                         <h3>WebGL Engine</h3>
@@ -404,9 +407,7 @@
             <div class="algo-section">
                 <div class="algo-text">
                     <h3>Neural Mesh Simulation</h3>
-                    <p>
-                        Real-time visualization of data packet routing. This canvas dynamically generates nodes and calculates distance thresholds to draw connecting vectors (edges) precisely when nodes interact.
-                    </p>
+                    <p>Real-time visualization of data packet routing. This canvas dynamically generates nodes and calculates distance thresholds to draw connecting vectors (edges) precisely when nodes interact.</p>
                     <p style="font-family: 'Share Tech Mono', monospace; font-size: 13px; color: var(--secondary-core);">
                         d(p, q) = √((q₁-p₁)² + (q₂-p₂)²) <br>
                         IF d < threshold THEN connect()
@@ -476,7 +477,6 @@
                         <textarea name="message" required id="message" rows="3"></textarea>
                         <label for="message">Execution Parameters (Details)</label>
                     </div>
-                    <!-- FIXED SUBMIT BUTTON -->
                     <button type="submit" class="btn-system hover-trigger" style="width: 100%; justify-content: center; margin-top: 10px;">
                         EXECUTE SEQUENCE <i class="fas fa-paper-plane"></i>
                     </button>
@@ -495,31 +495,20 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <script>
-        /**
-         * ==========================================
-         * CORE ARCHITECTURE SCRIPT
-         * Author: ENG. MOHAMMAD SALEH
-         * ==========================================
-         */
-
         const Config = {
             isTouch: window.matchMedia("(max-width: 900px) or (pointer: coarse)").matches,
             lerp: (s, e, f) => s + (e - s) * f
         };
 
-        // --- 1. BOOT SEQUENCE ENGINE ---
         class BootSequence {
             constructor() {
                 this.container = document.getElementById('system-bootloader');
                 this.console = document.getElementById('boot-console');
                 this.bar = document.getElementById('boot-bar');
                 this.logs = [
-                    "Initializing Kernel v5.0...",
-                    "Mounting Virtual DOM Elements...",
-                    "Establishing Secure WebGL Context...",
-                    "Compiling Shaders (GLSL)... OK",
-                    "Loading Neural Topology Map...",
-                    "Bypassing Security Protocols...",
+                    "Initializing Kernel v5.0...", "Mounting Virtual DOM Elements...",
+                    "Establishing Secure WebGL Context...", "Compiling Shaders (GLSL)... OK",
+                    "Loading Neural Topology Map...", "Bypassing Security Protocols...",
                     "Access Granted. Welcome, Engineer."
                 ];
                 this.init();
@@ -538,21 +527,16 @@
                     setTimeout(() => {
                         this.container.style.display = 'none';
                         document.body.style.overflow = 'auto';
-                        SystemArchitect.initGSAP(); // Trigger reveals after boot
+                        SystemArchitect.initGSAP(); 
                     }, 1200);
                 }, 800);
             }
         }
 
-        // --- 2. MASTER SYSTEM CLASS ---
         class SystemCore {
             constructor() {
-                this.initHUD();
-                this.initCursor();
-                this.initTiltEngine();
-                this.initCounters();
+                this.initHUD(); this.initCursor(); this.initTiltEngine(); this.initCounters();
             }
-
             initHUD() {
                 const scrollEl = document.getElementById('scroll-monitor');
                 const fpsEl = document.getElementById('fps-monitor');
@@ -578,19 +562,16 @@
                 };
                 requestAnimationFrame(loop);
             }
-
             initCursor() {
                 if(Config.isTouch) return;
                 const cursor = document.querySelector('.cursor-assembly');
                 const reticle = document.querySelector('.cursor-reticle');
                 let cx = window.innerWidth/2, cy = window.innerHeight/2, tx = cx, ty = cy;
-                
                 document.addEventListener('pointermove', (e) => { tx = e.clientX; ty = e.clientY; });
                 document.querySelectorAll('.hover-trigger').forEach(el => {
                     el.addEventListener('mouseenter', () => reticle.style.transform = 'scale(1.5) rotate(45deg)');
                     el.addEventListener('mouseleave', () => reticle.style.transform = 'scale(1) rotate(0deg)');
                 });
-
                 const animate = () => {
                     cx = Config.lerp(cx, tx, 0.3); cy = Config.lerp(cy, ty, 0.3);
                     cursor.style.transform = `translate(${cx}px, ${cy}px)`;
@@ -598,11 +579,9 @@
                 };
                 animate();
             }
-
             initTiltEngine() {
                 document.querySelectorAll('.tilt-chassis').forEach(card => {
                     let state = { tx: 0, ty: 0, cx: 0, cy: 0, active: false };
-
                     const onMove = (clientX, clientY) => {
                         const rect = card.getBoundingClientRect();
                         const x = clientX - rect.left; const y = clientY - rect.top;
@@ -612,9 +591,7 @@
                             state.active = true;
                         } else { state.active = false; state.tx = 0; state.ty = 0; }
                     };
-
                     const onLeave = () => { state.tx = 0; state.ty = 0; state.active = false; };
-
                     card.addEventListener('pointermove', (e) => onMove(e.clientX, e.clientY));
                     card.addEventListener('pointerleave', onLeave);
                     if(Config.isTouch) {
@@ -622,10 +599,8 @@
                         card.addEventListener('touchmove', (e) => onMove(e.touches[0].clientX, e.touches[0].clientY), {passive: true});
                         card.addEventListener('touchend', onLeave);
                     }
-
                     const render = () => {
-                        state.cx = Config.lerp(state.cx, state.tx, 0.1);
-                        state.cy = Config.lerp(state.cy, state.ty, 0.1);
+                        state.cx = Config.lerp(state.cx, state.tx, 0.1); state.cy = Config.lerp(state.cy, state.ty, 0.1);
                         if (Math.abs(state.cx) > 0.01 || Math.abs(state.cy) > 0.01 || state.active) {
                             card.style.transform = `rotateX(${state.cx}deg) rotateY(${state.cy}deg) scale3d(${state.active?1.02:1}, ${state.active?1.02:1}, 1)`;
                         }
@@ -634,7 +609,6 @@
                     render();
                 });
             }
-
             initCounters() {
                 gsap.registerPlugin(ScrollTrigger);
                 document.querySelectorAll('.counter').forEach(counter => {
@@ -651,13 +625,11 @@
                     });
                 });
             }
-
             initGSAP() {
-                // Ensure buttons aren't hidden
                 gsap.from('.hero-sys-status', { y: 20, opacity: 0, duration: 1 });
                 gsap.from('.hero-title span', { y: 40, opacity: 0, duration: 1, stagger: 0.1, delay: 0.2 });
                 gsap.from('.hero-desc', { opacity: 0, duration: 1, delay: 0.4 });
-                // We deliberately skip animating the button opacity to prevent iOS glitches. It's solid now.
+                gsap.from('.btn-container', { opacity: 0, y: 20, duration: 1, delay: 0.6 }); // Animate container, not buttons directly
 
                 const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*";
                 document.querySelectorAll('.cipher-text').forEach(el => {
@@ -687,8 +659,8 @@
                 gsap.from('.spec-node', { scrollTrigger: { trigger: '.specs-grid', start: "top 80%" }, y: 50, opacity: 0, duration: 0.8, stagger: 0.1 });
                 gsap.from('.comms-interface', { scrollTrigger: { trigger: '#comms', start: "top 80%" }, y: 30, opacity: 0, duration: 0.8 });
             }
-
             initiateTransfer(url) {
+                // Ensure proper link redirection without issues
                 const overlay = document.getElementById('transition-protocol');
                 const text = document.getElementById('trans-text');
                 overlay.classList.add('active');
@@ -699,72 +671,48 @@
             }
         }
 
-        // --- 3. NEURAL NETWORK CANVAS (Nodes Simulation) ---
         class NeuralMesh {
             constructor() {
                 this.canvas = document.getElementById('neural-canvas');
                 this.ctx = this.canvas.getContext('2d');
                 this.nodeLabel = document.getElementById('node-count');
                 this.edgeLabel = document.getElementById('edge-count');
-                this.nodes = [];
-                this.numNodes = Config.isTouch ? 40 : 80;
-                this.maxDistance = 100;
-                
-                this.resize();
-                window.addEventListener('resize', () => this.resize());
-                this.initNodes();
-                this.animate();
+                this.nodes = []; this.numNodes = Config.isTouch ? 40 : 80; this.maxDistance = 100;
+                this.resize(); window.addEventListener('resize', () => this.resize());
+                this.initNodes(); this.animate();
             }
             resize() { this.canvas.width = this.canvas.parentElement.clientWidth; this.canvas.height = this.canvas.parentElement.clientHeight; }
             initNodes() {
                 this.nodes = [];
                 for(let i=0; i<this.numNodes; i++) {
-                    this.nodes.push({
-                        x: Math.random() * this.canvas.width, y: Math.random() * this.canvas.height,
-                        vx: (Math.random() - 0.5) * 1.5, vy: (Math.random() - 0.5) * 1.5
-                    });
+                    this.nodes.push({ x: Math.random() * this.canvas.width, y: Math.random() * this.canvas.height, vx: (Math.random() - 0.5) * 1.5, vy: (Math.random() - 0.5) * 1.5 });
                 }
                 this.nodeLabel.innerText = this.numNodes;
             }
             animate() {
-                this.ctx.fillStyle = '#030406';
-                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-                
+                this.ctx.fillStyle = '#030406'; this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
                 let activeEdges = 0;
-                
                 for(let i=0; i<this.nodes.length; i++) {
                     let n = this.nodes[i];
                     n.x += n.vx; n.y += n.vy;
                     if(n.x < 0 || n.x > this.canvas.width) n.vx *= -1;
                     if(n.y < 0 || n.y > this.canvas.height) n.vy *= -1;
-
-                    this.ctx.beginPath();
-                    this.ctx.arc(n.x, n.y, 2, 0, Math.PI*2);
-                    this.ctx.fillStyle = '#4A90E2';
-                    this.ctx.fill();
-
+                    this.ctx.beginPath(); this.ctx.arc(n.x, n.y, 2, 0, Math.PI*2); this.ctx.fillStyle = '#4A90E2'; this.ctx.fill();
                     for(let j=i+1; j<this.nodes.length; j++) {
                         let n2 = this.nodes[j];
-                        let dx = n.x - n2.x; let dy = n.y - n2.y;
-                        let dist = Math.sqrt(dx*dx + dy*dy);
-
+                        let dx = n.x - n2.x, dy = n.y - n2.y, dist = Math.sqrt(dx*dx + dy*dy);
                         if(dist < this.maxDistance) {
                             activeEdges++;
-                            this.ctx.beginPath();
-                            this.ctx.strokeStyle = `rgba(0, 255, 65, ${1 - dist/this.maxDistance})`;
-                            this.ctx.lineWidth = 0.5;
-                            this.ctx.moveTo(n.x, n.y); this.ctx.lineTo(n2.x, n2.y);
-                            this.ctx.stroke();
+                            this.ctx.beginPath(); this.ctx.strokeStyle = `rgba(0, 255, 65, ${1 - dist/this.maxDistance})`;
+                            this.ctx.lineWidth = 0.5; this.ctx.moveTo(n.x, n.y); this.ctx.lineTo(n2.x, n2.y); this.ctx.stroke();
                         }
                     }
                 }
-                
-                if(Math.random() > 0.8) this.edgeLabel.innerText = activeEdges; // update less frequently for realism
+                if(Math.random() > 0.8) this.edgeLabel.innerText = activeEdges; 
                 requestAnimationFrame(() => this.animate());
             }
         }
 
-        // --- 4. ADVANCED WEBGL BACKGROUND ---
         class WebGLEngine {
             constructor() {
                 this.scene = new THREE.Scene();
@@ -772,31 +720,28 @@
                 this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: !Config.isTouch, powerPreference: "high-performance" });
                 this.renderer.setSize(window.innerWidth, window.innerHeight);
                 document.getElementById('webgl-core').appendChild(this.renderer.domElement);
-
                 this.group = new THREE.Group(); this.scene.add(this.group);
 
-                // Add Floor Grid
                 const gridHelper = new THREE.GridHelper(100, 40, 0x4A90E2, 0x111122);
-                gridHelper.position.y = -10;
-                this.scene.add(gridHelper);
+                gridHelper.position.y = -10; this.scene.add(gridHelper);
 
-                // Architecture Rings
-                const knotGeo = new THREE.TorusGeometry(2, 0.5, 16, Config.isTouch ? 50 : 100);
-                this.torus = new THREE.Mesh(knotGeo, new THREE.MeshBasicMaterial({ color: 0x4A90E2, wireframe: true, transparent: true, opacity: 0.1 }));
+                this.torus = new THREE.Mesh(new THREE.TorusGeometry(2, 0.5, 16, Config.isTouch ? 50 : 100), new THREE.MeshBasicMaterial({ color: 0x4A90E2, wireframe: true, transparent: true, opacity: 0.1 }));
                 this.group.add(this.torus);
-
-                const icoGeo = new THREE.IcosahedronGeometry(1.2, 1);
-                this.icosahedron = new THREE.Mesh(icoGeo, new THREE.MeshBasicMaterial({ color: 0xFF9F1C, wireframe: true, transparent: true, opacity: 0.15 }));
+                this.icosahedron = new THREE.Mesh(new THREE.IcosahedronGeometry(1.2, 1), new THREE.MeshBasicMaterial({ color: 0xFF9F1C, wireframe: true, transparent: true, opacity: 0.15 }));
                 this.group.add(this.icosahedron);
 
-                this.camera.position.z = 5;
-                this.clock = new THREE.Clock();
-                window.addEventListener('resize', () => this.resize());
-                this.animate();
+                const pGeo = new THREE.BufferGeometry(); const posArray = new Float32Array((Config.isTouch ? 300 : 1200) * 3);
+                for(let i=0; i<posArray.length; i++) posArray[i] = (Math.random() - 0.5) * 15;
+                pGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+                this.particles = new THREE.Points(pGeo, new THREE.PointsMaterial({ size: 0.02, color: 0xffffff, transparent: true, opacity: 0.2, blending: THREE.AdditiveBlending }));
+                this.scene.add(this.particles);
+
+                this.camera.position.z = 5; this.clock = new THREE.Clock();
+                window.addEventListener('resize', () => this.resize()); this.animate();
             }
             resize() { this.camera.aspect = window.innerWidth / window.innerHeight; this.camera.updateProjectionMatrix(); this.renderer.setSize(window.innerWidth, window.innerHeight); }
             animate() {
-                const t = this.clock.getElapsedTime(); const sy = window.scrollY;
+                const t = this.clock.getElapsedTime(), sy = window.scrollY;
                 this.torus.rotation.x = t * 0.1; this.torus.rotation.y = t * 0.2;
                 this.icosahedron.rotation.x = t * -0.2; this.icosahedron.rotation.y = t * -0.1;
                 this.group.position.y = (sy * -0.003) + Math.sin(t * 0.5) * 0.2;
@@ -806,9 +751,6 @@
             }
         }
 
-        // ==========================================
-        // SYSTEM INITIALIZATION
-        // ==========================================
         const SystemArchitect = new SystemCore();
         new BootSequence();
         setTimeout(() => new NeuralMesh(), 1500);
