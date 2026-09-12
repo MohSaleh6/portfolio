@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FinTech Core | Live Telemetry</title>
+    <title>FinTech Core | Live Market Telemetry</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -12,63 +12,79 @@
 
     <style>
         :root {
-            --bg-dark: #0a0f18; --panel-bg: rgba(17, 24, 39, 0.7); --border-color: rgba(74, 144, 226, 0.15);
-            --primary: #3b82f6; --success: #10b981; --danger: #ef4444; --text-main: #f8fafc; --text-muted: #94a3b8;
+            --bg-dark: #070a0f; --panel-bg: rgba(13, 17, 25, 0.85); --border-color: rgba(74, 144, 226, 0.15);
+            --primary: #3b82f6; --success: #10b981; --danger: #ef4444; --text-main: #f8fafc; --text-muted: #64748b;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Space Grotesk', sans-serif; background-color: var(--bg-dark); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+        body { font-family: 'Space Grotesk', sans-serif; background-color: var(--bg-dark); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; background-image: radial-gradient(circle at top right, rgba(59, 130, 246, 0.05), transparent 40%); }
 
         /* Sidebar Architecture */
-        .sidebar { width: 260px; background: rgba(10, 15, 24, 0.95); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 30px 20px; z-index: 100; }
-        .brand { font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 50px; display: flex; align-items: center; gap: 10px; }
-        .brand i { color: var(--primary); }
-        .nav-item { display: flex; align-items: center; gap: 15px; padding: 15px; color: var(--text-muted); text-decoration: none; border-radius: 10px; transition: 0.3s; margin-bottom: 10px; }
-        .nav-item:hover, .nav-item.active { background: rgba(59, 130, 246, 0.1); color: var(--primary); }
-        .return-btn { margin-top: auto; padding: 15px; text-align: center; border: 1px solid var(--primary); color: var(--primary); border-radius: 10px; text-decoration: none; transition: 0.3s; font-family: 'Share Tech Mono', monospace; }
-        .return-btn:hover { background: var(--primary); color: #fff; box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
+        .sidebar { width: 260px; background: rgba(8, 11, 16, 0.95); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 30px 20px; z-index: 100; backdrop-filter: blur(20px); }
+        .brand { font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 50px; display: flex; align-items: center; gap: 10px; letter-spacing: 1px; }
+        .brand i { color: var(--primary); text-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
+        .nav-item { display: flex; align-items: center; gap: 15px; padding: 15px; color: var(--text-muted); text-decoration: none; border-radius: 10px; transition: 0.3s; margin-bottom: 5px; font-weight: 600; cursor: pointer; }
+        .nav-item:hover, .nav-item.active { background: rgba(59, 130, 246, 0.1); color: var(--primary); border-left: 3px solid var(--primary); }
+        .return-btn { margin-top: auto; padding: 15px; text-align: center; border: 1px solid var(--border-color); color: var(--text-muted); border-radius: 10px; text-decoration: none; transition: 0.3s; font-family: 'Share Tech Mono', monospace; font-size: 13px; cursor: pointer; }
+        .return-btn:hover { background: rgba(239, 68, 68, 0.1); color: var(--danger); border-color: var(--danger); }
 
-        /* Main Dashboard Area */
-        .main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow-y: auto; padding: 30px; }
+        /* Main Content Area */
+        .main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow-y: auto; padding: 30px; position: relative; }
         
+        /* View Sections (For SPA Routing) */
+        .view-section { display: none; opacity: 0; transition: opacity 0.4s ease; }
+        .view-section.active { display: block; opacity: 1; animation: fadeIn 0.5s ease forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
         /* Header */
         .top-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
-        .header-title h1 { font-size: 28px; font-weight: 700; }
+        .header-title h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
         .header-title p { color: var(--text-muted); font-family: 'Share Tech Mono', monospace; font-size: 13px; margin-top: 5px; }
         .sys-status { display: flex; align-items: center; gap: 10px; background: rgba(16, 185, 129, 0.1); padding: 8px 15px; border-radius: 20px; color: var(--success); font-family: 'Share Tech Mono', monospace; font-size: 12px; border: 1px solid rgba(16, 185, 129, 0.3); }
         .sys-status i { animation: blink 1.5s infinite; }
+        .socket-indicator { width: 8px; height: 8px; border-radius: 50%; background: var(--success); box-shadow: 0 0 10px var(--success); display: inline-block; }
 
-        /* Telemetry Grid (Stats) */
+        /* Live Market Telemetry Grid */
         .telemetry-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 25px; margin-bottom: 30px; }
-        .stat-card { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 25px; backdrop-filter: blur(10px); position: relative; overflow: hidden; }
+        .stat-card { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 25px; backdrop-filter: blur(10px); position: relative; overflow: hidden; transition: 0.3s; }
+        .stat-card:hover { border-color: rgba(74, 144, 226, 0.4); transform: translateY(-3px); }
         .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--primary); }
-        .stat-card.success::before { background: var(--success); }
+        .stat-card.btc::before { background: #f59e0b; }
+        .stat-card.eth::before { background: #6366f1; }
         .stat-card.danger::before { background: var(--danger); }
-        .stat-label { color: var(--text-muted); font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
-        .stat-value { font-size: 32px; font-weight: 700; display: flex; align-items: baseline; gap: 10px; font-family: 'Share Tech Mono', monospace; }
-        .stat-change { font-size: 14px; border-radius: 4px; padding: 2px 6px; }
-        .change-up { background: rgba(16, 185, 129, 0.1); color: var(--success); }
-        .change-down { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+        
+        .stat-label { color: var(--text-muted); font-size: 13px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .stat-value { font-size: 32px; font-weight: 700; display: flex; align-items: baseline; gap: 10px; font-family: 'Share Tech Mono', monospace; transition: color 0.3s; }
+        .price-up { color: var(--success) !important; text-shadow: 0 0 15px rgba(16, 185, 129, 0.4); }
+        .price-down { color: var(--danger) !important; text-shadow: 0 0 15px rgba(239, 68, 68, 0.4); }
 
         /* Charts Layout */
         .charts-container { display: grid; grid-template-columns: 2fr 1fr; gap: 25px; margin-bottom: 30px; }
         .chart-panel { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 25px; backdrop-filter: blur(10px); }
-        .panel-header { display: flex; justify-content: space-between; margin-bottom: 20px; color: var(--text-main); font-weight: 600; }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; color: var(--text-main); font-weight: 600; }
         .chart-wrapper { width: 100%; height: 300px; position: relative; }
 
         /* Live Transactions Table */
         .table-panel { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 25px; backdrop-filter: blur(10px); }
         table { width: 100%; border-collapse: collapse; text-align: left; }
-        th { color: var(--text-muted); font-weight: 600; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); font-size: 13px; text-transform: uppercase; }
+        th { color: var(--text-muted); font-weight: 600; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); font-size: 13px; text-transform: uppercase; letter-spacing: 1px; }
         td { padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.02); font-family: 'Share Tech Mono', monospace; font-size: 14px; }
-        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-family: 'Space Grotesk', sans-serif; font-weight: bold; }
+        .tx-hash { color: var(--primary); cursor: pointer; }
+        .tx-hash:hover { text-decoration: underline; }
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-family: 'Space Grotesk', sans-serif; font-weight: bold; letter-spacing: 1px; }
         .status-completed { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
-        .status-pending { background: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
+
+        /* Blank State for New Views */
+        .blank-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh; color: var(--text-muted); text-align: center; border: 1px dashed var(--border-color); border-radius: 16px; background: rgba(255,255,255,0.01); }
+        .blank-state i { font-size: 48px; margin-bottom: 20px; opacity: 0.5; }
+        .blank-state h2 { font-family: 'Syncopate', sans-serif; font-size: 20px; margin-bottom: 10px; color: var(--text-main); }
 
         /* Loading Overlay */
-        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-dark); z-index: 9999; display: flex; justify-content: center; align-items: center; color: var(--primary); font-family: 'Share Tech Mono', monospace; font-size: 20px; transition: 0.5s; }
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-dark); z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column; gap: 20px; color: var(--primary); font-family: 'Share Tech Mono', monospace; font-size: 16px; transition: opacity 0.5s; }
+        .spinner { width: 50px; height: 50px; border: 3px solid rgba(59, 130, 246, 0.2); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
 
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
 
         @media (max-width: 1024px) { .charts-container { grid-template-columns: 1fr; } }
         @media (max-width: 768px) {
@@ -80,19 +96,22 @@
 </head>
 <body>
 
-    <!-- Loading Screen -->
-    <div id="loader"><i class="fas fa-circle-notch fa-spin"></i> &nbsp; ESTABLISHING SOCKET CONNECTION...</div>
+    <!-- Professional Boot Loader -->
+    <div id="loader">
+        <div class="spinner"></div>
+        <div id="loader-text">CONNECTING TO BINANCE WEBSOCKET API...</div>
+    </div>
 
     <!-- Sidebar Navigation -->
     <aside class="sidebar">
         <div class="brand"><i class="fas fa-layer-group"></i> FinTech Core</div>
-        <a href="#" class="nav-item active"><i class="fas fa-chart-line"></i> Dashboard</a>
-        <a href="#" class="nav-item"><i class="fas fa-wallet"></i> Portfolios</a>
-        <a href="#" class="nav-item"><i class="fas fa-exchange-alt"></i> Transactions</a>
-        <a href="#" class="nav-item"><i class="fas fa-shield-alt"></i> Security</a>
-        <a href="#" class="nav-item"><i class="fas fa-terminal"></i> API Logs</a>
+        <a class="nav-item active" data-target="view-dashboard"><i class="fas fa-chart-line"></i> Dashboard</a>
+        <a class="nav-item" data-target="view-portfolios"><i class="fas fa-wallet"></i> Portfolios</a>
+        <a class="nav-item" data-target="view-transactions"><i class="fas fa-exchange-alt"></i> Blockchain Tx</a>
+        <a class="nav-item" data-target="view-security"><i class="fas fa-shield-alt"></i> Security Rules</a>
+        <a class="nav-item" data-target="view-api"><i class="fas fa-terminal"></i> API Logs</a>
         
-        <a href="index.html" class="return-btn"><i class="fas fa-arrow-left"></i> RETURN TO MAIN</a>
+        <a href="index.html" class="return-btn"><i class="fas fa-sign-out-alt"></i> TERMINATE SESSION</a>
     </aside>
 
     <!-- Main Content -->
@@ -100,165 +119,338 @@
         <header class="top-header">
             <div class="header-title">
                 <h1>Global Telemetry</h1>
-                <p>SERVER: NODE-7 | LATENCY: <span id="ping" style="color: var(--success);">12ms</span></p>
+                <p>WS STREAM: wss://stream.binance.com:9443 | LATENCY: <span id="ping" style="color: var(--success);">12ms</span></p>
             </div>
             <div class="sys-status">
-                <i class="fas fa-circle"></i> LIVE MARKET DATA
+                <span class="socket-indicator"></span> SOCKET CONNECTED
             </div>
         </header>
 
-        <!-- Stats Grid -->
-        <div class="telemetry-grid">
-            <div class="stat-card">
-                <div class="stat-label">Total Volume (24H)</div>
-                <div class="stat-value">$<span id="vol-val">4,289,102.55</span> <span class="stat-change change-up" id="vol-change">+2.4% <i class="fas fa-arrow-up"></i></span></div>
+        <!-- ================= VIEW: DASHBOARD (DEFAULT) ================= -->
+        <section id="view-dashboard" class="view-section active">
+            
+            <!-- Real-Time Market Grid -->
+            <div class="telemetry-grid">
+                <div class="stat-card btc">
+                    <div class="stat-label"><span>Bitcoin (BTC/USDT)</span> <i class="fab fa-bitcoin" style="color: #f59e0b; font-size: 18px;"></i></div>
+                    <div class="stat-value" id="btc-price">CONNECTING...</div>
+                </div>
+                <div class="stat-card eth">
+                    <div class="stat-label"><span>Ethereum (ETH/USDT)</span> <i class="fab fa-ethereum" style="color: #6366f1; font-size: 18px;"></i></div>
+                    <div class="stat-value" id="eth-price">CONNECTING...</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label"><span>Solana (SOL/USDT)</span> <i class="fas fa-link" style="color: #10b981; font-size: 18px;"></i></div>
+                    <div class="stat-value" id="sol-price">CONNECTING...</div>
+                </div>
+                <div class="stat-card danger">
+                    <div class="stat-label"><span>Network Load</span> <i class="fas fa-server"></i></div>
+                    <div class="stat-value"><span id="load-val">42.5</span>%</div>
+                </div>
             </div>
-            <div class="stat-card success">
-                <div class="stat-label">Active Nodes</div>
-                <div class="stat-value"><span id="nodes-val">1,842</span> <span class="stat-change change-up">+12 <i class="fas fa-arrow-up"></i></span></div>
-            </div>
-            <div class="stat-card danger">
-                <div class="stat-label">Network Load</div>
-                <div class="stat-value"><span id="load-val">84.2</span>% <span class="stat-change change-down" id="load-change">-1.5% <i class="fas fa-arrow-down"></i></span></div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Transactions/Sec</div>
-                <div class="stat-value"><span id="tps-val">3,492</span> <span class="stat-change change-up">+8.1% <i class="fas fa-arrow-up"></i></span></div>
-            </div>
-        </div>
 
-        <!-- Charts -->
-        <div class="charts-container">
-            <div class="chart-panel">
-                <div class="panel-header"><span>Liquidity Flow (USD)</span> <span><i class="fas fa-expand"></i></span></div>
-                <div class="chart-wrapper"><canvas id="mainChart"></canvas></div>
+            <!-- Charts -->
+            <div class="charts-container">
+                <div class="chart-panel">
+                    <div class="panel-header">
+                        <span>Algorithm Liquidity Flow (Simulated)</span> 
+                        <span style="font-size: 12px; color: var(--success);"><i class="fas fa-circle" style="font-size: 8px;"></i> ACTIVE</span>
+                    </div>
+                    <div class="chart-wrapper"><canvas id="mainChart"></canvas></div>
+                </div>
+                <div class="chart-panel">
+                    <div class="panel-header"><span>Asset Distribution</span></div>
+                    <div class="chart-wrapper"><canvas id="doughnutChart"></canvas></div>
+                </div>
             </div>
-            <div class="chart-panel">
-                <div class="panel-header"><span>Asset Distribution</span></div>
-                <div class="chart-wrapper"><canvas id="doughnutChart"></canvas></div>
-            </div>
-        </div>
 
-        <!-- Data Table -->
-        <div class="table-panel">
-            <div class="panel-header"><span>Recent Executions (Real-Time)</span></div>
-            <div style="overflow-x: auto;">
+            <!-- Data Table -->
+            <div class="table-panel">
+                <div class="panel-header"><span>Real-Time WebSocket Trades (BTC)</span></div>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr><th>Trade ID</th><th>Time</th><th>Pair</th><th>Price (USDT)</th><th>Qty</th><th>Status</th></tr>
+                        </thead>
+                        <tbody id="live-trades-table">
+                            <!-- Populated by JavaScript WebSocket -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= VIEW: PORTFOLIOS ================= -->
+        <section id="view-portfolios" class="view-section">
+            <div class="blank-state">
+                <i class="fas fa-wallet"></i>
+                <h2>PORTFOLIO MANAGEMENT</h2>
+                <p>This module requires database authentication to fetch user holdings.<br>Connect Firebase to enable.</p>
+            </div>
+        </section>
+
+        <!-- ================= VIEW: TRANSACTIONS ================= -->
+        <section id="view-transactions" class="view-section">
+            <div class="table-panel" style="height: 100%;">
+                <div class="panel-header"><span>Blockchain Transaction Explorer (Mock)</span></div>
                 <table>
-                    <thead>
-                        <tr><th>Tx Hash</th><th>Timestamp</th><th>Type</th><th>Amount (USD)</th><th>Status</th></tr>
-                    </thead>
-                    <tbody id="table-body">
-                        <tr><td>0x8f...4a2b</td><td>2026-09-12 10:42:01</td><td>Smart Contract</td><td>$14,500.00</td><td><span class="status-badge status-completed">CONFIRMED</span></td></tr>
-                        <tr><td>0x3c...9d1f</td><td>2026-09-12 10:41:45</td><td>Liquidity Pool</td><td>$8,230.50</td><td><span class="status-badge status-pending">PROCESSING</span></td></tr>
-                        <tr><td>0x1a...7e8c</td><td>2026-09-12 10:40:12</td><td>P2P Transfer</td><td>$1,150.25</td><td><span class="status-badge status-completed">CONFIRMED</span></td></tr>
-                        <tr><td>0x9b...2c4d</td><td>2026-09-12 10:39:55</td><td>Arbitrage</td><td>$42,100.80</td><td><span class="status-badge status-completed">CONFIRMED</span></td></tr>
+                    <thead><tr><th>Tx Hash</th><th>Timestamp</th><th>Block</th><th>Value</th><th>Status</th></tr></thead>
+                    <tbody>
+                        <tr><td class="tx-hash">0x8f4d92...4a2b</td><td>Just Now</td><td>18492011</td><td>42.5 ETH</td><td><span class="status-badge status-completed">SUCCESS</span></td></tr>
+                        <tr><td class="tx-hash">0x3c71a1...9d1f</td><td>2 mins ago</td><td>18492008</td><td>1.2 BTC</td><td><span class="status-badge status-completed">SUCCESS</span></td></tr>
+                        <tr><td class="tx-hash">0x1a99f2...7e8c</td><td>5 mins ago</td><td>18491995</td><td>15,000 USDT</td><td><span class="status-badge status-completed">SUCCESS</span></td></tr>
+                        <tr><td class="tx-hash">0x9b2e4d...2c4d</td><td>12 mins ago</td><td>18491950</td><td>0.8 ETH</td><td><span class="status-badge status-completed">SUCCESS</span></td></tr>
                     </tbody>
                 </table>
             </div>
-        </div>
+        </section>
+
+        <!-- ================= VIEW: SECURITY & API ================= -->
+        <section id="view-security" class="view-section">
+            <div class="blank-state">
+                <i class="fas fa-shield-alt"></i>
+                <h2>SECURITY PROTOCOLS</h2>
+                <p>Firewall settings and IP whitelisting rules are currently locked for guest accounts.</p>
+            </div>
+        </section>
+        
+        <section id="view-api" class="view-section">
+            <div class="blank-state" style="align-items: flex-start; text-align: left; padding: 40px; background: #000; border: 1px solid #333;">
+                <h2 style="color: var(--matrix-green); font-family: 'Share Tech Mono', monospace; font-size: 16px; margin-bottom: 20px;">> LIVE API TERMINAL OUTPUT</h2>
+                <div id="terminal-output" style="font-family: 'Share Tech Mono', monospace; font-size: 12px; color: #a3a3a3; line-height: 1.8;">
+                    > System Boot... OK<br>
+                    > Connecting to wss://stream.binance.com:9443... OK<br>
+                    > Subscribed to: btcusdt@trade, ethusdt@trade, solusdt@trade<br>
+                    > Waiting for payloads...<br>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <script>
-        // Remove Loader & Play Animations
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                document.getElementById('loader').style.opacity = '0';
+        /**
+         * FINTECH CORE ENGINE
+         * Architected by ENG. MOHAMMAD SALEH
+         * Features: SPA Routing, Real-time WebSockets (Binance API), Chart.js
+         */
+
+        class FinTechApp {
+            constructor() {
+                this.initRouting();
+                this.initCharts();
+                this.initWebSockets();
+                this.initSimulators();
+                this.removeLoader();
+            }
+
+            // 1. SPA Routing System (Sidebar Logic)
+            initRouting() {
+                const navItems = document.querySelectorAll('.nav-item');
+                const views = document.querySelectorAll('.view-section');
+
+                navItems.forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const targetId = item.getAttribute('data-target');
+                        
+                        // Update active class on Sidebar
+                        navItems.forEach(nav => nav.classList.remove('active'));
+                        item.classList.add('active');
+
+                        // Switch Views
+                        views.forEach(view => {
+                            view.classList.remove('active');
+                            if(view.id === targetId) {
+                                view.classList.add('active');
+                            }
+                        });
+                    });
+                });
+            }
+
+            // 2. Real-Time Binance WebSockets (The "Wow" Factor)
+            initWebSockets() {
+                // We connect to Binance Public WebSocket for live trades
+                const ws = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@trade/ethusdt@trade/solusdt@trade');
+                
+                const btcEl = document.getElementById('btc-price');
+                const ethEl = document.getElementById('eth-price');
+                const solEl = document.getElementById('sol-price');
+                const tableBody = document.getElementById('live-trades-table');
+                const terminal = document.getElementById('terminal-output');
+
+                let prevBtc = 0, prevEth = 0, prevSol = 0;
+                let tradeCount = 0;
+
+                ws.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    const price = parseFloat(data.p);
+                    const symbol = data.s;
+
+                    // Formatter for currency
+                    const formatPrice = (val) => '$' + val.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+                    if(symbol === 'BTCUSDT') {
+                        btcEl.innerText = formatPrice(price);
+                        this.flashColor(btcEl, price, prevBtc);
+                        prevBtc = price;
+                        
+                        // Populate Table with BTC trades only to avoid overwhelming DOM
+                        tradeCount++;
+                        if(tradeCount % 3 === 0) { // Limit table updates for performance
+                            const time = new Date(data.T).toLocaleTimeString();
+                            const qty = parseFloat(data.q).toFixed(4);
+                            const row = `<tr>
+                                <td class="tx-hash">${data.t}</td>
+                                <td>${time}</td>
+                                <td><span style="color:#f59e0b; font-weight:bold;">BTC/USDT</span></td>
+                                <td style="color: ${data.m ? 'var(--danger)' : 'var(--success)'}">${formatPrice(price)}</td>
+                                <td>${qty}</td>
+                                <td><span class="status-badge status-completed">EXECUTED</span></td>
+                            </tr>`;
+                            tableBody.insertAdjacentHTML('afterbegin', row);
+                            if(tableBody.children.length > 5) tableBody.removeChild(tableBody.lastChild); // Keep 5 rows
+                            
+                            // Update API Terminal View
+                            if(document.getElementById('view-api').classList.contains('active')) {
+                                terminal.insertAdjacentHTML('beforeend', `> Recv [BTC]: TxID ${data.t} | Price: ${price} | Qty: ${qty}<br>`);
+                                if(terminal.children.length > 15) terminal.removeChild(terminal.firstChild);
+                            }
+                        }
+                    } 
+                    else if(symbol === 'ETHUSDT') {
+                        ethEl.innerText = formatPrice(price);
+                        this.flashColor(ethEl, price, prevEth);
+                        prevEth = price;
+                    }
+                    else if(symbol === 'SOLUSDT') {
+                        solEl.innerText = formatPrice(price);
+                        this.flashColor(solEl, price, prevSol);
+                        prevSol = price;
+                    }
+                };
+            }
+
+            // Helper to flash green/red when price changes
+            flashColor(element, currentPrice, previousPrice) {
+                if(previousPrice === 0) return;
+                
+                element.classList.remove('price-up', 'price-down');
+                // Force reflow
+                void element.offsetWidth;
+
+                if (currentPrice > previousPrice) {
+                    element.classList.add('price-up');
+                } else if (currentPrice < previousPrice) {
+                    element.classList.add('price-down');
+                }
+                
                 setTimeout(() => {
-                    document.getElementById('loader').style.display = 'none';
-                    // GSAP Reveal Animations
-                    gsap.from('.sidebar', { x: -100, opacity: 0, duration: 0.8, ease: "power3.out" });
-                    gsap.from('.top-header', { y: -20, opacity: 0, duration: 0.8, delay: 0.2 });
-                    gsap.from('.stat-card', { y: 30, opacity: 0, duration: 0.6, stagger: 0.1, delay: 0.3 });
-                    gsap.from('.chart-panel', { scale: 0.95, opacity: 0, duration: 0.6, stagger: 0.2, delay: 0.5 });
-                    gsap.from('.table-panel', { y: 30, opacity: 0, duration: 0.6, delay: 0.8 });
-                }, 500);
-            }, 1000);
-        });
-
-        // Setup Chart.js Defaults for Dark Mode
-        Chart.defaults.color = '#94a3b8';
-        Chart.defaults.font.family = "'Share Tech Mono', monospace";
-
-        // Main Line Chart
-        const ctxMain = document.getElementById('mainChart').getContext('2d');
-        let gradient = ctxMain.createLinearGradient(0, 0, 0, 400);
-        gradient.addColorStop(0, 'rgba(59, 130, 246, 0.5)');
-        gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
-
-        const mainChart = new Chart(ctxMain, {
-            type: 'line',
-            data: {
-                labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '24:00'],
-                datasets: [{
-                    label: 'Volume',
-                    data: [12000, 19000, 15000, 28000, 22000, 34000, 31000],
-                    borderColor: '#3b82f6',
-                    backgroundColor: gradient,
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.4,
-                    pointBackgroundColor: '#10b981',
-                    pointBorderColor: '#fff',
-                    pointRadius: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { beginAtZero: false, grid: { color: 'rgba(255,255,255,0.05)' } },
-                    x: { grid: { display: false } }
-                }
+                    element.classList.remove('price-up', 'price-down');
+                }, 400);
             }
-        });
 
-        // Doughnut Chart
-        const ctxDoughnut = document.getElementById('doughnutChart').getContext('2d');
-        const doughnutChart = new Chart(ctxDoughnut, {
-            type: 'doughnut',
-            data: {
-                labels: ['Crypto', 'Stocks', 'Bonds', 'Cash'],
-                datasets: [{
-                    data: [45, 25, 20, 10],
-                    backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#6366f1'],
-                    borderWidth: 0,
-                    hoverOffset: 10
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '75%',
-                plugins: {
-                    legend: { position: 'bottom', labels: { padding: 20, color: '#f8fafc', font: { family: 'Space Grotesk' } } }
-                }
+            // 3. Initialize Chart.js
+            initCharts() {
+                Chart.defaults.color = '#64748b';
+                Chart.defaults.font.family = "'Share Tech Mono', monospace";
+
+                // Main Line Chart
+                const ctxMain = document.getElementById('mainChart').getContext('2d');
+                let gradient = ctxMain.createLinearGradient(0, 0, 0, 400);
+                gradient.addColorStop(0, 'rgba(59, 130, 246, 0.4)');
+                gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
+
+                this.lineChart = new Chart(ctxMain, {
+                    type: 'line',
+                    data: {
+                        labels: ['10:00', '10:05', '10:10', '10:15', '10:20', '10:25', '10:30'],
+                        datasets: [{
+                            label: 'Liquidity',
+                            data: [42000, 42150, 41900, 42300, 42500, 42200, 42600],
+                            borderColor: '#3b82f6',
+                            backgroundColor: gradient,
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#0f172a',
+                            pointBorderColor: '#3b82f6',
+                            pointRadius: 3
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: false, grid: { color: 'rgba(255,255,255,0.03)' } },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
+
+                // Doughnut Chart
+                const ctxDoughnut = document.getElementById('doughnutChart').getContext('2d');
+                new Chart(ctxDoughnut, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Bitcoin', 'Ethereum', 'Solana', 'USDT'],
+                        datasets: [{
+                            data: [45, 30, 15, 10],
+                            backgroundColor: ['#f59e0b', '#6366f1', '#10b981', '#14b8a6'],
+                            borderWidth: 0, hoverOffset: 10
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false, cutout: '75%',
+                        plugins: { legend: { position: 'bottom', labels: { padding: 20, color: '#f8fafc', font: { family: 'Space Grotesk' } } } }
+                    }
+                });
             }
-        });
 
-        // Live Data Simulator (Engineering Magic)
-        setInterval(() => {
-            // Update Volume
-            const volEl = document.getElementById('vol-val');
-            const currentVol = parseFloat(volEl.innerText.replace(/,/g, ''));
-            const newVol = currentVol + (Math.random() * 1000 - 400);
-            volEl.innerText = newVol.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-            
-            // Update TPS
-            document.getElementById('tps-val').innerText = Math.floor(Math.random() * (4000 - 3000 + 1) + 3000).toLocaleString();
+            // 4. Background Simulators (Ping & Chart Updates)
+            initSimulators() {
+                // Ping Simulator
+                setInterval(() => {
+                    document.getElementById('ping').innerText = Math.floor(Math.random() * (35 - 12 + 1) + 12) + 'ms';
+                }, 3000);
 
-            // Simulate Ping
-            document.getElementById('ping').innerText = Math.floor(Math.random() * (25 - 8 + 1) + 8) + 'ms';
-
-            // Animate Chart Data
-            if(Math.random() > 0.5) {
-                const dataArray = mainChart.data.datasets[0].data;
-                const lastVal = dataArray[dataArray.length - 1];
-                dataArray.push(lastVal + (Math.random() * 2000 - 1000));
-                dataArray.shift();
-                mainChart.update('none'); // Update without full animation for performance
+                // Chart Live Update Simulator
+                setInterval(() => {
+                    const dataArr = this.lineChart.data.datasets[0].data;
+                    const lastVal = dataArr[dataArr.length - 1];
+                    dataArr.push(lastVal + (Math.random() * 500 - 200));
+                    dataArr.shift();
+                    this.lineChart.update('none'); // 'none' disables animation for better performance on frequent updates
+                }, 4000);
             }
-        }, 2000);
+
+            // 5. Preloader Removal
+            removeLoader() {
+                window.addEventListener('load', () => {
+                    setTimeout(() => {
+                        const loader = document.getElementById('loader');
+                        document.getElementById('loader-text').innerText = "SOCKET CONNECTED. INITIALIZING UI...";
+                        setTimeout(() => {
+                            loader.style.opacity = '0';
+                            setTimeout(() => {
+                                loader.style.display = 'none';
+                                // Entrance Animations
+                                gsap.from('.sidebar', { x: -50, opacity: 0, duration: 0.8, ease: "power3.out" });
+                                gsap.from('.top-header', { y: -20, opacity: 0, duration: 0.8, delay: 0.1 });
+                                gsap.from('.stat-card', { y: 20, opacity: 0, duration: 0.6, stagger: 0.1, delay: 0.2 });
+                                gsap.from('.charts-container', { y: 20, opacity: 0, duration: 0.6, delay: 0.4 });
+                                gsap.from('.table-panel', { y: 20, opacity: 0, duration: 0.6, delay: 0.5 });
+                            }, 500);
+                        }, 800);
+                    }, 500);
+                });
+            }
+        }
+
+        // Boot the System
+        const App = new FinTechApp();
+
     </script>
 </body>
 </html>
