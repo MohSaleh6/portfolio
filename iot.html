@@ -2,345 +2,601 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ENG.MOHAMMAD | Advanced Digital Twin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ENG.MOHAMMAD | Automotive Digital Twin</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=Syncopate:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
+    <!-- Three.js & GSAP Core -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
     <style>
+        /* ==========================================================================
+           01. SYSTEM VARIABLES & THEME ENGINE
+           ========================================================================== */
         :root {
-            --bg-dark: #020408; --panel-bg: rgba(8, 12, 20, 0.85); --border-core: rgba(74, 144, 226, 0.25);
-            --primary: #4A90E2; --accent: #FF9F1C; --danger: #ff3333; --success: #00ff41; --text-main: #f8fafc;
+            --bg-deep: #030508; --bg-panel: #0a0e17; --bg-glass: rgba(10, 14, 23, 0.85);
+            --border-primary: rgba(74, 144, 226, 0.15); --border-glow: rgba(74, 144, 226, 0.4);
+            --color-primary: #4A90E2; --color-accent: #FF9F1C; --color-danger: #ff3333; 
+            --color-success: #00ff41; --color-text: #f8fafc; --color-muted: #64748b;
+            --font-main: 'Space Grotesk', sans-serif; --font-mono: 'Share Tech Mono', monospace;
+            --font-head: 'Syncopate', sans-serif;
         }
 
+        /* ==========================================================================
+           02. BASE RESET & TYPOGRAPHY
+           ========================================================================== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Space Grotesk', sans-serif; background-color: var(--bg-dark); color: var(--text-main); height: 100vh; overflow: hidden; display: flex; background-image: radial-gradient(circle at center, rgba(74,144,226,0.03), #000 70%); }
+        body { font-family: var(--font-main); background-color: var(--bg-deep); color: var(--color-text); height: 100vh; display: flex; overflow: hidden; }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: var(--bg-deep); }
+        ::-webkit-scrollbar-thumb { background: var(--color-primary); border-radius: 2px; }
 
-        /* =========================================
-           SIDEBAR CONNECTION MATRIX
-           ========================================= */
-        .sidebar { width: 300px; background: rgba(4, 6, 10, 0.95); border-right: 1px solid var(--border-core); display: flex; flex-direction: column; padding: 30px 20px; z-index: 100; backdrop-filter: blur(20px); box-shadow: 10px 0 30px rgba(0,0,0,0.8); }
-        .brand { font-family: 'Syncopate', sans-serif; font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 10px; margin-bottom: 40px; color: #fff; }
-        .brand span { color: var(--primary); }
+        /* Blueprint Background */
+        .bg-grid { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; background-image: linear-gradient(rgba(74, 144, 226, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(74, 144, 226, 0.03) 1px, transparent 1px); background-size: 40px 40px; }
 
-        .conn-status-box { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 15px; margin-bottom: 30px; }
-        .conn-label { font-family: 'Share Tech Mono'; font-size: 10px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
-        .conn-value { font-family: 'Share Tech Mono'; font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 8px; color: var(--text-muted); }
-        .pulse { width: 8px; height: 8px; background: #666; border-radius: 50%; }
+        /* ==========================================================================
+           03. SPA SIDEBAR ARCHITECTURE (FinTech Style)
+           ========================================================================== */
+        .sidebar { width: 280px; background: rgba(5, 8, 13, 0.95); border-right: 1px solid var(--border-primary); display: flex; flex-direction: column; padding: 30px 20px; z-index: 100; backdrop-filter: blur(20px); box-shadow: 10px 0 30px rgba(0,0,0,0.9); }
+        .brand { font-family: var(--font-head); font-size: 18px; font-weight: 700; margin-bottom: 40px; display: flex; align-items: center; gap: 10px; color: #fff; letter-spacing: 1px; }
+        .brand span { color: var(--color-primary); text-shadow: 0 0 15px var(--color-primary); }
+
+        .nav-menu { display: flex; flex-direction: column; gap: 8px; margin-bottom: 40px; }
+        .nav-item { display: flex; align-items: center; gap: 15px; padding: 15px 20px; color: var(--color-muted); font-weight: 600; text-decoration: none; border-radius: 8px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; font-size: 14px; border-left: 3px solid transparent; }
+        .nav-item i { width: 20px; text-align: center; font-size: 16px; }
+        .nav-item:hover { background: rgba(74, 144, 226, 0.05); color: var(--color-primary); }
+        .nav-item.active { background: rgba(74, 144, 226, 0.1); color: var(--color-primary); border-left-color: var(--color-primary); box-shadow: inset 10px 0 20px -10px rgba(74, 144, 226, 0.3); }
+
+        /* Connection & Engine Controls */
+        .system-controls { margin-top: auto; display: flex; flex-direction: column; gap: 15px; }
+        .status-box { background: rgba(0,0,0,0.6); border: 1px solid var(--border-primary); border-radius: 8px; padding: 15px; text-align: center; }
+        .status-label { font-family: var(--font-mono); font-size: 10px; color: var(--color-muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; }
+        .status-indicator { display: flex; align-items: center; justify-content: center; gap: 10px; font-family: var(--font-mono); font-size: 14px; font-weight: bold; }
+        .pulse { width: 8px; height: 8px; border-radius: 50%; background: #555; }
+
+        /* Ignition Button */
+        .btn-ignition { background: rgba(255, 51, 51, 0.1); border: 1px solid var(--color-danger); color: var(--color-danger); padding: 15px; border-radius: 8px; font-family: var(--font-head); font-size: 14px; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; gap: 5px; text-shadow: 0 0 10px rgba(255,51,51,0.5); }
+        .btn-ignition i { font-size: 24px; }
+        .btn-ignition:hover { background: var(--color-danger); color: #fff; box-shadow: 0 0 25px rgba(255, 51, 51, 0.6); }
+        .btn-ignition.engine-on { background: rgba(0, 255, 65, 0.1); border-color: var(--color-success); color: var(--color-success); text-shadow: 0 0 10px rgba(0,255,65,0.5); }
+        .btn-ignition.engine-on:hover { background: var(--color-success); color: #000; box-shadow: 0 0 25px rgba(0, 255, 65, 0.6); }
+
+        /* Audio Toggle */
+        .audio-control { display: flex; align-items: center; justify-content: space-between; padding: 10px 15px; background: rgba(255,255,255,0.03); border-radius: 8px; cursor: pointer; border: 1px solid transparent; transition: 0.3s; }
+        .audio-control:hover { border-color: var(--border-primary); }
+        .audio-text { font-family: var(--font-mono); font-size: 11px; color: var(--color-muted); }
+        .audio-icon { color: var(--color-danger); font-size: 14px; }
+        .audio-icon.active { color: var(--color-success); }
+
+        /* ==========================================================================
+           04. MAIN CONTENT AREA & VIEWS
+           ========================================================================== */
+        .main-content { flex: 1; position: relative; overflow: hidden; background: radial-gradient(circle at 50% 50%, rgba(10,14,23,0) 0%, rgba(3,5,8,1) 100%); }
+        .view-section { position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 30px; display: none; opacity: 0; overflow-y: auto; transition: opacity 0.4s ease; }
+        .view-section.active { display: block; opacity: 1; animation: slideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+        /* View Headers */
+        .view-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 1px solid var(--border-primary); }
+        .view-title h1 { font-family: var(--font-head); font-size: 28px; letter-spacing: -1px; }
+        .view-title p { font-family: var(--font-mono); font-size: 12px; color: var(--color-muted); margin-top: 5px; }
+        .sys-metrics { font-family: var(--font-mono); font-size: 12px; color: var(--color-primary); text-align: right; }
+
+        /* ==========================================================================
+           05. VIEW: MAIN DASHBOARD (Gauges & Telemetry)
+           ========================================================================== */
+        .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; height: calc(100% - 100px); }
+        .panel { background: var(--bg-glass); border: 1px solid var(--border-primary); border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; backdrop-filter: blur(12px); box-shadow: inset 0 0 30px rgba(0,0,0,0.5); }
+        .panel-header { font-family: var(--font-mono); font-size: 13px; color: var(--color-primary); text-transform: uppercase; letter-spacing: 2px; padding: 15px 20px; background: rgba(0,0,0,0.4); border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; gap: 10px; }
+
+        /* Gauges Cluster */
+        .cluster-container { display: flex; justify-content: space-around; align-items: center; flex: 1; padding: 20px; }
+        .gauge-wrapper { position: relative; width: 45%; aspect-ratio: 1; max-width: 300px; display: flex; justify-content: center; align-items: center; }
+        .gauge-canvas { width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
+        .gauge-data { text-align: center; z-index: 10; }
+        .g-val { font-family: var(--font-mono); font-size: clamp(30px, 4vw, 55px); font-weight: 700; line-height: 1; text-shadow: 0 0 20px rgba(255,255,255,0.2); }
+        .g-unit { font-size: 11px; color: var(--color-muted); letter-spacing: 2px; margin-top: 5px; text-transform: uppercase; }
+
+        /* Vitals Grid */
+        .vitals-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 20px; }
+        .vital-card { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 20px; position: relative; overflow: hidden; }
+        .vital-card::before { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 3px; background: var(--color-primary); }
+        .v-label { font-family: var(--font-mono); font-size: 11px; color: var(--color-muted); text-transform: uppercase; margin-bottom: 10px; display: flex; justify-content: space-between; }
+        .v-val { font-family: var(--font-mono); font-size: 24px; font-weight: bold; color: var(--color-text); }
+        .v-graph { height: 30px; width: 100%; margin-top: 10px; }
+
+        /* ==========================================================================
+           06. VIEW: 3D DIGITAL TWIN & SPATIAL TARGETING
+           ========================================================================== */
+        .hologram-container { position: relative; width: 100%; height: calc(100% - 100px); border-radius: 16px; border: 1px solid var(--border-primary); overflow: hidden; box-shadow: inset 0 0 100px #000; background: radial-gradient(circle at center, #0a1220 0%, #010203 100%); }
+        #webgl-engine { width: 100%; height: 100%; }
         
-        .status-live { color: var(--success); text-shadow: 0 0 10px var(--success); }
-        .status-live .pulse { background: var(--success); animation: blink 1s infinite; box-shadow: 0 0 10px var(--success); }
-        .status-sim { color: var(--accent); text-shadow: 0 0 10px var(--accent); }
-        .status-sim .pulse { background: var(--accent); animation: blink 2s infinite; }
+        .holo-overlay { position: absolute; top: 20px; left: 20px; pointer-events: none; }
+        .holo-title { font-family: var(--font-head); font-size: 20px; text-shadow: 0 0 10px var(--color-primary); }
+        .holo-desc { font-family: var(--font-mono); font-size: 12px; color: var(--color-accent); margin-top: 5px; }
 
-        .btn-group { display: flex; flex-direction: column; gap: 12px; }
-        .btn { font-family: 'Share Tech Mono', monospace; font-size: 12px; padding: 12px; border-radius: 6px; cursor: pointer; transition: 0.3s; text-transform: uppercase; font-weight: bold; border: 1px solid transparent; display: flex; align-items: center; justify-content: center; gap: 10px; letter-spacing: 1px; }
-        .btn-connect { background: rgba(74, 144, 226, 0.1); border-color: var(--primary); color: var(--primary); }
-        .btn-connect:hover { background: var(--primary); color: #fff; box-shadow: 0 0 20px rgba(74, 144, 226, 0.4); }
-        .btn-demo { background: rgba(255, 159, 28, 0.05); border-color: var(--accent); color: var(--accent); }
-        .btn-demo:hover { background: var(--accent); color: #000; box-shadow: 0 0 20px rgba(255, 159, 28, 0.4); }
-        .btn-stop { background: rgba(255, 51, 51, 0.05); border-color: var(--danger); color: var(--danger); display: none; }
-        .btn-stop:hover { background: var(--danger); color: #fff; }
+        /* Smart Spatial Pointer */
+        #spatial-target { position: absolute; top: 0; left: 0; pointer-events: none; opacity: 0; transition: opacity 0.3s; z-index: 50; display: flex; align-items: center; transform: translate(0, -50%); }
+        .target-line { width: 150px; height: 1px; background: var(--color-danger); box-shadow: 0 0 10px var(--color-danger); position: relative; transform-origin: left center; }
+        .target-dot { position: absolute; left: 0; top: -4px; width: 9px; height: 9px; background: #fff; border-radius: 50%; border: 2px solid var(--color-danger); box-shadow: 0 0 15px var(--color-danger); }
+        .target-box { background: rgba(10, 14, 23, 0.9); border: 1px solid var(--color-danger); padding: 15px; border-radius: 8px; margin-left: 10px; backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(255,51,51,0.2); width: 280px; }
+        .target-head { display: flex; justify-content: space-between; font-family: var(--font-mono); color: var(--color-danger); font-size: 14px; font-weight: bold; border-bottom: 1px solid rgba(255,51,51,0.2); padding-bottom: 8px; margin-bottom: 8px; }
+        .target-body { font-size: 12px; color: var(--color-text); line-height: 1.5; }
+
+        /* ==========================================================================
+           07. VIEW: OBD-II SCANNER & DTC LOGIC
+           ========================================================================== */
+        .scanner-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px; height: calc(100% - 100px); }
         
-        .audio-toggle { margin-top: 20px; display: flex; align-items: center; gap: 10px; font-family: 'Share Tech Mono'; font-size: 11px; color: var(--text-muted); cursor: pointer; }
-        .audio-toggle i { font-size: 16px; color: var(--primary); }
+        .dtc-list { display: flex; flex-direction: column; gap: 15px; overflow-y: auto; padding-right: 10px; }
+        .dtc-empty { height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; color: var(--color-muted); font-family: var(--font-mono); border: 1px dashed rgba(255,255,255,0.1); border-radius: 12px; }
+        .dtc-empty i { font-size: 40px; color: var(--color-success); margin-bottom: 15px; text-shadow: 0 0 20px rgba(0,255,65,0.4); }
 
-        .btn-exit { margin-top: auto; color: var(--text-muted); text-decoration: none; font-size: 12px; text-align: center; border: 1px solid #333; padding: 10px; border-radius: 6px; transition: 0.3s; font-family: 'Share Tech Mono'; }
-        .btn-exit:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
+        .fault-card { background: rgba(255, 51, 51, 0.05); border: 1px solid rgba(255, 51, 51, 0.3); border-radius: 12px; padding: 20px; transition: 0.3s; cursor: pointer; animation: slideUp 0.4s ease forwards; }
+        .fault-card:hover, .fault-card.active { background: rgba(255, 51, 51, 0.1); border-color: var(--color-danger); box-shadow: 0 5px 20px rgba(255,51,51,0.15); transform: translateX(10px); }
+        .fc-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .fc-code { font-family: var(--font-head); font-size: 20px; color: var(--color-danger); font-weight: bold; }
+        .fc-module { font-family: var(--font-mono); font-size: 10px; background: var(--color-danger); color: #fff; padding: 4px 10px; border-radius: 12px; }
+        .fc-title { font-weight: bold; font-size: 15px; margin-bottom: 8px; }
+        .fc-desc { font-size: 13px; color: var(--color-muted); line-height: 1.6; }
 
-        /* =========================================
-           MAIN LAYOUT
-           ========================================= */
-        .main-stage { flex: 1; display: grid; grid-template-columns: 280px 1fr 380px; gap: 20px; padding: 20px; position: relative; }
-        
-        .panel { background: var(--panel-bg); border: 1px solid var(--border-core); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; backdrop-filter: blur(10px); }
-        .panel-header { font-family: 'Share Tech Mono', monospace; font-size: 12px; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; }
+        .scanner-actions { display: flex; flex-direction: column; gap: 15px; }
+        .btn-action { padding: 18px; border-radius: 8px; font-family: var(--font-mono); font-size: 13px; font-weight: bold; cursor: pointer; transition: 0.3s; display: flex; justify-content: center; align-items: center; gap: 10px; letter-spacing: 1px; }
+        .btn-scan { background: rgba(74, 144, 226, 0.1); border: 1px solid var(--color-primary); color: var(--color-primary); }
+        .btn-scan:hover { background: var(--color-primary); color: #fff; box-shadow: 0 0 20px rgba(74, 144, 226, 0.4); }
+        .btn-clear { background: rgba(0, 255, 65, 0.05); border: 1px solid var(--color-success); color: var(--color-success); }
+        .btn-clear:hover { background: var(--color-success); color: #000; box-shadow: 0 0 20px rgba(0, 255, 65, 0.4); }
+        .btn-inject { background: rgba(255, 159, 28, 0.05); border: 1px solid var(--color-accent); color: var(--color-accent); }
+        .btn-inject:hover { background: var(--color-accent); color: #000; box-shadow: 0 0 20px rgba(255, 159, 28, 0.4); }
 
-        /* LEFT: TELEMETRY GAUGES */
-        .telemetry-col { padding: 15px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; }
-        .gauge-wrapper { position: relative; display: flex; justify-content: center; align-items: center; flex-direction: column; }
-        canvas.gauge { width: 100%; max-width: 220px; height: auto; }
-        .gauge-data { position: absolute; text-align: center; top: 50%; transform: translateY(-30%); }
-        .g-val { font-size: 38px; font-weight: 700; font-family: 'Share Tech Mono', monospace; line-height: 1; text-shadow: 0 0 10px rgba(255,255,255,0.2); }
-        .g-unit { font-size: 10px; color: var(--text-muted); letter-spacing: 2px; margin-top: 5px; }
-        
-        .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .data-box { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); padding: 12px; border-radius: 6px; }
-        .db-label { font-family: 'Share Tech Mono'; font-size: 10px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 5px; }
-        .db-val { font-family: 'Share Tech Mono'; font-size: 16px; font-weight: bold; color: var(--primary); }
+        .terminal-panel { flex: 1; background: #000; border: 1px solid #222; border-radius: 12px; padding: 20px; font-family: var(--font-mono); font-size: 12px; color: #a3a3a3; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+        .log-tx { color: var(--color-primary); } .log-rx { color: var(--color-success); } .log-err { color: var(--color-danger); }
 
-        /* CENTER: 3D DIGITAL TWIN & SPATIAL POINTER */
-        .center-col { position: relative; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-core); box-shadow: inset 0 0 50px rgba(0,0,0,0.9); background: radial-gradient(circle at center, #0a111f, #020305); }
-        #car-canvas-container { width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
-        
-        .spatial-pointer { position: absolute; top: -100px; left: -100px; pointer-events: none; opacity: 0; transition: opacity 0.3s; display: flex; align-items: center; gap: 10px; z-index: 20; transform: translate(0, -50%); }
-        .sp-line { width: 40px; height: 1px; background: var(--danger); box-shadow: 0 0 5px var(--danger); position: relative; }
-        .sp-line::before { content: ''; position: absolute; left: 0; top: -3px; width: 6px; height: 6px; border-radius: 50%; background: var(--danger); box-shadow: 0 0 10px var(--danger); }
-        .sp-label { background: rgba(255, 51, 51, 0.15); border: 1px solid var(--danger); color: #fff; font-family: 'Share Tech Mono'; font-size: 11px; padding: 5px 10px; border-radius: 4px; backdrop-filter: blur(5px); text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 0 15px rgba(255,51,51,0.3); }
-
-        /* RIGHT: TERMINAL & DIAGNOSTICS */
-        .diag-col { display: flex; flex-direction: column; }
-        .terminal { height: 25%; background: #000; padding: 15px; font-family: 'Share Tech Mono', monospace; font-size: 11px; color: #a3a3a3; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; border-bottom: 1px solid var(--border-core); }
-        .log-sys { color: var(--primary); }
-        .log-tx { color: var(--success); }
-        .log-err { color: var(--danger); text-shadow: 0 0 5px rgba(255,51,51,0.5); }
-        .log-warn { color: var(--accent); }
-
-        .dtc-analyzer { flex: 1; background: rgba(0,0,0,0.4); padding: 20px; overflow-y: auto; position: relative; }
-        .empty-dtc { color: var(--text-muted); font-family: 'Share Tech Mono'; font-size: 12px; text-align: center; margin-top: 30px; }
-        
-        .dtc-card { background: rgba(10, 14, 22, 0.95); border: 1px solid var(--danger); border-radius: 8px; margin-bottom: 15px; display: none; animation: slideUp 0.4s ease; overflow: hidden; box-shadow: 0 5px 20px rgba(255,51,51,0.15); }
-        .dtc-header { background: rgba(255, 51, 51, 0.15); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,51,51,0.3); cursor: pointer; }
-        .dtc-code { font-family: 'Syncopate', sans-serif; color: var(--danger); font-size: 18px; font-weight: bold; text-shadow: 0 0 10px rgba(255,51,51,0.5); }
-        .dtc-body { padding: 15px; font-size: 12px; line-height: 1.6; }
-        .dtc-title { font-weight: bold; font-size: 14px; margin-bottom: 15px; color: #fff; }
-        .dtc-section { margin-bottom: 15px; background: rgba(255,255,255,0.02); padding: 10px; border-left: 2px solid var(--text-muted); border-radius: 0 4px 4px 0; }
-        .section-label { font-family: 'Share Tech Mono'; color: var(--primary); font-size: 10px; text-transform: uppercase; margin-bottom: 5px; }
-
-        .action-bar { padding: 15px; display: flex; flex-direction: column; gap: 10px; border-top: 1px solid var(--border-core); background: rgba(0,0,0,0.8); }
-        .btn-scan { background: rgba(255, 51, 51, 0.1); border: 1px solid var(--danger); color: var(--danger); padding: 12px; font-family: 'Share Tech Mono', monospace; font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.3s; border-radius: 4px; display: flex; justify-content: center; align-items: center; gap: 10px; }
-        .btn-scan:hover { background: var(--danger); color: #fff; box-shadow: 0 0 20px rgba(255, 51, 51, 0.4); }
-        .btn-clear { background: rgba(0, 255, 65, 0.05); border: 1px solid var(--success); color: var(--success); padding: 10px; font-family: 'Share Tech Mono', monospace; font-size: 11px; cursor: pointer; transition: 0.3s; border-radius: 4px; }
-        .btn-clear:hover { background: var(--success); color: #000; }
-
-        /* Cinematic Overlay */
-        #cinematic-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 99999; display: flex; justify-content: center; align-items: center; color: var(--primary); font-family: 'Syncopate', sans-serif; font-size: 24px; letter-spacing: 10px; pointer-events: none; }
+        /* ==========================================================================
+           08. VIEW: TERMINAL / SETTINGS
+           ========================================================================== */
+        .settings-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        .terminal-large { height: 500px; background: #000; border-radius: 12px; padding: 25px; font-family: var(--font-mono); font-size: 13px; color: #00ff41; overflow-y: auto; border: 1px solid #111; box-shadow: inset 0 0 30px #000; }
+        .terminal-large p { margin-bottom: 8px; }
 
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        @media (max-width: 1200px) {
-            body { overflow-y: auto; flex-direction: column; }
-            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border-core); padding: 20px; }
-            .brand { margin-bottom: 20px; }
-            .main-stage { grid-template-columns: 1fr; height: auto; }
-            .center-col { height: 500px; }
-            .diag-col { height: 600px; }
+        /* Responsive */
+        @media (max-width: 1024px) {
+            body { flex-direction: column; overflow-y: auto; }
+            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border-primary); padding: 20px; }
+            .dash-grid, .scanner-grid { grid-template-columns: 1fr; height: auto; }
+            .main-content { overflow-y: visible; height: auto; min-height: 100vh; }
+            .view-section { position: relative; height: auto; opacity: 1; display: none; }
+            .view-section.active { display: block; }
+            .hologram-container { height: 500px; }
+            .gauge-wrapper { width: 100%; }
         }
     </style>
 </head>
 <body>
 
-    <div id="cinematic-overlay">ASSEMBLING DIGITAL TWIN</div>
+    <div class="bg-grid"></div>
 
+    <!-- ==========================================================================
+         SIDEBAR NAVIGATION
+         ========================================================================== -->
     <aside class="sidebar">
         <div class="brand"><i class="fas fa-microchip"></i> IoT<span>.</span>TWIN</div>
         
-        <div class="conn-status-box">
-            <div class="conn-label">Hardware Link Protocol</div>
-            <div class="conn-value" id="conn-status">
-                <div class="pulse"></div> <span id="status-text">OFFLINE</span>
+        <nav class="nav-menu">
+            <a class="nav-item active" data-view="view-dash"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a class="nav-item" data-view="view-3d"><i class="fas fa-cube"></i> 3D Powertrain</a>
+            <a class="nav-item" data-view="view-obd"><i class="fas fa-stethoscope"></i> OBD-II Scanner</a>
+            <a class="nav-item" data-view="view-term"><i class="fas fa-terminal"></i> CAN Console</a>
+        </nav>
+
+        <div class="system-controls">
+            <div class="status-box">
+                <div class="status-label">Engine Control Unit</div>
+                <div class="status-indicator status-sim" id="ecu-status">
+                    <div class="pulse"></div> <span id="ecu-text">IGNITION OFF</span>
+                </div>
+            </div>
+
+            <button class="btn-ignition" id="btn-ignite" onclick="SimulationEngine.toggleIgnition()">
+                <i class="fas fa-power-off"></i>
+                <span id="ignite-text">START ENGINE</span>
+            </button>
+            
+            <div class="audio-control" onclick="AudioSystem.toggle()">
+                <div class="audio-text">V8 Synth Audio</div>
+                <i class="fas fa-volume-mute audio-icon" id="audio-icon"></i>
             </div>
         </div>
-
-        <div class="btn-group">
-            <button class="btn btn-connect" onclick="AppCore.connectHardware()"><i class="fab fa-bluetooth-b"></i> PAIR OBD-II SCANNER</button>
-            <button class="btn btn-demo" id="btn-demo" onclick="AppCore.startDemo()"><i class="fas fa-play"></i> START SIMULATION</button>
-            <button class="btn btn-stop" id="btn-stop" onclick="AppCore.stopSimulation()"><i class="fas fa-stop"></i> CUT IGNITION</button>
-        </div>
-
-        <div class="audio-toggle" onclick="AppCore.toggleAudio()">
-            <i class="fas fa-volume-mute" id="audio-icon"></i> <span>Engine Synth (Web Audio)</span>
-        </div>
-
-        <a href="index.html" class="btn-exit"><i class="fas fa-arrow-left"></i> Return to Portfolio</a>
     </aside>
 
-    <div class="main-stage">
+    <!-- ==========================================================================
+         MAIN CONTENT AREA
+         ========================================================================== -->
+    <main class="main-content">
         
-        <div class="panel telemetry-col">
-            <div class="panel-header"><span>Telemetry</span> <i class="fas fa-tachometer-alt"></i></div>
-            
-            <div class="gauge-wrapper">
-                <canvas id="rpmGauge" class="gauge"></canvas>
-                <div class="gauge-data">
-                    <div class="g-val" id="val-rpm" style="color: var(--accent);">0</div>
-                    <div class="g-unit">ENGINE RPM</div>
+        <!-- VIEW 1: DASHBOARD -->
+        <section class="view-section active" id="view-dash">
+            <div class="view-header">
+                <div class="view-title">
+                    <h1>Telemetry Cluster</h1>
+                    <p>Real-time thermodynamic and kinematic vehicle data</p>
                 </div>
-            </div>
-            
-            <div class="gauge-wrapper">
-                <canvas id="speedGauge" class="gauge"></canvas>
-                <div class="gauge-data">
-                    <div class="g-val" id="val-speed" style="color: var(--primary);">0</div>
-                    <div class="g-unit">VEHICLE KM/H</div>
-                </div>
+                <div class="sys-metrics">REFRESH RATE: 60Hz<br>PROTOCOL: ISO 15765-4</div>
             </div>
 
-            <div class="data-grid">
-                <div class="data-box"><div class="db-label">Coolant (05)</div><div class="db-val" id="val-temp">-- °C</div></div>
-                <div class="data-box"><div class="db-label">Load (04)</div><div class="db-val" id="val-load">-- %</div></div>
-                <div class="data-box"><div class="db-label">Throttle (11)</div><div class="db-val" id="val-throttle">-- %</div></div>
-                <div class="data-box"><div class="db-label">Voltage (RV)</div><div class="db-val" id="val-volt">12.1 V</div></div>
-            </div>
-        </div>
-
-        <div class="center-col">
-            <div id="car-canvas-container"></div>
-            
-            <div class="spatial-pointer" id="spatial-pointer">
-                <div class="sp-line"></div>
-                <div class="sp-label" id="sp-text">FAULT DETECTED</div>
-            </div>
-
-        </div>
-
-        <div class="panel diag-col">
-            <div class="panel-header"><span>ECU Diagnostics</span> <i class="fas fa-laptop-code"></i></div>
-            
-            <div class="terminal" id="terminal-out">
-                <div class="log-sys">> SYSTEM KERNEL INITIALIZED</div>
-                <div class="log-sys">> AWAITING HARDWARE CONNECTION OR SIMULATION...</div>
-            </div>
-
-            <div class="dtc-analyzer" id="dtc-container">
-                <div class="empty-dtc" id="empty-dtc-msg">
-                    <i class="fas fa-check-circle" style="font-size: 30px; color: var(--success); margin-bottom: 10px; display: block;"></i>
-                    SYSTEM OPTIMAL. NO FAULTS DETECTED.
-                </div>
+            <div class="dash-grid">
+                <!-- Gauges -->
+                <div class="panel">
+                    <div class="panel-header"><i class="fas fa-circle-notch"></i> Primary Instruments</div>
+                    <div class="cluster-container">
+                        <div class="gauge-wrapper">
+                            <canvas class="gauge-canvas" id="gauge-rpm"></canvas>
+                            <div class="gauge-data">
+                                <div class="g-val" id="val-rpm" style="color: var(--color-accent);">0</div>
+                                <div class="g-unit">RPM</div>
+                            </div>
+                        </div>
+                        <div class="gauge-wrapper">
+                            <canvas class="gauge-canvas" id="gauge-speed"></canvas>
+                            <div class="gauge-data">
+                                <div class="g-val" id="val-speed" style="color: var(--color-primary);">0</div>
+                                <div class="g-unit">KM/H</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-            <div class="action-bar">
-                <button class="btn-scan" onclick="AppCore.runDiagnostics()"><i class="fas fa-search"></i> REQUEST DTCs (MODE 03)</button>
-                <button class="btn-clear" onclick="AppCore.clearCodes()"><i class="fas fa-eraser"></i> CLEAR CODES (MODE 04)</button>
+                <!-- Vitals -->
+                <div class="panel">
+                    <div class="panel-header"><i class="fas fa-bolt"></i> Thermodynamics & ECU Vitals</div>
+                    <div class="vitals-grid">
+                        <div class="vital-card">
+                            <div class="v-label">Coolant Temp (05) <i class="fas fa-thermometer-half"></i></div>
+                            <div class="v-val" id="val-temp">-- °C</div>
+                            <canvas class="v-graph" id="graph-temp"></canvas>
+                        </div>
+                        <div class="vital-card">
+                            <div class="v-label">Calculated Load (04) <i class="fas fa-weight-hanging"></i></div>
+                            <div class="v-val" id="val-load">-- %</div>
+                            <canvas class="v-graph" id="graph-load"></canvas>
+                        </div>
+                        <div class="vital-card">
+                            <div class="v-label">Horsepower (Calc) <i class="fas fa-horse"></i></div>
+                            <div class="v-val" id="val-hp">-- HP</div>
+                            <canvas class="v-graph" id="graph-hp"></canvas>
+                        </div>
+                        <div class="vital-card">
+                            <div class="v-label">Battery Voltage (RV) <i class="fas fa-car-battery"></i></div>
+                            <div class="v-val" id="val-volt">12.1 V</div>
+                            <canvas class="v-graph" id="graph-volt"></canvas>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
+        </section>
 
-    </div>
+        <!-- VIEW 2: 3D DIGITAL TWIN -->
+        <section class="view-section" id="view-3d">
+            <div class="view-header">
+                <div class="view-title">
+                    <h1>3D Powertrain Topology</h1>
+                    <p>Procedural WebGL Engine Block & Drive-train Simulation</p>
+                </div>
+                <div class="sys-metrics">VERTICES: 12,450<br>RENDER ENGINE: THREE.JS</div>
+            </div>
 
+            <div class="hologram-container">
+                <div id="webgl-engine"></div>
+                <div class="holo-overlay">
+                    <div class="holo-title">V8 ARCHITECTURE</div>
+                    <div class="holo-desc">Live Kinetic Tracking</div>
+                </div>
+
+                <!-- SMART TARGETING POINTER -->
+                <div id="spatial-target">
+                    <div class="target-dot"></div>
+                    <div class="target-line" id="target-line"></div>
+                    <div class="target-box">
+                        <div class="target-head"><span id="target-code">P0000</span> <i class="fas fa-exclamation-triangle"></i></div>
+                        <div class="target-body" id="target-desc">Locating component...</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 3: OBD-II SCANNER -->
+        <section class="view-section" id="view-obd">
+            <div class="view-header">
+                <div class="view-title">
+                    <h1>OBD-II Diagnostic Center</h1>
+                    <p>Deep scan logic, DTC analysis, and repair procedures</p>
+                </div>
+            </div>
+
+            <div class="scanner-grid">
+                <div class="panel">
+                    <div class="panel-header"><i class="fas fa-clipboard-list"></i> Detected Fault Codes</div>
+                    <div class="dtc-list" id="dtc-list">
+                        <div class="dtc-empty" id="dtc-empty">
+                            <i class="fas fa-shield-check"></i>
+                            <h2>SYSTEM OPTIMAL</h2>
+                            <p>No Diagnostic Trouble Codes (DTCs) found in ECU.</p>
+                        </div>
+                        <!-- Fault Cards Injected Here -->
+                    </div>
+                </div>
+
+                <div class="scanner-actions">
+                    <button class="btn-action btn-scan" onclick="DiagnosticsController.runScan()"><i class="fas fa-search"></i> REQUEST DTCs (MODE 03)</button>
+                    <button class="btn-action btn-inject" onclick="DiagnosticsController.injectFault()"><i class="fas fa-bug"></i> INJECT TEST FAULT</button>
+                    <button class="btn-action btn-clear" onclick="DiagnosticsController.clearCodes()"><i class="fas fa-eraser"></i> CLEAR CODES (MODE 04)</button>
+                    
+                    <div class="terminal-panel" id="mini-terminal">
+                        <div class="log-tx">> OBD-II SCANNER READY.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 4: CAN TERMINAL -->
+        <section class="view-section" id="view-term">
+            <div class="view-header">
+                <div class="view-title">
+                    <h1>CAN-BUS Console</h1>
+                    <p>Raw hexadecimal data stream from Engine Control Unit</p>
+                </div>
+            </div>
+            <div class="terminal-large" id="main-terminal">
+                <p>> STARTING CAN-BUS SNIFFER...</p>
+                <p>> PROTOCOL: ISO 15765-4 CAN (11 bit ID, 500 Kbaud)</p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ==========================================================================
+         JAVASCRIPT KERNEL (ARCHITECTURE & LOGIC)
+         ========================================================================== -->
     <script>
         /**
-         * ==========================================
-         * 1. SYNTHESIZER: WEB AUDIO API ENGINE SOUND
-         * Dynamically generates engine noise based on RPM
-         * ==========================================
+         * GLOBAL UTILITIES
          */
-        class EngineAudio {
+        const MathUtils = {
+            lerp: (s, e, f) => s + (e - s) * f,
+            clamp: (v, min, max) => Math.min(Math.max(v, min), max),
+            map: (v, inMin, inMax, outMin, outMax) => (v - inMin) * (outMax - outMin) / (inMax - inMin) + outMin
+        };
+
+        /**
+         * 1. SPA ROUTER CONTROLLER
+         */
+        class UIController {
             constructor() {
-                this.ctx = null;
-                this.osc = null;
-                this.gainNode = null;
-                this.filter = null;
-                this.isPlaying = false;
-                this.isMuted = true;
+                this.navItems = document.querySelectorAll('.nav-item');
+                this.views = document.querySelectorAll('.view-section');
+                this.initEvents();
+            }
+            initEvents() {
+                this.navItems.forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const target = item.getAttribute('data-view');
+                        
+                        this.navItems.forEach(n => n.classList.remove('active'));
+                        item.classList.add('active');
+                        
+                        this.views.forEach(v => {
+                            v.classList.remove('active');
+                            if(v.id === target) v.classList.add('active');
+                        });
+
+                        // Resize 3D canvas if 3D tab is clicked to fix aspect ratio
+                        if(target === 'view-3d' && window.Engine3D) {
+                            setTimeout(() => window.Engine3D.resize(), 100);
+                        }
+                    });
+                });
+            }
+            
+            logTerminal(msg, type='tx') {
+                const terms = [document.getElementById('mini-terminal'), document.getElementById('main-terminal')];
+                const time = new Date().toISOString().substring(11, 23);
+                const html = `<p class="log-${type}">[${time}] ${msg}</p>`;
+                terms.forEach(t => {
+                    if(!t) return;
+                    t.insertAdjacentHTML('beforeend', html);
+                    if(t.children.length > 50) t.removeChild(t.firstChild);
+                    t.scrollTop = t.scrollHeight;
+                });
+            }
+        }
+
+        /**
+         * 2. CUSTOM CANVAS GAUGES & GRAPHS
+         */
+        class DashboardGauges {
+            constructor() {
+                this.rpmGauge = this.initArcGauge('gauge-rpm', 8000, '#FF9F1C');
+                this.speedGauge = this.initArcGauge('gauge-speed', 260, '#4A90E2');
+                
+                // Mini Graphs history
+                this.history = { temp: [], load: [], hp: [], volt: [] };
+                this.graphs = {
+                    temp: document.getElementById('graph-temp').getContext('2d'),
+                    load: document.getElementById('graph-load').getContext('2d'),
+                    hp: document.getElementById('graph-hp').getContext('2d'),
+                    volt: document.getElementById('graph-volt').getContext('2d')
+                };
             }
 
-            init() {
-                if(this.ctx) return;
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                this.ctx = new AudioContext();
+            initArcGauge(id, max, color) {
+                const canvas = document.getElementById(id);
+                const ctx = canvas.getContext('2d');
+                const state = { curr: 0, target: 0 };
                 
-                this.osc = this.ctx.createOscillator();
-                this.osc.type = 'sawtooth'; // Rough, engine-like waveform
-                
-                this.filter = this.ctx.createBiquadFilter();
-                this.filter.type = 'lowpass';
-                this.filter.frequency.value = 400; // Muffle it to sound like an exhaust
+                const draw = () => {
+                    const rect = canvas.parentElement.getBoundingClientRect();
+                    canvas.width = rect.width; canvas.height = rect.width;
+                    const w = canvas.width, cx = w/2, cy = w/2, r = w/2 - 15;
+                    
+                    state.curr = MathUtils.lerp(state.curr, state.target, 0.1);
+                    ctx.clearRect(0,0,w,w);
 
-                this.gainNode = this.ctx.createGain();
-                this.gainNode.gain.value = 0; // Start silent
+                    // Track
+                    ctx.beginPath(); ctx.arc(cx, cy, r, 0.75*Math.PI, 2.25*Math.PI);
+                    ctx.strokeStyle = 'rgba(255,255,255,0.05)'; ctx.lineWidth = 15; ctx.lineCap = 'round'; ctx.stroke();
 
-                this.osc.connect(this.filter);
-                this.filter.connect(this.gainNode);
-                this.gainNode.connect(this.ctx.destination);
-                
-                this.osc.start();
+                    // Value
+                    const pct = state.curr / max;
+                    ctx.beginPath(); ctx.arc(cx, cy, r, 0.75*Math.PI, 0.75*Math.PI + (1.5*Math.PI*pct));
+                    ctx.strokeStyle = color; ctx.lineWidth = 15; ctx.stroke();
+
+                    // Ticks
+                    for(let i=0; i<=10; i++) {
+                        const ang = 0.75*Math.PI + (1.5*Math.PI*(i/10));
+                        ctx.beginPath();
+                        ctx.moveTo(cx + (r-20)*Math.cos(ang), cy + (r-20)*Math.sin(ang));
+                        ctx.lineTo(cx + (r-30)*Math.cos(ang), cy + (r-30)*Math.sin(ang));
+                        ctx.strokeStyle = i>=8 ? '#ff3333' : 'rgba(255,255,255,0.2)'; ctx.lineWidth = 2; ctx.stroke();
+                    }
+                    requestAnimationFrame(draw);
+                };
+                draw();
+                return state;
             }
 
-            toggleMute() {
+            updateMiniGraph(key, val, max, color) {
+                const arr = this.history[key];
+                arr.push(val); if(arr.length > 30) arr.shift();
+                
+                const ctx = this.graphs[key];
+                const canvas = ctx.canvas;
+                canvas.width = canvas.parentElement.clientWidth;
+                canvas.height = 30;
+                
+                ctx.clearRect(0,0,canvas.width, canvas.height);
+                ctx.beginPath();
+                ctx.moveTo(0, canvas.height);
+                
+                const stepX = canvas.width / 29;
+                arr.forEach((v, i) => {
+                    const y = canvas.height - (v/max)*canvas.height;
+                    ctx.lineTo(i * stepX, y);
+                });
+                
+                ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.stroke();
+                ctx.lineTo(canvas.width, canvas.height);
+                ctx.fillStyle = color.replace(')', ', 0.2)').replace('rgb', 'rgba');
+                ctx.fill();
+            }
+
+            update(rpm, speed, temp, load, hp, volt) {
+                this.rpmGauge.target = rpm;
+                this.speedGauge.target = speed;
+                
+                document.getElementById('val-rpm').innerText = Math.round(rpm);
+                document.getElementById('val-speed').innerText = Math.round(speed);
+                document.getElementById('val-temp').innerText = Math.round(temp) + ' °C';
+                document.getElementById('val-load').innerText = Math.round(load) + ' %';
+                document.getElementById('val-hp').innerText = Math.round(hp) + ' HP';
+                document.getElementById('val-volt').innerText = volt.toFixed(1) + ' V';
+
+                this.updateMiniGraph('temp', temp, 120, 'rgb(255, 51, 51)');
+                this.updateMiniGraph('load', load, 100, 'rgb(74, 144, 226)');
+                this.updateMiniGraph('hp', hp, 500, 'rgb(255, 159, 28)');
+                this.updateMiniGraph('volt', volt, 16, 'rgb(0, 255, 65)');
+            }
+        }
+
+        /**
+         * 3. SYNTHESIZER: WEB AUDIO V8 ENGINE
+         */
+        class AudioSystem {
+            static ctx = null;
+            static gain = null;
+            static oscBase = null;
+            static oscHarmonic = null;
+            static isMuted = true;
+            static isRunning = false;
+
+            static toggle() {
                 this.isMuted = !this.isMuted;
                 const icon = document.getElementById('audio-icon');
                 if(this.isMuted) {
-                    icon.className = 'fas fa-volume-mute';
-                    if(this.gainNode) this.gainNode.gain.setTargetAtTime(0, this.ctx.currentTime, 0.1);
+                    icon.className = 'fas fa-volume-mute audio-icon';
+                    if(this.gain) this.gain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.1);
                 } else {
-                    icon.className = 'fas fa-volume-up';
+                    icon.className = 'fas fa-volume-up audio-icon active';
                     this.init();
-                    if(this.isPlaying) this.gainNode.gain.setTargetAtTime(0.3, this.ctx.currentTime, 0.1);
+                    if(this.isRunning) this.gain.gain.setTargetAtTime(0.3, this.ctx.currentTime, 0.1);
                 }
             }
 
-            startEngine() {
-                this.init();
-                this.isPlaying = true;
-                if(!this.isMuted) this.gainNode.gain.setTargetAtTime(0.3, this.ctx.currentTime, 0.5);
-            }
-
-            stopEngine() {
-                this.isPlaying = false;
-                if(this.gainNode) this.gainNode.gain.setTargetAtTime(0, this.ctx.currentTime, 0.5);
-            }
-
-            updateRPM(rpm) {
-                if(!this.isPlaying || !this.osc) return;
-                // Map RPM (800-8000) to Frequency (40Hz - 200Hz)
-                const baseFreq = 30;
-                const targetFreq = baseFreq + (rpm / 8000) * 150;
-                this.osc.frequency.setTargetAtTime(targetFreq, this.ctx.currentTime, 0.1);
+            static init() {
+                if(this.ctx) return;
+                const AC = window.AudioContext || window.webkitAudioContext;
+                this.ctx = new AC();
                 
-                // Increase lowpass filter frequency with RPM for a "roaring" effect
-                this.filter.frequency.setTargetAtTime(400 + (rpm/8000)*800, this.ctx.currentTime, 0.1);
+                // Deep V8 rumble
+                this.oscBase = this.ctx.createOscillator();
+                this.oscBase.type = 'sawtooth';
+                
+                // Higher harmonic for engine whine
+                this.oscHarmonic = this.ctx.createOscillator();
+                this.oscHarmonic.type = 'triangle';
+
+                // Lowpass filter to muffle and sound like exhaust
+                const filter = this.ctx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.value = 150;
+
+                this.gain = this.ctx.createGain();
+                this.gain.gain.value = 0;
+
+                this.oscBase.connect(filter);
+                this.oscHarmonic.connect(filter);
+                filter.connect(this.gain);
+                this.gain.connect(this.ctx.destination);
+                
+                this.oscBase.start();
+                this.oscHarmonic.start();
+            }
+
+            static start() {
+                this.isRunning = true;
+                if(!this.ctx) this.init();
+                if(!this.isMuted) this.gain.gain.setTargetAtTime(0.3, this.ctx.currentTime, 0.5);
+            }
+
+            static stop() {
+                this.isRunning = false;
+                if(this.gain) this.gain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.5);
+            }
+
+            static update(rpm) {
+                if(!this.isRunning || !this.oscBase) return;
+                // V8 Engine frequency math
+                // Idle 800 RPM = ~26Hz for V8 (800 / 60 * 4 strokes)
+                const freq = (rpm / 60) * 2; 
+                
+                this.oscBase.frequency.setTargetAtTime(freq, this.ctx.currentTime, 0.1);
+                this.oscHarmonic.frequency.setTargetAtTime(freq * 2.5, this.ctx.currentTime, 0.1);
             }
         }
 
         /**
-         * ==========================================
-         * 2. CUSTOM CANVAS TRIGONOMETRIC GAUGE
-         * ==========================================
+         * 4. 3D DIGITAL TWIN (THREE.JS PROCEDURAL ENGINE)
          */
-        class HUDGauge {
-            constructor(canvasId, maxVal, color) {
-                this.canvas = document.getElementById(canvasId);
-                this.ctx = this.canvas.getContext('2d');
-                const dpr = window.devicePixelRatio || 1;
-                const rect = this.canvas.parentElement.getBoundingClientRect();
-                const size = Math.min(rect.width, 220); 
-                
-                this.canvas.width = size * dpr; this.canvas.height = size * dpr;
-                this.ctx.scale(dpr, dpr);
-                this.w = size; this.h = size;
-                this.max = maxVal; this.color = color;
-                this.curr = 0; this.target = 0;
-                this.draw();
-            }
-            set(val) { this.target = Math.min(Math.max(val, 0), this.max); }
-            draw() {
-                this.curr += (this.target - this.curr) * 0.15;
-                const ctx = this.ctx; const cx = this.w/2, cy = this.h/2, r = this.w/2 - 15;
-                ctx.clearRect(0, 0, this.w, this.h);
-
-                ctx.beginPath(); ctx.arc(cx, cy, r, 0.75 * Math.PI, 2.25 * Math.PI);
-                ctx.strokeStyle = 'rgba(255,255,255,0.05)'; ctx.lineWidth = 12; ctx.lineCap = 'round'; ctx.stroke();
-
-                const pct = this.curr / this.max;
-                const end = 0.75 * Math.PI + (1.5 * Math.PI * pct);
-                ctx.beginPath(); ctx.arc(cx, cy, r, 0.75 * Math.PI, end);
-                ctx.strokeStyle = this.color; ctx.lineWidth = 12; ctx.stroke();
-
-                for(let i=0; i<=10; i++) {
-                    const ang = 0.75 * Math.PI + (1.5 * Math.PI * (i/10));
-                    ctx.beginPath();
-                    ctx.moveTo(cx + (r-18)*Math.cos(ang), cy + (r-18)*Math.sin(ang));
-                    ctx.lineTo(cx + (r-26)*Math.cos(ang), cy + (r-26)*Math.sin(ang));
-                    ctx.strokeStyle = i>=8 ? '#ff3333' : 'rgba(255,255,255,0.2)'; ctx.lineWidth = 2; ctx.stroke();
-                }
-                requestAnimationFrame(() => this.draw());
-            }
-        }
-
-        /**
-         * ==========================================
-         * 3. PROCEDURAL 3D CAR VISUALIZER (Extremely Detailed)
-         * ==========================================
-         */
-        class CarVisualizer {
+        class HologramEngine {
             constructor() {
-                this.container = document.getElementById('car-canvas-container');
+                this.container = document.getElementById('webgl-engine');
                 this.scene = new THREE.Scene();
                 this.camera = new THREE.PerspectiveCamera(45, this.container.clientWidth / this.container.clientHeight, 0.1, 1000);
                 this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: "high-performance" });
@@ -348,194 +604,159 @@
                 this.container.appendChild(this.renderer.domElement);
 
                 this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
-                this.controls.enableDamping = true; this.controls.autoRotate = false; // Will be handled by GSAP initially
-                this.controls.maxPolarAngle = Math.PI / 2;
+                this.controls.enableDamping = true; 
+                this.controls.autoRotate = true; 
+                this.controls.autoRotateSpeed = 2.0;
+                this.controls.maxPolarAngle = Math.PI / 2 + 0.2;
 
-                this.carGroup = new THREE.Group();
-                this.parts = {}; 
-                this.movingParts = []; // For RPM animations
+                this.components = {}; // For targeting
+                this.kinematics = []; // Parts that move
 
-                // Materials
-                this.matFrame = new THREE.MeshStandardMaterial({ color: 0x1e293b, wireframe: true, transparent: true, opacity: 0.1 });
-                this.matTech = new THREE.MeshStandardMaterial({ color: 0x4A90E2, wireframe: true, transparent: true, opacity: 0.4 });
-                this.matSolid = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.8, roughness: 0.2 });
-                this.matError = new THREE.MeshStandardMaterial({ color: 0xff3333, wireframe: false, emissive: 0xff3333, emissiveIntensity: 0.8 });
-
-                const ambientLight = new THREE.AmbientLight(0xffffff, 0.6); this.scene.add(ambientLight);
-                const dirLight = new THREE.DirectionalLight(0xffffff, 1); dirLight.position.set(10, 20, 10); this.scene.add(dirLight);
-
-                this.buildHyperDetailedCar();
-                this.scene.add(this.carGroup);
+                this.buildEngineTopology();
+                this.camera.position.set(30, 20, 40);
                 
-                const grid = new THREE.GridHelper(100, 50, 0x4A90E2, 0x111122); grid.position.y = -3; this.scene.add(grid);
+                // Target Pointer Elements
+                this.pointer = document.getElementById('spatial-target');
+                this.targetLine = document.getElementById('target-line');
+                this.activeFault = null;
 
                 window.addEventListener('resize', () => this.resize());
-                
-                // Spatial Pointer Logic
-                this.pointerEl = document.getElementById('spatial-pointer');
-                this.activeFaultPart = null;
-
                 this.animate();
             }
 
-            buildHyperDetailedCar() {
-                // 1. CHASSIS FRAME
-                const chassis = new THREE.Mesh(new THREE.BoxGeometry(14, 1.5, 32), this.matFrame);
-                this.carGroup.add(chassis);
+            buildEngineTopology() {
+                this.group = new THREE.Group();
+                this.scene.add(this.group);
 
-                // 2. V8 ENGINE BLOCK (Highly detailed procedurally)
-                this.parts.engine = new THREE.Group();
-                const block = new THREE.Mesh(new THREE.BoxGeometry(5, 4, 6), this.matSolid);
-                this.parts.engine.add(block);
+                const matGhost = new THREE.MeshStandardMaterial({ color: 0x4A90E2, wireframe: true, transparent: true, opacity: 0.15 });
+                const matSolid = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.8, roughness: 0.2 });
+                const matWarn = new THREE.MeshStandardMaterial({ color: 0xff3333, emissive: 0xff0000, emissiveIntensity: 0.5 });
+                this.mats = { base: matGhost, solid: matSolid, err: matWarn };
+
+                // Lights
+                this.scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+                const dLight = new THREE.DirectionalLight(0xffffff, 1); dLight.position.set(10, 20, 10); this.scene.add(dLight);
+
+                // --- 1. ENGINE BLOCK (V8) ---
+                this.components.engine = new THREE.Group();
+                const block = new THREE.Mesh(new THREE.BoxGeometry(8, 6, 10), matSolid);
+                this.components.engine.add(block);
                 
-                // Cylinder Heads (V-Shape)
-                const headGeo = new THREE.BoxGeometry(2.5, 2, 6);
-                const headL = new THREE.Mesh(headGeo, this.matTech); headL.position.set(-2, 1.5, 0); headL.rotation.z = 0.5;
-                const headR = new THREE.Mesh(headGeo, this.matTech); headR.position.set(2, 1.5, 0); headR.rotation.z = -0.5;
-                this.parts.engine.add(headL, headR);
-
-                // Crank Pulley (Will rotate)
-                const pulleyGeo = new THREE.CylinderGeometry(0.8, 0.8, 0.5, 16);
-                const pulley = new THREE.Mesh(pulleyGeo, this.matTech);
-                pulley.rotation.z = Math.PI/2; pulley.position.set(0, -1, 3.2);
-                this.parts.engine.add(pulley);
-                this.movingParts.push({ mesh: pulley, axis: 'x', mult: 1 });
-
-                this.parts.engine.position.set(0, 2, 10);
-                this.carGroup.add(this.parts.engine);
-
-                // 3. EXHAUST SYSTEM & CATALYST
-                this.parts.exhaust = new THREE.Group();
-                // Manifolds
-                const manGeo = new THREE.CylinderGeometry(0.3, 0.3, 3);
-                const manL = new THREE.Mesh(manGeo, this.matTech); manL.position.set(-3, 0, 9); manL.rotation.x = Math.PI/2;
-                const manR = new THREE.Mesh(manGeo, this.matTech); manR.position.set(3, 0, 9); manR.rotation.x = Math.PI/2;
-                
-                // Main Pipes
-                const pipeGeo = new THREE.CylinderGeometry(0.4, 0.4, 26);
-                const pipeL = new THREE.Mesh(pipeGeo, this.matTech); pipeL.position.set(-2, -1, -3); pipeL.rotation.x = Math.PI/2;
-                const pipeR = new THREE.Mesh(pipeGeo, this.matTech); pipeR.position.set(2, -1, -3); pipeR.rotation.x = Math.PI/2;
-                
-                // Catalytic Converters (The target for P0420)
-                const catGeo = new THREE.CylinderGeometry(1.2, 1.2, 4, 16);
-                const catL = new THREE.Mesh(catGeo, this.matSolid); catL.position.set(-2, -1, 4); catL.rotation.x = Math.PI/2;
-                const catR = new THREE.Mesh(catGeo, this.matSolid); catR.position.set(2, -1, 4); catR.rotation.x = Math.PI/2;
-                
-                this.parts.exhaust.add(manL, manR, pipeL, pipeR, catL, catR);
-                this.carGroup.add(this.parts.exhaust);
-
-                // 4. ECU (Computer)
-                this.parts.ecu = new THREE.Mesh(new THREE.BoxGeometry(2.5, 0.5, 3), this.matTech);
-                this.parts.ecu.position.set(-5, 3, 12);
-                this.carGroup.add(this.parts.ecu);
-
-                // 5. DRIVESHAFT & DIFFERENTIAL
-                const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 18), this.matTech);
-                shaft.rotation.x = Math.PI/2; shaft.position.set(0, -0.5, -2);
-                this.carGroup.add(shaft);
-                this.movingParts.push({ mesh: shaft, axis: 'z', mult: 0.5 }); // Rotates with speed
-
-                // 6. SUSPENSION SPRINGS (Procedural Math)
-                const createSpring = (x, z) => {
-                    const curve = new THREE.CatmullRomCurve3(
-                        Array.from({length: 40}, (_, i) => {
-                            const t = i / 40; const a = t * Math.PI * 10;
-                            return new THREE.Vector3(Math.cos(a)*0.8, t*3 - 1.5, Math.sin(a)*0.8);
-                        })
-                    );
-                    const spring = new THREE.Mesh(new THREE.TubeGeometry(curve, 60, 0.15, 8, false), this.matTech);
-                    spring.position.set(x, 0, z);
-                    this.carGroup.add(spring);
-                };
-                createSpring(6, 11); createSpring(-6, 11); createSpring(6, -11); createSpring(-6, -11);
-
-                // Wheels
-                const wheelGeo = new THREE.CylinderGeometry(3, 3, 1.5, 24);
-                const wheelPos = [ [7.5, 0, 11], [-7.5, 0, 11], [7.5, 0, -11], [-7.5, 0, -11] ];
-                this.wheels = [];
-                wheelPos.forEach(pos => {
-                    let w = new THREE.Mesh(wheelGeo, this.matFrame);
-                    w.rotation.z = Math.PI / 2; w.position.set(...pos);
-                    this.carGroup.add(w);
-                    this.wheels.push(w);
-                });
-            }
-
-            introAnimation() {
-                // Cinematic assembly effect
-                this.carGroup.position.y = 50;
-                gsap.to(this.carGroup.position, { y: 0, duration: 2, ease: "bounce.out" });
-                this.camera.position.set(40, 30, 50);
-                gsap.to(this.camera.position, { x: 25, y: 15, z: 35, duration: 3, ease: "power3.out" });
-                this.controls.autoRotate = true;
-            }
-
-            highlightPart(partName, text) {
-                this.resetMaterials();
-                this.controls.autoRotate = false;
-                const target = this.parts[partName];
-                
-                if(target) {
-                    this.activeFaultPart = target;
-                    const setErr = (mesh) => { mesh.material = this.matError; };
-                    if(target.type === 'Group') target.children.forEach(setErr); else setErr(target);
+                // Pistons inside V block (Procedural math)
+                this.pistons = [];
+                const cylGeo = new THREE.CylinderGeometry(0.8, 0.8, 2, 16);
+                for(let i=0; i<4; i++) {
+                    // Left bank
+                    let pL = new THREE.Mesh(cylGeo, matGhost.clone());
+                    pL.position.set(-3, 2, -3 + i*2); pL.rotation.z = 0.5;
+                    // Right bank
+                    let pR = new THREE.Mesh(cylGeo, matGhost.clone());
+                    pR.position.set(3, 2, -3 + i*2); pR.rotation.z = -0.5;
                     
-                    const box = new THREE.Box3().setFromObject(target);
-                    const center = box.getCenter(new THREE.Vector3());
-                    
-                    gsap.to(this.camera.position, { x: center.x + 15, y: center.y + 12, z: center.z + 15, duration: 1.5, ease: "power2.inOut" });
-                    gsap.to(this.controls.target, { x: center.x, y: center.y, z: center.z, duration: 1.5, ease: "power2.inOut" });
-
-                    // Show UI Pointer
-                    document.getElementById('sp-text').innerText = text;
-                    this.pointerEl.style.opacity = '1';
+                    this.components.engine.add(pL, pR);
+                    this.pistons.push({mesh: pL, offset: i}, {mesh: pR, offset: i+0.5});
                 }
+                
+                // Intake Manifold
+                this.components.intake = new THREE.Mesh(new THREE.BoxGeometry(4, 2, 8), matGhost.clone());
+                this.components.intake.position.set(0, 4, 0);
+                this.components.engine.add(this.components.intake);
+
+                this.components.engine.position.y = 2;
+                this.group.add(this.components.engine);
+
+                // --- 2. TRANSMISSION ---
+                this.components.transmission = new THREE.Mesh(new THREE.CylinderGeometry(2, 3.5, 8, 16), matSolid);
+                this.components.transmission.rotation.x = Math.PI/2;
+                this.components.transmission.position.set(0, 0, -9);
+                this.group.add(this.components.transmission);
+
+                // --- 3. EXHAUST & CATALYST ---
+                this.components.exhaust = new THREE.Group();
+                const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 30, 8), matGhost.clone());
+                pipe.rotation.x = Math.PI/2; pipe.position.set(3, -2, -10);
+                const cat = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.5, 5, 16), matSolid);
+                cat.rotation.x = Math.PI/2; cat.position.set(3, -2, -5);
+                this.components.exhaust.add(pipe, cat);
+                this.group.add(this.components.exhaust);
+
+                // --- 4. DRIVESHAFT ---
+                this.driveshaft = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 20), matSolid);
+                this.driveshaft.rotation.x = Math.PI/2; this.driveshaft.position.set(0, -1, -20);
+                this.group.add(this.driveshaft);
+                this.kinematics.push(this.driveshaft);
             }
 
-            resetMaterials() {
-                Object.values(this.parts).forEach(groupOrMesh => {
-                    const setMat = (mesh) => { 
-                        // Restore original material based on geometry type
-                        mesh.material = (mesh.geometry.type === 'BoxGeometry' && mesh.scale.x === 1) ? this.matSolid : this.matTech; 
-                    };
-                    if(groupOrMesh.type === 'Group') groupOrMesh.children.forEach(setMat); else setMat(groupOrMesh);
+            updateKinematics(rpm, speed) {
+                // Rotate Driveshaft based on speed
+                this.driveshaft.rotation.z += speed * 0.05;
+                
+                // Move Pistons based on RPM and Sine waves
+                const time = Date.now() * 0.001 * (rpm / 60);
+                this.pistons.forEach(p => {
+                    p.mesh.position.y = 2 + Math.sin(time + p.offset * Math.PI) * 1.5;
                 });
             }
 
-            clearFaults() {
+            focusOnPart(partKey, dtcCode, dtcTitle) {
+                this.controls.autoRotate = false;
                 this.resetMaterials();
-                this.activeFaultPart = null;
-                this.pointerEl.style.opacity = '0';
-                this.controls.autoRotate = true;
-                gsap.to(this.camera.position, { x: 25, y: 15, z: 35, duration: 1.5, ease: "power2.inOut" });
-                gsap.to(this.controls.target, { x: 0, y: 0, z: 0, duration: 1.5 });
+                
+                const target = this.components[partKey];
+                if(!target) return;
+
+                this.activeFault = target;
+
+                // Turn material Red
+                const setRed = (mesh) => { mesh.material = this.mats.err; };
+                if(target.type === 'Group') target.children.forEach(setRed); else setRed(target);
+
+                // Calc Center for Camera Zoom
+                const box = new THREE.Box3().setFromObject(target);
+                const center = box.getCenter(new THREE.Vector3());
+
+                gsap.to(this.camera.position, { x: center.x + 15, y: center.y + 10, z: center.z + 15, duration: 1.5, ease: "power2.inOut" });
+                gsap.to(this.controls.target, { x: center.x, y: center.y, z: center.z, duration: 1.5, ease: "power2.inOut" });
+
+                // Update UI Pointer text
+                document.getElementById('target-code').innerText = dtcCode;
+                document.getElementById('target-desc').innerText = dtcTitle;
+                this.pointer.style.opacity = '1';
             }
 
-            updatePointer() {
-                if(!this.activeFaultPart) return;
-                
-                // Get 3D position of the fault
-                const box = new THREE.Box3().setFromObject(this.activeFaultPart);
+            updatePointerPosition() {
+                if(!this.activeFault) return;
+                const box = new THREE.Box3().setFromObject(this.activeFault);
                 const center = box.getCenter(new THREE.Vector3());
-                
-                // Project 3D to 2D Screen Space
-                center.project(this.camera);
+                center.project(this.camera); // Project to 2D screen
                 
                 const x = (center.x * .5 + .5) * this.container.clientWidth;
                 const y = (center.y * -.5 + .5) * this.container.clientHeight;
                 
-                this.pointerEl.style.left = `${x}px`;
-                this.pointerEl.style.top = `${y}px`;
+                this.pointer.style.left = `${x}px`;
+                this.pointer.style.top = `${y}px`;
+
+                // Calculate line length and angle to box
+                const dx = 10 - (-150); // relative to pointer container
+                const dy = 0;
             }
 
-            updatePhysics(rpm, speed) {
-                const rpmRad = (rpm / 60) * Math.PI * 2 * 0.016; // Approx rotation per frame
-                this.movingParts.forEach(p => {
-                    if(p.axis === 'x') p.mesh.rotation.x += rpmRad * p.mult;
-                    if(p.axis === 'z') p.mesh.rotation.z += (speed * 0.1) * p.mult;
+            resetView() {
+                this.controls.autoRotate = true;
+                this.resetMaterials();
+                this.activeFault = null;
+                this.pointer.style.opacity = '0';
+                gsap.to(this.camera.position, { x: 30, y: 20, z: 40, duration: 1.5 });
+                gsap.to(this.controls.target, { x: 0, y: 0, z: 0, duration: 1.5 });
+            }
+
+            resetMaterials() {
+                Object.values(this.components).forEach(c => {
+                    const setMat = (mesh) => { 
+                        mesh.material = (mesh.geometry.type === 'BoxGeometry' && mesh.scale.x === 1) ? this.mats.solid : this.mats.base; 
+                    };
+                    if(c.type === 'Group') c.children.forEach(setMat); else setMat(c);
                 });
-                // Wheels
-                this.wheels.forEach(w => w.rotation.x += speed * 0.05);
             }
 
             resize() {
@@ -547,207 +768,176 @@
             animate() {
                 requestAnimationFrame(() => this.animate());
                 this.controls.update();
-                this.updatePointer();
+                this.updatePointerPosition();
                 this.renderer.render(this.scene, this.camera);
             }
         }
 
         /**
-         * ==========================================
-         * 4. DTC DATABASE (Diagnostic Dictionary)
-         * ==========================================
+         * 5. DIAGNOSTICS LOGIC (DTC Database & Injection)
          */
         const DTC_DB = {
             "P0171": {
-                part: "engine", locName: "Fuel/Air Induction",
-                title: "System Too Lean (Bank 1)",
-                func: "The ECU calculates the perfect air-to-fuel ratio (14.7:1). Sensors monitor this mixture to ensure optimal combustion.",
-                cause: "Detected too much oxygen in the exhaust. Caused by unmetered air (vacuum leak) or a failing Mass Air Flow (MAF) sensor.",
-                fix: "1. Perform a smoke test to locate vacuum leaks.\n2. Clean/replace the MAF sensor.\n3. Verify fuel pressure."
+                part: "intake", loc: "Intake Manifold", title: "System Too Lean (Bank 1)",
+                func: "Measures incoming air mass for fuel calculation.",
+                cause: "Vacuum leak detected after the MAF sensor, causing unmetered air to enter the combustion chamber.",
+                fix: "Perform smoke test on intake. Replace gaskets."
             },
             "P0420": {
-                part: "exhaust", locName: "Catalytic Converter",
-                title: "Catalyst System Efficiency Below Threshold",
-                func: "The Catalytic Converter reduces toxic emissions. Upstream and downstream O2 sensors monitor its filtering efficiency.",
-                cause: "The downstream O2 sensor's waveform is mimicking the upstream sensor, indicating the internal catalyst honeycomb has degraded.",
-                fix: "1. Graph O2 sensor voltages to verify health.\n2. Replace Catalytic Converter.\n3. Fix underlying misfires."
+                part: "exhaust", loc: "Catalytic Converter", title: "Catalyst System Efficiency",
+                func: "Filters exhaust gasses. Monitored by downstream O2 sensor.",
+                cause: "Honeycomb mesh has degraded. O2 sensor readings matching upstream.",
+                fix: "Verify O2 sensors via oscilloscope. Replace Catalytic Converter."
             }
         };
 
-        /**
-         * ==========================================
-         * 5. MAIN SYSTEM CONTROLLER
-         * ==========================================
-         */
-        class TelemetryController {
-            constructor() {
-                this.rpmGauge = new HUDGauge('rpmGauge', 8000, '#FF9F1C');
-                this.speedGauge = new HUDGauge('speedGauge', 260, '#4A90E2');
-                this.carViz = new CarVisualizer();
-                this.audio = new EngineAudio();
-                this.terminal = document.getElementById('terminal-out');
+        class DiagnosticsController {
+            static runScan() {
+                if(!SimulationEngine.isRunning) { window.UI.logTerminal("ERROR: ECU IGNITION OFF.", "err"); return; }
+                window.UI.logTerminal("TX: 03 (REQUEST STORED DTCs)");
                 
-                this.isLive = false; this.simInterval = null;
-                this.rpm = 0; this.speed = 0;
-                
-                this.bootSequence();
+                const container = document.getElementById('dtc-list');
+                container.innerHTML = ''; // clear
+
+                setTimeout(() => {
+                    const codes = SimulationEngine.injectedFaults;
+                    if(codes.length === 0) {
+                        window.UI.logTerminal("RX: 43 00 (NO CODES)", "rx");
+                        container.innerHTML = `<div class="dtc-empty"><i class="fas fa-shield-check"></i><h2>SYSTEM OPTIMAL</h2></div>`;
+                        return;
+                    }
+
+                    window.UI.logTerminal(`RX: 43 ${codes.length} ... FOUND CODES`, "rx");
+                    codes.forEach((c, i) => setTimeout(() => this.renderDTC(c, i===0), i*800));
+                }, 1000);
             }
 
-            bootSequence() {
-                gsap.to('#cinematic-overlay', { opacity: 0, duration: 1.5, delay: 1, onComplete: () => {
-                    document.getElementById('cinematic-overlay').style.display = 'none';
-                    this.carViz.introAnimation();
-                }});
+            static renderDTC(code, autoFocus) {
+                const data = DTC_DB[code]; if(!data) return;
+                const html = `
+                    <div class="fault-card" onclick="window.Engine3D.focusOnPart('${data.part}', '${code}', '${data.title}')">
+                        <div class="fc-head"><span class="fc-code">${code}</span><span class="fc-module">${data.loc}</span></div>
+                        <div class="fc-title">${data.title}</div>
+                        <div class="fc-desc"><b>Function:</b> ${data.func}<br><br><b style="color:var(--color-danger)">Failure:</b> ${data.cause}<br><br><b style="color:var(--color-success)">Action:</b> ${data.fix}</div>
+                    </div>`;
+                document.getElementById('dtc-list').insertAdjacentHTML('beforeend', html);
+                if(autoFocus) window.Engine3D.focusOnPart(data.part, code, data.title);
             }
 
-            log(msg, type='sys') {
-                const div = document.createElement('div');
-                div.className = `log-${type}`; div.innerText = `[${new Date().toLocaleTimeString()}] ${msg}`;
-                this.terminal.appendChild(div);
-                this.terminal.scrollTop = this.terminal.scrollHeight;
-            }
-
-            setUIStatus(mode) {
-                const badge = document.getElementById('conn-status'); const text = document.getElementById('status-text');
-                const btnDemo = document.getElementById('btn-demo'); const btnStop = document.getElementById('btn-stop');
-                
-                badge.className = 'status-badge'; 
-                if(mode === 'live') { badge.classList.add('live'); text.innerText = 'OBD-II CONNECTED'; btnDemo.style.display = 'none'; btnStop.style.display = 'flex'; }
-                else if(mode === 'demo') { badge.classList.add('demo'); text.innerText = 'SIMULATION'; btnDemo.style.display = 'none'; btnStop.style.display = 'flex'; }
-                else { text.innerText = 'OFFLINE'; btnDemo.style.display = 'flex'; btnStop.style.display = 'none'; }
-            }
-
-            toggleAudio() { this.audio.toggleMute(); }
-
-            // --- REAL WEB BLUETOOTH ---
-            async connectHardware() {
-                if (!navigator.bluetooth) { this.log("ERROR: Web Bluetooth API not supported.", "err"); return; }
-                try {
-                    this.log("REQUESTING BLUETOOTH DEVICE (ELM327)...", "warn");
-                    this.device = await navigator.bluetooth.requestDevice({ filters: [{ services: [0xFFE0] }], optionalServices: ['0000ffe0-0000-1000-8000-00805f9b34fb'] });
-                    this.log(`DEVICE PAIRED: ${this.device.name}`, "sys");
-                    this.setUIStatus('live');
-                    this.startEngineLogic(); 
-                } catch (error) {
-                    this.log(`CONNECTION CANCELLED.`, "err");
+            static injectFault() {
+                if(!SimulationEngine.isRunning) return;
+                const codes = Object.keys(DTC_DB);
+                const code = codes[Math.floor(Math.random() * codes.length)];
+                if(!SimulationEngine.injectedFaults.includes(code)) {
+                    SimulationEngine.injectedFaults.push(code);
+                    window.UI.logTerminal(`SYSTEM FAULT INJECTED: ${code}`, "err");
+                    document.getElementById('ecu-text').innerText = "CHECK ENGINE LIGHT ON";
+                    document.getElementById('ecu-status').style.color = 'var(--color-danger)';
                 }
             }
 
-            // --- SIMULATION ---
-            startDemo() {
-                this.setUIStatus('demo');
-                this.log("INITIALIZING VIRTUAL ECU SIMULATION...", "warn");
-                setTimeout(() => this.log("ENGINE CRANKING...", "sys"), 500);
+            static clearCodes() {
+                if(!SimulationEngine.isRunning) return;
+                window.UI.logTerminal("TX: 04 (CLEAR DTCs)");
                 setTimeout(() => {
-                    this.log("ENGINE RUNNING. CAN-BUS ACTIVE.", "tx");
-                    this.startEngineLogic();
-                }, 1500);
-            }
-
-            stopSimulation() {
-                if(this.simInterval) clearInterval(this.simInterval);
-                this.isLive = false; this.setUIStatus('offline');
-                this.rpm = 0; this.speed = 0;
-                this.updateGauges(0, 0, '--', '--', '--', '12.1');
-                this.audio.stopEngine();
-                this.log("SIMULATION HALTED. IGNITION CUT.", "err");
-            }
-
-            startEngineLogic() {
-                if(this.simInterval) clearInterval(this.simInterval);
-                this.isLive = true;
-                this.rpm = 800; this.speed = 0; let temp = 70, load = 20;
-                
-                this.audio.startEngine();
-
-                this.simInterval = setInterval(() => {
-                    // Physics Math
-                    if(Math.random() > 0.85) { 
-                        this.rpm = 2500 + Math.random() * 4000;
-                        this.speed = Math.min(this.speed + (Math.random() * 15), 180);
-                        this.log(`TX: 010C (RPM) -> ${Math.round(this.rpm)}`, 'tx');
-                    } else {
-                        this.rpm = Math.max(800 + (Math.random()*50-25), this.rpm - 200);
-                        this.speed = Math.max(0, this.speed - 1);
-                    }
-
-                    if(temp < 92 && Math.random() > 0.5) temp += 0.5;
-                    load = (this.rpm / 8000) * 100 + (Math.random() * 5);
-
-                    this.updateGauges(this.rpm, this.speed, temp, load, (this.rpm/8000)*100, 14.1);
-                    
-                    // Update 3D Model and Audio
-                    this.carViz.updatePhysics(this.rpm, this.speed);
-                    this.audio.updateRPM(this.rpm);
-
-                }, 100); // Fast update rate for smooth audio and 3D
-            }
-
-            updateGauges(r, s, t, l, th, v) {
-                this.rpmGauge.set(r); this.speedGauge.set(s);
-                document.getElementById('val-rpm').innerText = Math.round(r);
-                document.getElementById('val-speed').innerText = Math.round(s);
-                document.getElementById('val-temp').innerText = t === '--' ? t : Math.round(t) + ' °C';
-                document.getElementById('val-load').innerText = l === '--' ? l : Math.round(l) + ' %';
-                document.getElementById('val-throttle').innerText = th === '--' ? th : Math.round(th) + ' %';
-                document.getElementById('val-volt').innerText = v + ' V';
-            }
-
-            // --- DIAGNOSTICS LOGIC ---
-            runDiagnostics() {
-                if(!this.isLive) { this.log("ERROR: IGNITION OFF.", "err"); return; }
-                this.log("SENDING COMMAND: 03 (REQUEST DTCs)", "warn");
-                const dtcContainer = document.getElementById('dtc-container');
-                dtcContainer.innerHTML = ''; 
-
-                setTimeout(() => {
-                    this.log("ECU RESPONDED: 43 02 01 71 04 20", "tx");
-                    const codes = ["P0171", "P0420"]; 
-                    this.log(`FOUND ${codes.length} STORED CODES.`, "err");
-                    codes.forEach((code, index) => { setTimeout(() => this.renderDTC(code, index === 0), index * 1000); });
-                }, 1500);
-            }
-
-            renderDTC(code, autoClick) {
-                const data = DTC_DB[code]; if(!data) return;
-                const card = document.createElement('div'); card.className = 'dtc-card';
-                card.innerHTML = `
-                    <div class="dtc-header"><div class="dtc-code">${code}</div><div class="dtc-loc"><i class="fas fa-crosshairs"></i> TARGET: ${data.locName}</div></div>
-                    <div class="dtc-body">
-                        <div class="dtc-title">${data.title}</div>
-                        <div class="dtc-section"><div class="section-label">Component Function</div>${data.func}</div>
-                        <div class="dtc-section" style="border-color: var(--danger);"><div class="section-label" style="color: var(--danger);">Failure Analysis</div>${data.cause}</div>
-                        <div class="dtc-fix"><div class="section-label"><i class="fas fa-wrench"></i> Recommended Action</div>${data.fix.replace(/\n/g, '<br>')}</div>
-                    </div>`;
-                
-                card.querySelector('.dtc-header').onclick = () => {
-                    document.querySelectorAll('.dtc-card').forEach(c => c.style.borderColor = 'var(--danger)');
-                    card.style.borderColor = '#fff';
-                    this.log(`TARGETING MESH: ${data.locName.toUpperCase()}`, 'sys');
-                    this.carViz.highlightPart(data.part, `${code} : ${data.title}`);
-                };
-
-                document.getElementById('dtc-container').appendChild(card);
-                card.style.display = 'block';
-                if(autoClick) card.querySelector('.dtc-header').click();
-            }
-
-            clearCodes() {
-                if(!this.isLive) { this.log("ERROR: MUST BE CONNECTED TO CLEAR CODES.", "err"); return; }
-                this.log("SENDING COMMAND: 04 (CLEAR DTCs)", "warn");
-                setTimeout(() => {
-                    this.log("ECU RESPONDED: 44 (CODES CLEARED)", "success");
-                    document.getElementById('dtc-container').innerHTML = `
-                        <div class="empty-dtc" id="empty-dtc-msg">
-                            <i class="fas fa-check-circle" style="font-size: 30px; color: var(--success); margin-bottom: 10px; display: block;"></i>
-                            SYSTEM OPTIMAL. NO FAULTS DETECTED.
-                        </div>`;
-                    this.carViz.clearFaults();
+                    window.UI.logTerminal("RX: 44 (CODES CLEARED)", "rx");
+                    SimulationEngine.injectedFaults = [];
+                    document.getElementById('dtc-list').innerHTML = `<div class="dtc-empty"><i class="fas fa-shield-check"></i><h2>SYSTEM OPTIMAL</h2></div>`;
+                    document.getElementById('ecu-text').innerText = "ENGINE RUNNING";
+                    document.getElementById('ecu-status').style.color = 'var(--color-success)';
+                    window.Engine3D.resetView();
                 }, 1000);
             }
         }
 
-        const AppCore = new TelemetryController();
+        /**
+         * 6. MASTER SIMULATION KERNEL (Thermodynamics Math)
+         */
+        class SimulationEngine {
+            static isRunning = false;
+            static interval = null;
+            static injectedFaults = [];
+            
+            // Physics States
+            static rpm = 0; static speed = 0; static temp = 40; static throttle = 0;
+
+            static toggleIgnition() {
+                const btn = document.getElementById('btn-ignite');
+                const statText = document.getElementById('ecu-text');
+                const statBox = document.getElementById('ecu-status');
+
+                this.isRunning = !this.isRunning;
+
+                if(this.isRunning) {
+                    btn.classList.add('engine-on'); btn.innerHTML = '<i class="fas fa-power-off"></i><span>CUT IGNITION</span>';
+                    statBox.className = 'status-indicator status-live'; statText.innerText = 'ENGINE RUNNING';
+                    
+                    window.UI.logTerminal("STARTING IGNITION SEQUENCE...", "sys");
+                    this.rpm = 1200; // Cold start flare
+                    AudioSystem.start();
+                    
+                    this.interval = setInterval(() => this.physicsTick(), 100);
+                } else {
+                    btn.classList.remove('engine-on'); btn.innerHTML = '<i class="fas fa-power-off"></i><span>START ENGINE</span>';
+                    statBox.className = 'status-indicator status-sim'; statText.innerText = 'IGNITION OFF';
+                    
+                    clearInterval(this.interval);
+                    this.rpm = 0; this.speed = 0; this.throttle = 0;
+                    window.Gauges.update(0, 0, this.temp, 0, 0, 12.1);
+                    AudioSystem.stop();
+                    window.Engine3D.resetView();
+                    window.UI.logTerminal("IGNITION CUT. ENGINE STOPPED.", "err");
+                }
+            }
+
+            static physicsTick() {
+                // Random Throttle Input
+                if(Math.random() > 0.9) {
+                    this.throttle = MathUtils.lerp(this.throttle, 80 + Math.random()*20, 0.5);
+                    window.UI.logTerminal(`THROTTLE APPLIED: ${Math.round(this.throttle)}%`, "sys");
+                } else {
+                    this.throttle = MathUtils.lerp(this.throttle, 0, 0.1);
+                }
+
+                // Calculate RPM based on throttle
+                const idleRpm = 800;
+                const targetRpm = idleRpm + (this.throttle / 100) * 6000;
+                this.rpm = MathUtils.lerp(this.rpm, targetRpm, 0.15);
+
+                // Calculate Speed (Simplified Gear ratio logic)
+                if(this.throttle > 10) this.speed = Math.min(180, this.speed + (this.rpm/8000)*2);
+                else this.speed = Math.max(0, this.speed - 0.5); // Coasting
+
+                // Thermodynamics
+                if(this.temp < 92) this.temp += 0.05; // Warming up
+                const load = (this.rpm / 8000) * 100;
+                
+                // Horsepower Calculation: (RPM * Torque) / 5252
+                // Assuming max torque of ~400 lb-ft around 4500 RPM
+                const torqueCurve = Math.max(100, 400 - Math.pow((this.rpm - 4500)/100, 2)); 
+                let hp = (this.rpm * torqueCurve) / 5252;
+                if(hp < 0) hp = 0;
+
+                // Update UI, Audio, 3D
+                window.Gauges.update(this.rpm, this.speed, this.temp, load, hp, 14.2 + Math.random()*0.2);
+                AudioSystem.update(this.rpm);
+                window.Engine3D.updateKinematics(this.rpm, this.speed);
+            }
+        }
+
+        // ==========================================
+        // SYSTEM BOOTSTRAP
+        // ==========================================
+        window.onload = () => {
+            window.UI = new UIController();
+            window.Gauges = new DashboardGauges();
+            window.Engine3D = new HologramEngine();
+            // Connect global scopes for HTML inline onclick attributes
+            window.DiagnosticsController = DiagnosticsController;
+            window.SimulationEngine = SimulationEngine;
+            window.AudioSystem = AudioSystem;
+        };
+
     </script>
 </body>
 </html>
