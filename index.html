@@ -304,40 +304,14 @@
         </section>
 
         <!-- ENGINEERING PROCESS -->
-        <section class="section-module" id="process">
+            <!-- PROJECTS MATRIX SECTION (تم إصلاح الـ ID هنا لتعمل الكبسة) -->
+        <section class="section-module" id="projects">
             <div class="module-header">
-                <span class="module-index">01 //</span>
-                <h2 class="cipher-text" data-original="Engineering Process">Engineering Process</h2>
+                <span class="module-index">02 //</span>
+                <h2 class="cipher-text" data-original="Architected Works">Architected Works</h2>
             </div>
-            <div class="process-grid">
-                <div class="process-step tilt-chassis hover-trigger">
-                    <div class="process-icon"><i class="fas fa-network-wired"></i></div>
-                    <div class="process-content">
-                        <h3>Phase 1: Topology & Wireframing</h3>
-                        <p>Mapping the mathematical architecture of the application. Designing normalized database schemas, defining API gateways, and building high-fidelity glassmorphic UI wireframes.</p>
-                    </div>
-                </div>
-                <div class="process-step tilt-chassis hover-trigger">
-                    <div class="process-icon"><i class="fas fa-microchip"></i></div>
-                    <div class="process-content">
-                        <h3>Phase 2: Algorithmic Logic</h3>
-                        <p>Writing the core engine. Integrating Firebase auth, establishing Firestore listeners, and coding custom Node.js logic for heavy data processing and real-time socket communications.</p>
-                    </div>
-                </div>
-                <div class="process-step tilt-chassis hover-trigger">
-                    <div class="process-icon"><i class="fas fa-rocket"></i></div>
-                    <div class="process-content">
-                        <h3>Phase 3: WebGL & Deployment</h3>
-                        <p>Applying hardware-accelerated rendering. Implementing Three.js shaders, custom GSAP spring physics, and deploying the bundle to edge networks for sub-millisecond global latency.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- PROJECTS MATRIX -->
- 
-
-                            <div class="project-matrix">
+            
+            <div class="project-matrix">
                 
                 <!-- 01. EduTech Platform -->
                 <div class="matrix-card tilt-chassis hover-trigger" onclick="SystemArchitect.initiateTransfer('https://tuition-platform.mohalisal1.workers.dev/')">
@@ -360,17 +334,27 @@
                     </div>
                 </div>
 
-                <!-- 03. IoT Automotive Twin -->
+                <!-- 03. WebGL Engine (تمت إعادته!) -->
+                <div class="matrix-card tilt-chassis hover-trigger" onclick="SystemArchitect.initiateTransfer('webgl.html')">
+                    <div class="matrix-image" style="background-image: url('https://images.unsplash.com/photo-1618761714954-0b8cd0026356?q=80&w=2070&auto=format&fit=crop');"></div>
+                    <div class="matrix-data">
+                        <h3>WebGL Particle Engine</h3>
+                        <p>Interactive 3D simulation engine utilizing WebGL shaders and Three.js to compute complex mathematical morphologies.</p>
+                        <div class="tech-array"><span>THREE.JS</span> <span>GLSL</span> <span>MATH_KINEMATICS</span></div>
+                    </div>
+                </div>
+
+                <!-- 04. IoT Automotive Twin -->
                 <div class="matrix-card tilt-chassis hover-trigger" onclick="SystemArchitect.initiateTransfer('iot.html')">
                     <div class="matrix-image" style="background-image: url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=2070&auto=format&fit=crop');"></div>
                     <div class="matrix-data">
                         <h3>IoT Automotive Twin</h3>
-                        <p>Hardware-to-Web OBD-II diagnostic tool linking CAN-BUS hex streams to a 3D procedural V8 engine.</p>
+                        <p>Hardware-to-Web OBD-II diagnostic tool linking CAN-BUS hex streams to a procedural 3D ECU hologram.</p>
                         <div class="tech-array"><span>WEB_BLUETOOTH</span> <span>THREE.JS</span> <span>WEB_AUDIO</span></div>
                     </div>
                 </div>
 
-                <!-- 04. Smart Factory SCADA -->
+                <!-- 05. Smart Factory SCADA -->
                 <div class="matrix-card tilt-chassis hover-trigger" onclick="SystemArchitect.initiateTransfer('factory.html')">
                     <div class="matrix-image" style="background-image: url('https://images.unsplash.com/photo-1565514020179-026b92b84bb6?q=80&w=2070&auto=format&fit=crop');"></div>
                     <div class="matrix-data">
@@ -380,7 +364,7 @@
                     </div>
                 </div>
 
-                <!-- 05. AI Supply Chain -->
+                <!-- 06. AI Supply Chain -->
                 <div class="matrix-card tilt-chassis hover-trigger" onclick="SystemArchitect.initiateTransfer('supply-chain.html')">
                     <div class="matrix-image" style="background-image: url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=2070&auto=format&fit=crop');"></div>
                     <div class="matrix-data">
@@ -390,7 +374,7 @@
                     </div>
                 </div>
 
-                <!-- 06. WebRTC Sync Room -->
+                <!-- 07. WebRTC Sync Room -->
                 <div class="matrix-card tilt-chassis hover-trigger" onclick="SystemArchitect.initiateTransfer('webrtc.html')">
                     <div class="matrix-image" style="background-image: url('https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=2070&auto=format&fit=crop');"></div>
                     <div class="matrix-data">
@@ -401,11 +385,8 @@
                 </div>
 
             </div>
-
-
-
-            </div>
         </section>
+
 
         <!-- LIVE TELEMETRY COUNTERS -->
         <section class="section-module" id="telemetry">
