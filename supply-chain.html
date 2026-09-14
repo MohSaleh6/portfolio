@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ENG.MOHAMMAD | Supply Chain Optimizer</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=Syncopate:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        /* ==========================================================================
+           01. ENTERPRISE CSS ARCHITECTURE
+           ========================================================================== */
+        :root {
+            --bg-deep: #020617; --bg-panel: rgba(15, 23, 42, 0.85); --bg-glass: rgba(30, 41, 59, 0.7);
+            --border-core: rgba(56, 189, 248, 0.2); --border-glow: rgba(56, 189, 248, 0.5);
+            --primary: #38bdf8; --accent: #818cf8; --warning: #fbbf24; --danger: #ef4444; --success: #10b981;
+            --text-main: #f8fafc; --text-muted: #94a3b8;
+            --font-main: 'Space Grotesk', sans-serif; --font-mono: 'Share Tech Mono', monospace; --font-head: 'Syncopate', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-main); background-color: var(--bg-deep); color: var(--text-main); height: 100vh; overflow: hidden; display: flex; }
+        ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: var(--primary); }
+
+        /* Tech Background */
+        .tech-grid { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; background-color: var(--bg-deep); background-image: radial-gradient(rgba(56, 189, 248, 0.1) 1px, transparent 1px); background-size: 30px 30px; }
+        .tech-grid::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, transparent 0%, var(--bg-deep) 100%); }
+
+        /* ==========================================================================
+           02. SIDEBAR (LOGISTICS CONTROL PANEL)
+           ========================================================================== */
+        .sidebar { width: 320px; background: rgba(2, 6, 23, 0.95); border-right: 1px solid var(--border-core); display: flex; flex-direction: column; padding: 25px; box-shadow: 10px 0 40px rgba(0,0,0,0.8); z-index: 100; backdrop-filter: blur(10px); }
+        .brand { font-family: var(--font-head); font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 5px; display: flex; align-items: center; gap: 10px; }
+        .brand span { color: var(--primary); text-shadow: 0 0 10px var(--primary); }
+        .brand-sub { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); letter-spacing: 1px; margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px; text-transform: uppercase; }
+
+        /* Control Panel */
+        .control-group { background: rgba(0,0,0,0.4); border: 1px solid rgba(56, 189, 248, 0.05); border-radius: 8px; padding: 15px; margin-bottom: 20px; }
+        .cg-title { font-family: var(--font-mono); font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 5px; }
+        
+        .stat-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 12px; font-family: var(--font-mono); }
+        .stat-row:last-child { margin-bottom: 0; }
+        .stat-label { color: var(--text-muted); }
+        .stat-val { font-weight: bold; color: #fff; }
+        .stat-val.highlight { color: var(--success); text-shadow: 0 0 10px rgba(16, 185, 129, 0.5); font-size: 14px; }
+
+        /* Sliders */
+        .slider-wrap { margin-bottom: 15px; }
+        .slider-wrap:last-child { margin-bottom: 0; }
+        .slider-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); font-family: var(--font-mono); margin-bottom: 8px; }
+        .slider-val { color: #fff; font-weight: bold; }
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 14px; width: 14px; border-radius: 50%; background: var(--primary); cursor: pointer; box-shadow: 0 0 10px var(--primary); margin-top: -5px; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+        /* Buttons */
+        .btn-group { display: flex; flex-direction: column; gap: 10px; margin-top: auto; }
+        .btn { padding: 12px; font-family: var(--font-mono); font-size: 12px; font-weight: bold; text-transform: uppercase; border-radius: 6px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; border: 1px solid transparent; letter-spacing: 1px; }
+        .btn-opt { background: rgba(16, 185, 129, 0.1); border-color: var(--success); color: var(--success); }
+        .btn-opt:hover { background: var(--success); color: #000; box-shadow: 0 0 20px rgba(16, 185, 129, 0.4); }
+        .btn-reset { background: rgba(56, 189, 248, 0.1); border-color: var(--primary); color: var(--primary); }
+        .btn-reset:hover { background: var(--primary); color: #000; box-shadow: 0 0 20px rgba(56, 189, 248, 0.4); }
+        
+        .btn-exit { margin-top: 20px; color: var(--text-muted); text-decoration: none; font-size: 11px; text-align: center; border: 1px solid rgba(255,255,255,0.1); padding: 10px; border-radius: 6px; transition: 0.3s; font-family: var(--font-mono); }
+        .btn-exit:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
+
+        /* ==========================================================================
+           03. MAIN STAGE (MAP & ANALYTICS)
+           ========================================================================== */
+        .main-stage { flex: 1; display: flex; flex-direction: column; padding: 20px; gap: 20px; position: relative; }
+        
+        /* TOP: INTERACTIVE MAP */
+        .map-container { flex: 2; background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-core); border-radius: 12px; position: relative; overflow: hidden; box-shadow: inset 0 0 30px rgba(0,0,0,0.5); backdrop-filter: blur(5px); }
+        #network-canvas { width: 100%; height: 100%; display: block; cursor: crosshair; }
+        
+        .map-overlay { position: absolute; top: 20px; left: 20px; pointer-events: none; }
+        .map-title { font-family: var(--font-head); font-size: 20px; color: #fff; text-shadow: 0 0 10px var(--primary); }
+        .map-desc { font-family: var(--font-mono); font-size: 11px; color: var(--primary); margin-top: 5px; }
+
+        .instructions { position: absolute; bottom: 20px; left: 20px; font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); background: rgba(0,0,0,0.6); padding: 8px 12px; border-radius: 4px; pointer-events: none; border-left: 2px solid var(--accent); }
+
+        /* BOTTOM: ANALYTICS DASHBOARD */
+        .analytics-panel { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        
+        .kpi-card { background: var(--bg-panel); border: 1px solid var(--border-core); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; backdrop-filter: blur(10px); }
+        .kpi-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: var(--primary); }
+        
+        .kpi-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .kpi-label { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .kpi-icon { color: var(--primary); font-size: 14px; opacity: 0.8; }
+        
+        .kpi-val { font-family: var(--font-mono); font-size: 36px; font-weight: bold; color: #fff; }
+        .kpi-sub { font-size: 10px; color: var(--text-muted); font-family: var(--font-mono); margin-top: 5px; }
+
+        .kpi-card.cost-card::before { background: var(--success); }
+        .kpi-card.cost-card .kpi-icon { color: var(--success); }
+        .kpi-card.cost-card .kpi-val { color: var(--success); text-shadow: 0 0 15px rgba(16, 185, 129, 0.4); }
+
+        .kpi-card.time-card::before { background: var(--accent); }
+        .kpi-card.time-card .kpi-icon { color: var(--accent); }
+        .kpi-card.time-card .kpi-val { color: var(--accent); text-shadow: 0 0 15px rgba(129, 140, 248, 0.4); }
+
+        /* Cost Breakdown Bar */
+        .cost-bar-wrap { width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; margin-top: 15px; display: flex; overflow: hidden; }
+        .cb-fuel { height: 100%; background: var(--warning); transition: width 0.3s; }
+        .cb-labor { height: 100%; background: var(--primary); transition: width 0.3s; }
+        .cb-maint { height: 100%; background: var(--danger); transition: width 0.3s; }
+        .cb-labels { display: flex; justify-content: space-between; font-size: 9px; color: var(--text-muted); font-family: var(--font-mono); margin-top: 5px; }
+
+        @media (max-width: 1024px) {
+            body { flex-direction: column; overflow-y: auto; }
+            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border-core); }
+            .analytics-panel { grid-template-columns: 1fr; }
+            .map-container { min-height: 400px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="tech-grid"></div>
+
+    <!-- ==========================================================================
+         SIDEBAR (LOGISTICS CONTROLS)
+         ========================================================================== -->
+    <aside class="sidebar">
+        <div class="brand"><i class="fas fa-network-wired"></i> LOGISTICS<span>.</span>AI</div>
+        <div class="brand-sub">Supply Chain Route Optimization</div>
+
+        <div class="control-group">
+            <div class="cg-title"><span>Network Status</span> <i class="fas fa-globe"></i></div>
+            <div class="stat-row"><span class="stat-label">Active Nodes (Warehouses)</span> <span class="stat-val" id="val-nodes">0</span></div>
+            <div class="stat-row"><span class="stat-label">Possible Routes</span> <span class="stat-val" id="val-edges">0</span></div>
+            <div class="stat-row" style="margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px;">
+                <span class="stat-label">Algorithm Status</span> 
+                <span class="stat-val" id="val-algo" style="color:var(--warning);">AWAITING RUN</span>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <div class="cg-title"><span>Fleet Parameters</span> <i class="fas fa-truck"></i></div>
+            
+            <div class="slider-wrap">
+                <div class="slider-labels"><span>Fuel Price ($/L)</span> <span class="slider-val" id="lbl-fuel">1.5</span></div>
+                <input type="range" id="sim-fuel" min="0.5" max="3" step="0.1" value="1.5" oninput="SupplyChain.updateParams()">
+            </div>
+            
+            <div class="slider-wrap">
+                <div class="slider-labels"><span>Truck Speed (KM/H)</span> <span class="slider-val" id="lbl-speed">80</span></div>
+                <input type="range" id="sim-speed" min="40" max="120" step="5" value="80" oninput="SupplyChain.updateParams()">
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn btn-opt" onclick="SupplyChain.runOptimization()">
+                <i class="fas fa-magic"></i> <span>Run Dijkstra Optimizer</span>
+            </button>
+            <button class="btn btn-reset" onclick="SupplyChain.generateRandomNetwork()">
+                <i class="fas fa-random"></i> <span>Generate New Network</span>
+            </button>
+        </div>
+        
+        <a href="index.html" class="btn-exit"><i class="fas fa-arrow-left"></i> Return to Portfolio</a>
+    </aside>
+
+    <!-- ==========================================================================
+         MAIN STAGE (MAP & ANALYTICS)
+         ========================================================================== -->
+    <main class="main-stage">
+        
+        <!-- INTERACTIVE NETWORK MAP -->
+        <div class="map-container" id="map-wrap">
+            <canvas id="network-canvas"></canvas>
+            
+            <div class="map-overlay">
+                <div class="map-title">LOGISTICS TOPOLOGY</div>
+                <div class="map-desc">Interactive Node & Edge Routing Network</div>
+            </div>
+
+            <div class="instructions">
+                [ DRAG NODES TO RECALCULATE ROUTES IN REAL-TIME ]
+            </div>
+        </div>
+
+        <!-- ANALYTICS DASHBOARD -->
+        <div class="analytics-panel">
+            
+            <!-- Distance Metric -->
+            <div class="kpi-card">
+                <div class="kpi-head"><span class="kpi-label">Total Route Distance</span><i class="fas fa-route kpi-icon"></i></div>
+                <div>
+                    <div class="kpi-val" id="kpi-dist">0.0</div>
+                    <div class="kpi-sub">Kilometers (Optimal Path)</div>
+                </div>
+            </div>
+            
+            <!-- Time Metric -->
+            <div class="kpi-card time-card">
+                <div class="kpi-head"><span class="kpi-label">Est. Delivery Time</span><i class="fas fa-clock kpi-icon"></i></div>
+                <div>
+                    <div class="kpi-val" id="kpi-time">0.0</div>
+                    <div class="kpi-sub">Hours (Based on Fleet Speed)</div>
+                </div>
+            </div>
+
+            <!-- Cost Metric -->
+            <div class="kpi-card cost-card">
+                <div class="kpi-head"><span class="kpi-label">Total Transport Cost</span><i class="fas fa-dollar-sign kpi-icon"></i></div>
+                <div>
+                    <div class="kpi-val" id="kpi-cost">$0.00</div>
+                    
+                    <!-- Cost Breakdown -->
+                    <div class="cost-bar-wrap">
+                        <div class="cb-fuel" id="bar-fuel" style="width: 50%;"></div>
+                        <div class="cb-labor" id="bar-labor" style="width: 30%;"></div>
+                        <div class="cb-maint" id="bar-maint" style="width: 20%;"></div>
+                    </div>
+                    <div class="cb-labels">
+                        <span style="color:var(--warning)">Fuel</span>
+                        <span style="color:var(--primary)">Labor</span>
+                        <span style="color:var(--danger)">Maint.</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- ==========================================================================
+         ENGINEERING JAVASCRIPT KERNEL
+         ========================================================================== -->
+    <script>
+        /**
+         * SUPPLY CHAIN OPTIMIZATION SYSTEM
+         * Mathematical implementation of Dijkstra's Algorithm for Shortest Path.
+         */
+        class SupplyChainOptimizer {
+            constructor() {
+                this.canvas = document.getElementById('network-canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.wrap = document.getElementById('map-wrap');
+                
+                // State
+                this.nodes = [];
+                this.edges = [];
+                this.optimalPath = []; // Array of node indices forming the shortest path
+                
+                // Interaction
+                this.draggedNode = null;
+                this.mouse = { x: 0, y: 0 };
+                
+                // Fleet Parameters
+                this.fuelPrice = 1.5;
+                this.truckSpeed = 80;
+                
+                this.initCanvas();
+                this.bindEvents();
+                this.generateRandomNetwork();
+                
+                // Render Loop
+                requestAnimationFrame(() => this.render());
+            }
+
+            initCanvas() {
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+            }
+
+            resize() {
+                const rect = this.wrap.getBoundingClientRect();
+                const dpr = window.devicePixelRatio || 1;
+                this.canvas.width = rect.width * dpr;
+                this.canvas.height = rect.height * dpr;
+                this.ctx.scale(dpr, dpr);
+                this.width = rect.width;
+                this.height = rect.height;
+            }
+
+            bindEvents() {
+                this.canvas.addEventListener('mousedown', (e) => this.onMouseDown(e));
+                this.canvas.addEventListener('mousemove', (e) => this.onMouseMove(e));
+                window.addEventListener('mouseup', () => this.onMouseUp());
+                
+                // Touch support for iPad
+                this.canvas.addEventListener('touchstart', (e) => {
+                    const touch = e.touches[0];
+                    this.onMouseDown({ offsetX: touch.clientX - this.wrap.offsetLeft, offsetY: touch.clientY - this.wrap.offsetTop });
+                });
+                this.canvas.addEventListener('touchmove', (e) => {
+                    e.preventDefault();
+                    const touch = e.touches[0];
+                    this.onMouseMove({ offsetX: touch.clientX - this.wrap.offsetLeft, offsetY: touch.clientY - this.wrap.offsetTop });
+                }, { passive: false });
+                window.addEventListener('touchend', () => this.onMouseUp());
+            }
+
+            // --- NETWORK GENERATION ---
+            generateRandomNetwork() {
+                this.nodes = [];
+                this.edges = [];
+                this.optimalPath = [];
+                
+                const numNodes = 8 + Math.floor(Math.random() * 5); // 8 to 12 nodes
+                const padding = 60;
+
+                // 1. Generate Nodes (Warehouses)
+                for(let i=0; i<numNodes; i++) {
+                    this.nodes.push({
+                        id: i,
+                        x: padding + Math.random() * (this.width - padding*2),
+                        y: padding + Math.random() * (this.height - padding*2),
+                        label: i === 0 ? 'START' : (i === numNodes-1 ? 'DEST' : `W-${i}`)
+                    });
+                }
+
+                // 2. Generate Edges (Routes) based on distance threshold
+                for(let i=0; i<this.nodes.length; i++) {
+                    for(let j=i+1; j<this.nodes.length; j++) {
+                        const dist = this.getDistance(this.nodes[i], this.nodes[j]);
+                        // Connect if reasonably close, ensuring a mesh network
+                        if(dist < (this.width * 0.45)) {
+                            this.edges.push({ source: i, target: j });
+                        }
+                    }
+                }
+
+                // Ensure START and DEST have connections (fail-safe)
+                this.edges.push({ source: 0, target: 1 });
+                this.edges.push({ source: numNodes-2, target: numNodes-1 });
+
+                this.updateSidebarStats();
+                document.getElementById('val-algo').innerText = "AWAITING RUN";
+                document.getElementById('val-algo').style.color = "var(--warning)";
+                this.calculateKPIs(0); // Reset KPIs
+            }
+
+            getDistance(n1, n2) {
+                const dx = n2.x - n1.x; const dy = n2.y - n1.y;
+                return Math.sqrt(dx*dx + dy*dy);
+            }
+
+            // --- DIJKSTRA ALGORITHM (OPERATIONS RESEARCH) ---
+            runOptimization() {
+                document.getElementById('val-algo').innerText = "OPTIMIZING...";
+                document.getElementById('val-algo').style.color = "var(--primary)";
+
+                // Run Dijkstra to find shortest path from Node 0 to Node (length-1)
+                const startNode = 0;
+                const destNode = this.nodes.length - 1;
+                
+                // Create Adjacency List with distances as weights
+                const graph = {};
+                this.nodes.forEach(n => graph[n.id] = {});
+                this.edges.forEach(e => {
+                    const dist = this.getDistance(this.nodes[e.source], this.nodes[e.target]);
+                    graph[e.source][e.target] = dist;
+                    graph[e.target][e.source] = dist; // Undirected graph
+                });
+
+                // Dijkstra Initialization
+                const distances = {};
+                const previous = {};
+                const unvisited = new Set(this.nodes.map(n => n.id));
+                
+                this.nodes.forEach(n => distances[n.id] = Infinity);
+                distances[startNode] = 0;
+
+                // Main Loop
+                while(unvisited.size > 0) {
+                    // Find unvisited node with smallest distance
+                    let currNode = null;
+                    let minDistance = Infinity;
+                    for(let nodeId of unvisited) {
+                        if(distances[nodeId] < minDistance) {
+                            minDistance = distances[nodeId];
+                            currNode = nodeId;
+                        }
+                    }
+
+                    if(currNode === null || currNode === destNode) break;
+
+                    unvisited.delete(currNode);
+
+                    // Update neighbors
+                    for(let neighborStr in graph[currNode]) {
+                        let neighbor = parseInt(neighborStr);
+                        if(unvisited.has(neighbor)) {
+                            let alt = distances[currNode] + graph[currNode][neighbor];
+                            if(alt < distances[neighbor]) {
+                                distances[neighbor] = alt;
+                                previous[neighbor] = currNode;
+                            }
+                        }
+                    }
+                }
+
+                // Reconstruct Path
+                this.optimalPath = [];
+                let curr = destNode;
+                let totalDist = 0;
+                
+                if(previous[curr] !== undefined || curr === startNode) {
+                    while(curr !== undefined) {
+                        this.optimalPath.unshift(curr);
+                        curr = previous[curr];
+                    }
+                }
+
+                // Calculate exact total distance of path in "Kilometers" (scaled from pixels)
+                if(this.optimalPath.length > 1) {
+                    for(let i=0; i<this.optimalPath.length-1; i++) {
+                        totalDist += this.getDistance(this.nodes[this.optimalPath[i]], this.nodes[this.optimalPath[i+1]]);
+                    }
+                    document.getElementById('val-algo').innerText = "OPTIMIZED";
+                    document.getElementById('val-algo').style.color = "var(--success)";
+                } else {
+                    document.getElementById('val-algo').innerText = "NO PATH FOUND";
+                    document.getElementById('val-algo').style.color = "var(--danger)";
+                }
+
+                // Convert pixel distance to fake "Kilometers" (1 px = 2.5 km)
+                const realDistKm = totalDist * 2.5; 
+                this.calculateKPIs(realDistKm);
+            }
+
+            // --- INDUSTRIAL ENGINEERING ECONOMICS (Cost Analysis) ---
+            calculateKPIs(distanceKm) {
+                if(distanceKm === 0) {
+                    document.getElementById('kpi-dist').innerText = "0.0";
+                    document.getElementById('kpi-time').innerText = "0.0";
+                    document.getElementById('kpi-cost').innerText = "$0.00";
+                    return;
+                }
+
+                // Time = Distance / Speed
+                const timeHours = distanceKm / this.truckSpeed;
+                
+                // Costs
+                // Fuel consumption: assumed 30 Liters per 100 KM
+                const fuelLiters = (distanceKm / 100) * 30;
+                const fuelCost = fuelLiters * this.fuelPrice;
+                
+                // Labor: $25 per hour
+                const laborCost = timeHours * 25;
+                
+                // Maintenance wear and tear: $0.10 per KM
+                const maintCost = distanceKm * 0.10;
+
+                const totalCost = fuelCost + laborCost + maintCost;
+
+                // Update UI Texts
+                document.getElementById('kpi-dist').innerText = distanceKm.toFixed(1);
+                document.getElementById('kpi-time').innerText = timeHours.toFixed(1);
+                document.getElementById('kpi-cost').innerText = '$' + totalCost.toFixed(2);
+
+                // Update Cost Breakdown Bars
+                const pFuel = (fuelCost / totalCost) * 100;
+                const pLabor = (laborCost / totalCost) * 100;
+                const pMaint = (maintCost / totalCost) * 100;
+
+                document.getElementById('bar-fuel').style.width = `${pFuel}%`;
+                document.getElementById('bar-labor').style.width = `${pLabor}%`;
+                document.getElementById('bar-maint').style.width = `${pMaint}%`;
+            }
+
+            updateParams() {
+                this.fuelPrice = parseFloat(document.getElementById('sim-fuel').value);
+                this.truckSpeed = parseFloat(document.getElementById('sim-speed').value);
+                
+                document.getElementById('lbl-fuel').innerText = '$' + this.fuelPrice.toFixed(1);
+                document.getElementById('lbl-speed').innerText = this.truckSpeed;
+
+                // If path exists, recalculate KPIs instantly
+                if(this.optimalPath.length > 1) {
+                    let totalDist = 0;
+                    for(let i=0; i<this.optimalPath.length-1; i++) {
+                        totalDist += this.getDistance(this.nodes[this.optimalPath[i]], this.nodes[this.optimalPath[i+1]]);
+                    }
+                    this.calculateKPIs(totalDist * 2.5);
+                }
+            }
+
+            updateSidebarStats() {
+                document.getElementById('val-nodes').innerText = this.nodes.length;
+                document.getElementById('val-edges').innerText = this.edges.length;
+            }
+
+            // --- INTERACTION (DRAG & DROP) ---
+            onMouseDown(e) {
+                const mx = e.offsetX; const my = e.offsetY;
+                // Check if clicking a node
+                for(let i=0; i<this.nodes.length; i++) {
+                    const n = this.nodes[i];
+                    const dist = Math.sqrt((mx - n.x)**2 + (my - n.y)**2);
+                    if(dist < 20) { // Node radius hit detection
+                        this.draggedNode = n;
+                        this.canvas.style.cursor = 'grabbing';
+                        break;
+                    }
+                }
+            }
+            onMouseMove(e) {
+                if(this.draggedNode) {
+                    // Clamp to canvas bounds
+                    this.draggedNode.x = MathUtils.clamp(e.offsetX, 20, this.width - 20);
+                    this.draggedNode.y = MathUtils.clamp(e.offsetY, 20, this.height - 20);
+                    
+                    // Live recalculation if path exists
+                    if(this.optimalPath.length > 0) this.runOptimization();
+                } else {
+                    // Hover effect logic (optional)
+                }
+            }
+            onMouseUp() {
+                this.draggedNode = null;
+                this.canvas.style.cursor = 'crosshair';
+            }
+
+            // --- RENDER ENGINE ---
+            render() {
+                if(this.ctx && this.width) {
+                    this.ctx.clearRect(0, 0, this.width, this.height);
+
+                    // 1. Draw All Standard Edges
+                    this.ctx.lineWidth = 1;
+                    this.edges.forEach(e => {
+                        const n1 = this.nodes[e.source]; const n2 = this.nodes[e.target];
+                        this.ctx.beginPath(); this.ctx.moveTo(n1.x, n1.y); this.ctx.lineTo(n2.x, n2.y);
+                        this.ctx.strokeStyle = 'rgba(56, 189, 248, 0.15)'; // Faint blue
+                        this.ctx.stroke();
+                    });
+
+                    // 2. Draw Optimal Path (Thick glowing line)
+                    if(this.optimalPath.length > 1) {
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(this.nodes[this.optimalPath[0]].x, this.nodes[this.optimalPath[0]].y);
+                        for(let i=1; i<this.optimalPath.length; i++) {
+                            this.ctx.lineTo(this.nodes[this.optimalPath[i]].x, this.nodes[this.optimalPath[i]].y);
+                        }
+                        this.ctx.strokeStyle = '#10b981'; // Success Green
+                        this.ctx.lineWidth = 4;
+                        this.ctx.shadowColor = '#10b981';
+                        this.ctx.shadowBlur = 15;
+                        this.ctx.stroke();
+                        this.ctx.shadowBlur = 0; // Reset
+                        
+                        // Animated traveling dot (Visual flair)
+                        const time = Date.now() * 0.002;
+                        const pIndex = Math.floor(time) % (this.optimalPath.length - 1);
+                        const pFrac = time % 1;
+                        const p1 = this.nodes[this.optimalPath[pIndex]];
+                        const p2 = this.nodes[this.optimalPath[pIndex+1]];
+                        const dotX = MathUtils.lerp(p1.x, p2.x, pFrac);
+                        const dotY = MathUtils.lerp(p1.y, p2.y, pFrac);
+                        
+                        this.ctx.beginPath(); this.ctx.arc(dotX, dotY, 6, 0, Math.PI*2);
+                        this.ctx.fillStyle = '#fff'; this.ctx.fill();
+                    }
+
+                    // 3. Draw Nodes (Warehouses)
+                    this.nodes.forEach((n, i) => {
+                        const isStart = i === 0;
+                        const isDest = i === this.nodes.length - 1;
+                        const isOptimal = this.optimalPath.includes(n.id);
+
+                        this.ctx.beginPath();
+                        this.ctx.arc(n.x, n.y, 12, 0, Math.PI*2);
+                        
+                        if(isStart) this.ctx.fillStyle = '#10b981'; // Green
+                        else if(isDest) this.ctx.fillStyle = '#ef4444'; // Red
+                        else if(isOptimal) this.ctx.fillStyle = '#38bdf8'; // Blue
+                        else this.ctx.fillStyle = '#1e293b'; // Slate
+
+                        this.ctx.fill();
+                        this.ctx.strokeStyle = isOptimal ? '#fff' : 'rgba(56, 189, 248, 0.5)';
+                        this.ctx.lineWidth = 2;
+                        this.ctx.stroke();
+
+                        // Label
+                        this.ctx.fillStyle = '#fff';
+                        this.ctx.font = '10px "Share Tech Mono"';
+                        this.ctx.textAlign = 'center';
+                        this.ctx.fillText(n.label, n.x, n.y - 18);
+                    });
+                }
+                requestAnimationFrame(() => this.render());
+            }
+        }
+
+        // Initialize System
+        window.onload = () => {
+            window.SupplyChain = new SupplyChainOptimizer();
+        };
+
+    </script>
+</body>
+</html>
