@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ENG.MOHAMMAD | Engineering Sync Room</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=Syncopate:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Three.js for CAD Viewer -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <style>
+        /* ==========================================================================
+           01. CAD / ENTERPRISE UI VARIABLES
+           ========================================================================== */
+        :root {
+            --bg-deep: #090a0f; --bg-panel: #11141d; --bg-glass: rgba(17, 20, 29, 0.8);
+            --border-core: rgba(0, 243, 255, 0.2); --border-glow: rgba(0, 243, 255, 0.4);
+            --primary: #00f3ff; --accent: #f50057; --warning: #ffb700; --success: #00e676;
+            --text-main: #ffffff; --text-muted: #6b7280;
+            --blueprint-bg: #0b1528; --blueprint-line: rgba(0, 243, 255, 0.15);
+            --font-main: 'Space Grotesk', sans-serif; --font-mono: 'Share Tech Mono', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-main); background-color: var(--bg-deep); color: var(--text-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: var(--bg-panel); } ::-webkit-scrollbar-thumb { background: var(--primary); }
+
+        /* ==========================================================================
+           02. TOP NAVIGATION BAR
+           ========================================================================== */
+        .topbar { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: var(--bg-panel); border-bottom: 1px solid var(--border-core); z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+        .brand { font-family: 'Syncopate', sans-serif; font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+        .brand span { color: var(--primary); text-shadow: 0 0 10px var(--primary); }
+        
+        .session-info { display: flex; align-items: center; gap: 20px; font-family: var(--font-mono); font-size: 11px; }
+        .badge { padding: 5px 10px; border-radius: 4px; border: 1px solid; display: flex; align-items: center; gap: 5px; }
+        .badge-webrtc { background: rgba(0, 230, 118, 0.1); border-color: var(--success); color: var(--success); }
+        .badge-latency { background: rgba(255, 183, 0, 0.1); border-color: var(--warning); color: var(--warning); }
+        .pulse { width: 6px; height: 6px; background: var(--success); border-radius: 50%; animation: blink 1s infinite; box-shadow: 0 0 8px var(--success); }
+
+        .btn-exit { color: var(--text-muted); text-decoration: none; font-size: 12px; font-family: var(--font-mono); border: 1px solid var(--text-muted); padding: 5px 10px; border-radius: 4px; transition: 0.3s; }
+        .btn-exit:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+        /* ==========================================================================
+           03. MAIN WORKSPACE (GRID LAYOUT)
+           ========================================================================== */
+        .workspace { flex: 1; display: flex; overflow: hidden; position: relative; }
+        
+        /* --- TOOLBAR (LEFT) --- */
+        .toolbar { width: 60px; background: var(--bg-panel); border-right: 1px solid var(--border-core); display: flex; flex-direction: column; align-items: center; padding: 20px 0; gap: 15px; z-index: 10; }
+        .tool-btn { width: 40px; height: 40px; border-radius: 8px; border: 1px solid transparent; background: transparent; color: var(--text-muted); font-size: 16px; cursor: pointer; transition: 0.3s; display: flex; justify-content: center; align-items: center; position: relative; }
+        .tool-btn:hover { background: rgba(0, 243, 255, 0.1); color: var(--primary); }
+        .tool-btn.active { background: rgba(0, 243, 255, 0.2); border-color: var(--primary); color: var(--primary); box-shadow: 0 0 10px rgba(0,243,255,0.3); }
+        .tool-tooltip { position: absolute; left: 50px; background: #000; color: #fff; font-family: var(--font-mono); font-size: 10px; padding: 5px 8px; border-radius: 4px; border: 1px solid var(--border-core); opacity: 0; pointer-events: none; transition: 0.3s; white-space: nowrap; }
+        .tool-btn:hover .tool-tooltip { opacity: 1; transform: translateX(5px); }
+
+        /* --- CENTER: BLUEPRINT CANVAS --- */
+        .canvas-container { flex: 1; position: relative; background-color: var(--blueprint-bg); background-image: linear-gradient(var(--blueprint-line) 1px, transparent 1px), linear-gradient(90deg, var(--blueprint-line) 1px, transparent 1px); background-size: 50px 50px; overflow: hidden; cursor: crosshair; }
+        #blueprint { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        
+        .canvas-overlay { position: absolute; bottom: 20px; left: 20px; font-family: var(--font-mono); font-size: 11px; color: var(--primary); background: rgba(0,0,0,0.6); padding: 10px; border-radius: 4px; pointer-events: none; border: 1px solid var(--border-core); }
+        .canvas-overlay span { color: #fff; }
+
+        /* --- RIGHT PANEL: CAD VIEWER & CHAT --- */
+        .right-panel { width: 350px; background: var(--bg-panel); border-left: 1px solid var(--border-core); display: flex; flex-direction: column; z-index: 10; }
+        
+        /* 3D CAD Viewer */
+        .cad-container { height: 45%; border-bottom: 1px solid var(--border-core); position: relative; background: radial-gradient(circle at center, #1a2235, #090a0f); }
+        #cad-webgl { width: 100%; height: 100%; position: absolute; top: 0; left: 0; outline: none; }
+        .cad-header { position: absolute; top: 10px; left: 10px; display: flex; justify-content: space-between; width: calc(100% - 20px); pointer-events: none; }
+        .cad-title { font-family: var(--font-head); font-size: 12px; color: var(--primary); text-shadow: 0 0 5px #000; }
+        .cad-metrics { font-family: var(--font-mono); font-size: 9px; color: var(--text-muted); text-align: right; }
+        
+        .cad-controls { position: absolute; bottom: 10px; right: 10px; display: flex; gap: 5px; }
+        .btn-cad { background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 5px 8px; font-size: 10px; cursor: pointer; border-radius: 4px; font-family: var(--font-mono); transition: 0.3s; }
+        .btn-cad:hover, .btn-cad.active { background: var(--primary); border-color: var(--primary); color: #000; }
+
+        /* WebRTC Participants & Chat */
+        .collab-container { flex: 1; display: flex; flex-direction: column; background: var(--bg-glass); }
+        
+        .participants { display: flex; gap: 10px; padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .user-cam { width: 60px; height: 60px; border-radius: 8px; background: #000; border: 1px solid var(--border-core); position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center; }
+        .user-cam img { width: 100%; height: 100%; object-fit: cover; opacity: 0.7; }
+        .user-cam.local { border-color: var(--primary); }
+        .user-name { position: absolute; bottom: 2px; left: 4px; font-family: var(--font-mono); font-size: 8px; color: #fff; background: rgba(0,0,0,0.5); padding: 2px 4px; border-radius: 2px; }
+        .user-mic { position: absolute; top: 4px; right: 4px; font-size: 8px; color: var(--success); }
+
+        .chat-box { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; font-family: var(--font-mono); font-size: 11px; }
+        .msg { padding: 8px 12px; border-radius: 6px; max-width: 85%; line-height: 1.4; position: relative; }
+        .msg-sys { background: rgba(0, 243, 255, 0.1); color: var(--primary); align-self: center; text-align: center; border: 1px dashed var(--primary); width: 100%; font-size: 10px; }
+        .msg-remote { background: rgba(255,255,255,0.05); color: #ccc; align-self: flex-start; border: 1px solid rgba(255,255,255,0.1); border-bottom-left-radius: 0; }
+        .msg-local { background: rgba(0, 243, 255, 0.15); color: #fff; align-self: flex-end; border: 1px solid var(--primary); border-bottom-right-radius: 0; }
+        .msg-author { font-size: 9px; color: var(--primary); margin-bottom: 3px; font-weight: bold; }
+
+        .chat-input { display: flex; padding: 15px; border-top: 1px solid rgba(255,255,255,0.05); }
+        .chat-input input { flex: 1; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 10px; font-family: var(--font-main); font-size: 12px; border-radius: 4px; outline: none; }
+        .chat-input input:focus { border-color: var(--primary); }
+        .chat-input button { background: var(--primary); border: none; color: #000; padding: 0 15px; border-radius: 4px; margin-left: 10px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .chat-input button:hover { background: #fff; }
+
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        @media (max-width: 1024px) {
+            .workspace { flex-direction: column; overflow-y: auto; }
+            .toolbar { width: 100%; flex-direction: row; justify-content: center; padding: 10px; border-right: none; border-bottom: 1px solid var(--border-core); }
+            .tool-tooltip { display: none; }
+            .canvas-container { min-height: 400px; }
+            .right-panel { width: 100%; border-left: none; border-top: 1px solid var(--border-core); }
+            .cad-container { height: 350px; }
+            .collab-container { height: 400px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==========================================================================
+         TOP NAVIGATION
+         ========================================================================== -->
+    <header class="topbar">
+        <div class="brand"><i class="fas fa-satellite-dish"></i> SYNC<span>.</span>ROOM</div>
+        
+        <div class="session-info">
+            <div class="badge badge-webrtc"><div class="pulse"></div> WebRTC Peer-to-Peer</div>
+            <div class="badge badge-latency"><i class="fas fa-network-wired"></i> Latency: <span id="ping">12</span>ms</div>
+        </div>
+
+        <a href="index.html" class="btn-exit"><i class="fas fa-sign-out-alt"></i> Leave Session</a>
+    </header>
+
+    <!-- ==========================================================================
+         MAIN WORKSPACE
+         ========================================================================== -->
+    <div class="workspace">
+        
+        <!-- LEFT TOOLBAR -->
+        <aside class="toolbar">
+            <button class="tool-btn active" id="btn-draw" onclick="Blueprint.setMode('draw')">
+                <i class="fas fa-pen"></i><span class="tool-tooltip">Draw Topology</span>
+            </button>
+            <button class="tool-btn" id="btn-measure" onclick="Blueprint.setMode('measure')">
+                <i class="fas fa-ruler-combined"></i><span class="tool-tooltip">Measure Distance (Math)</span>
+            </button>
+            <button class="tool-btn" id="btn-rect" onclick="Blueprint.setMode('rect')">
+                <i class="far fa-square"></i><span class="tool-tooltip">Draw Component Bounds</span>
+            </button>
+            <div style="height: 1px; width: 30px; background: rgba(255,255,255,0.1); margin: 5px 0;"></div>
+            <button class="tool-btn" onclick="Blueprint.clearCanvas()">
+                <i class="fas fa-trash-alt" style="color: var(--accent);"></i><span class="tool-tooltip">Clear Canvas</span>
+            </button>
+            <button class="tool-btn" onclick="WebRTCSim.syncCanvas()">
+                <i class="fas fa-cloud-upload-alt" style="color: var(--success);"></i><span class="tool-tooltip">Sync to Peers</span>
+            </button>
+        </aside>
+
+        <!-- CENTER CANVAS -->
+        <main class="canvas-container" id="canvas-wrap">
+            <canvas id="blueprint"></canvas>
+            <div class="canvas-overlay">
+                <div>CURSOR: <span id="c-coords">X: 000, Y: 000</span></div>
+                <div>MODE: <span id="c-mode">DRAW</span></div>
+                <div style="margin-top: 5px; color: var(--text-muted);">Math Engine Active (1px = 0.5mm)</div>
+            </div>
+        </main>
+
+        <!-- RIGHT PANEL (CAD & CHAT) -->
+        <aside class="right-panel">
+            
+            <!-- 3D CAD VIEWER -->
+            <div class="cad-container">
+                <div id="cad-webgl"></div>
+                <div class="cad-header">
+                    <div class="cad-title">ASSEMBLY: DUAL GEARBOX</div>
+                    <div class="cad-metrics">PROCEDURAL GEOMETRY<br>VERTICES: <span id="cad-verts">Loading...</span></div>
+                </div>
+                <div class="cad-controls">
+                    <button class="btn-cad" onclick="CADEngine.toggleWireframe()"><i class="fas fa-border-all"></i> WIREFRAME</button>
+                    <button class="btn-cad" onclick="CADEngine.toggleAnimation()"><i class="fas fa-play"></i> KINEMATICS</button>
+                </div>
+            </div>
+
+            <!-- WEBRTC COLLABORATION -->
+            <div class="collab-container">
+                <div class="participants">
+                    <!-- Local User -->
+                    <div class="user-cam local">
+                        <i class="fas fa-user" style="font-size: 24px; color: var(--primary);"></i>
+                        <span class="user-name">You (Admin)</span>
+                        <i class="fas fa-microphone user-mic"></i>
+                    </div>
+                    <!-- Remote User (Simulated) -->
+                    <div class="user-cam">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop" alt="Engineer">
+                        <span class="user-name">Alex M.</span>
+                        <i class="fas fa-microphone user-mic"></i>
+                    </div>
+                </div>
+
+                <div class="chat-box" id="chat-box">
+                    <div class="msg msg-sys">WebRTC Data Channel Established. Connection encrypted.</div>
+                    <div class="msg msg-remote">
+                        <div class="msg-author">Alex M.</div>
+                        Mohammad, the gear ratio in the 3D model looks solid. Let's map the housing dimensions on the blueprint.
+                    </div>
+                </div>
+
+                <form class="chat-input" id="chat-form">
+                    <input type="text" id="chat-msg" placeholder="Send coordinates or message..." autocomplete="off">
+                    <button type="submit"><i class="fas fa-paper-plane"></i></button>
+                </form>
+            </div>
+
+        </aside>
+    </div>
+
+    <!-- ==========================================================================
+         ENGINEERING JAVASCRIPT KERNEL
+         ========================================================================== -->
+    <script>
+        /**
+         * 1. INTERACTIVE BLUEPRINT CANVAS (Engineering Math & Drawing)
+         */
+        class BlueprintCanvas {
+            constructor() {
+                this.canvas = document.getElementById('blueprint');
+                this.ctx = this.canvas.getContext('2d');
+                this.wrap = document.getElementById('canvas-wrap');
+                
+                this.isDrawing = false;
+                this.mode = 'draw'; // 'draw', 'measure', 'rect'
+                this.paths = []; // Store strokes
+                this.currentPath = null;
+                this.startX = 0; this.startY = 0;
+
+                this.scale = 0.5; // 1px = 0.5mm
+
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+                this.bindEvents();
+                this.redraw();
+            }
+
+            resize() {
+                const rect = this.wrap.getBoundingClientRect();
+                this.canvas.width = rect.width; this.canvas.height = rect.height;
+                this.redraw();
+            }
+
+            setMode(newMode) {
+                this.mode = newMode;
+                document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+                document.getElementById('btn-' + newMode).classList.add('active');
+                document.getElementById('c-mode').innerText = newMode.toUpperCase();
+            }
+
+            clearCanvas() {
+                this.paths = []; this.redraw();
+                WebRTCSim.logSys("Canvas cleared by Admin.");
+            }
+
+            bindEvents() {
+                this.canvas.addEventListener('mousedown', (e) => this.startAction(e));
+                this.canvas.addEventListener('mousemove', (e) => this.doAction(e));
+                window.addEventListener('mouseup', () => this.endAction());
+            }
+
+            getPos(e) {
+                const rect = this.canvas.getBoundingClientRect();
+                return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+            }
+
+            startAction(e) {
+                this.isDrawing = true;
+                const pos = this.getPos(e);
+                this.startX = pos.x; this.startY = pos.y;
+                
+                if(this.mode === 'draw') {
+                    this.currentPath = { type: 'draw', points: [{x: pos.x, y: pos.y}] };
+                } else if(this.mode === 'measure') {
+                    this.currentPath = { type: 'measure', x1: pos.x, y1: pos.y, x2: pos.x, y2: pos.y };
+                } else if(this.mode === 'rect') {
+                    this.currentPath = { type: 'rect', x: pos.x, y: pos.y, w: 0, h: 0 };
+                }
+            }
+
+            doAction(e) {
+                const pos = this.getPos(e);
+                document.getElementById('c-coords').innerText = `X: ${Math.round(pos.x)}, Y: ${Math.round(pos.y)}`;
+
+                if(!this.isDrawing) return;
+
+                if(this.mode === 'draw') {
+                    this.currentPath.points.push({x: pos.x, y: pos.y});
+                } else if(this.mode === 'measure') {
+                    this.currentPath.x2 = pos.x; this.currentPath.y2 = pos.y;
+                } else if(this.mode === 'rect') {
+                    this.currentPath.w = pos.x - this.startX;
+                    this.currentPath.h = pos.y - this.startY;
+                }
+                this.redraw();
+            }
+
+            endAction() {
+                if(!this.isDrawing) return;
+                this.isDrawing = false;
+                if(this.currentPath) {
+                    this.paths.push(this.currentPath);
+                    this.currentPath = null;
+                }
+            }
+
+            redraw() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                const drawPath = (p) => {
+                    this.ctx.strokeStyle = '#00f3ff'; this.ctx.lineWidth = 2; this.ctx.lineCap = 'round';
+                    
+                    if(p.type === 'draw') {
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(p.points[0].x, p.points[0].y);
+                        for(let i=1; i<p.points.length; i++) this.ctx.lineTo(p.points[i].x, p.points[i].y);
+                        this.ctx.stroke();
+                    } 
+                    else if(p.type === 'rect') {
+                        this.ctx.beginPath();
+                        this.ctx.rect(p.x, p.y, p.w, p.h);
+                        this.ctx.stroke();
+                    }
+                    else if(p.type === 'measure') {
+                        this.ctx.strokeStyle = '#f50057'; // Accent color for measurements
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(p.x1, p.y1); this.ctx.lineTo(p.x2, p.y2);
+                        this.ctx.stroke();
+                        
+                        // Circle ends
+                        this.ctx.fillStyle = '#f50057';
+                        this.ctx.beginPath(); this.ctx.arc(p.x1, p.y1, 4, 0, Math.PI*2); this.ctx.fill();
+                        this.ctx.beginPath(); this.ctx.arc(p.x2, p.y2, 4, 0, Math.PI*2); this.ctx.fill();
+
+                        // Euclidean Distance Math
+                        const dx = p.x2 - p.x1; const dy = p.y2 - p.y1;
+                        const distPx = Math.sqrt(dx*dx + dy*dy);
+                        const distMm = (distPx * this.scale).toFixed(1);
+
+                        // Draw Text
+                        const midX = p.x1 + dx/2; const midY = p.y1 + dy/2;
+                        this.ctx.fillStyle = '#11141d';
+                        this.ctx.fillRect(midX - 25, midY - 15, 50, 20);
+                        this.ctx.fillStyle = '#fff';
+                        this.ctx.font = '12px "Share Tech Mono"';
+                        this.ctx.textAlign = 'center';
+                        this.ctx.fillText(`${distMm}mm`, midX, midY);
+                    }
+                };
+
+                this.paths.forEach(drawPath);
+                if(this.currentPath) drawPath(this.currentPath);
+            }
+        }
+
+        /**
+         * 2. PROCEDURAL 3D CAD ENGINE (THREE.JS MATH)
+         * Generates involute-like gears procedurally
+         */
+        class CADViewer {
+            constructor() {
+                this.container = document.getElementById('cad-webgl');
+                if(!this.container) return;
+                
+                this.scene = new THREE.Scene();
+                this.camera = new THREE.PerspectiveCamera(45, this.container.clientWidth / this.container.clientHeight, 0.1, 1000);
+                this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+                this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
+                this.container.appendChild(this.renderer.domElement);
+
+                this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+                this.controls.enableDamping = true; 
+
+                this.isWireframe = false;
+                this.isAnimating = true;
+                
+                this.gears = [];
+                this.buildAssembly();
+                
+                this.camera.position.set(0, 30, 40);
+                this.resize(); window.addEventListener('resize', () => this.resize());
+                this.animate();
+            }
+
+            // Procedural Mathematics to draw a Gear Shape
+            createGearShape(numTeeth, outerRadius, innerRadius, holeRadius) {
+                const shape = new THREE.Shape();
+                const step = (Math.PI * 2) / (numTeeth * 2);
+                
+                for(let i=0; i < numTeeth * 2; i++) {
+                    const radius = (i % 2 === 0) ? outerRadius : innerRadius;
+                    // Add slight bevel to teeth for realism
+                    const angle1 = i * step;
+                    const angle2 = angle1 + step * 0.2; 
+                    const angle3 = angle1 + step * 0.8;
+                    
+                    if(i === 0) shape.moveTo(Math.cos(angle1)*radius, Math.sin(angle1)*radius);
+                    shape.lineTo(Math.cos(angle2)*radius, Math.sin(angle2)*radius);
+                    shape.lineTo(Math.cos(angle3)*radius, Math.sin(angle3)*radius);
+                }
+                shape.closePath();
+
+                // Center Hole
+                const holePath = new THREE.Path();
+                holePath.absarc(0, 0, holeRadius, 0, Math.PI * 2, false);
+                shape.holes.push(holePath);
+
+                return shape;
+            }
+
+            buildAssembly() {
+                this.group = new THREE.Group(); this.scene.add(this.group);
+                
+                // Lighting
+                this.scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+                const dLight = new THREE.DirectionalLight(0xffffff, 1); dLight.position.set(10, 20, 15); this.scene.add(dLight);
+                const dLight2 = new THREE.DirectionalLight(0x00f3ff, 0.5); dLight2.position.set(-10, -10, -10); this.scene.add(dLight2);
+
+                this.matSolid = new THREE.MeshStandardMaterial({ color: 0x2d3748, metalness: 0.8, roughness: 0.4 });
+                this.matWire = new THREE.MeshBasicMaterial({ color: 0x00f3ff, wireframe: true, transparent: true, opacity: 0.4 });
+
+                // Gear 1 (Drive)
+                const shape1 = this.createGearShape(12, 6, 5, 2);
+                const extOpts1 = { depth: 2, bevelEnabled: true, bevelSegments: 2, steps: 1, bevelSize: 0.1, bevelThickness: 0.1 };
+                const geo1 = new THREE.ExtrudeGeometry(shape1, extOpts1);
+                const gear1 = new THREE.Mesh(geo1, this.matSolid);
+                gear1.rotation.x = Math.PI/2;
+                gear1.position.set(-6, 0, 0);
+                this.group.add(gear1);
+                this.gears.push({ mesh: gear1, speed: 0.02 });
+
+                // Gear 2 (Driven - Larger, slower, opposite direction)
+                const shape2 = this.createGearShape(24, 12, 11, 3); // Double teeth = half speed
+                const extOpts2 = { depth: 2, bevelEnabled: true, bevelSegments: 2, steps: 1, bevelSize: 0.1, bevelThickness: 0.1 };
+                const geo2 = new THREE.ExtrudeGeometry(shape2, extOpts2);
+                const gear2 = new THREE.Mesh(geo2, this.matSolid);
+                gear2.rotation.x = Math.PI/2;
+                // Offset mesh mathematically to interlock teeth. Distance = radius1 + radius2
+                gear2.position.set(11.5, 0, 0); 
+                // Offset rotation so teeth mesh perfectly
+                gear2.rotation.z = (Math.PI * 2) / (24 * 4); 
+                this.group.add(gear2);
+                this.gears.push({ mesh: gear2, speed: -0.01 }); // Half speed, negative dir
+
+                // Update UI Vertex count
+                const totalVerts = geo1.attributes.position.count + geo2.attributes.position.count;
+                document.getElementById('cad-verts').innerText = totalVerts.toLocaleString();
+            }
+
+            toggleWireframe() {
+                this.isWireframe = !this.isWireframe;
+                this.gears.forEach(g => { g.mesh.material = this.isWireframe ? this.matWire : this.matSolid; });
+            }
+            toggleAnimation() { this.isAnimating = !this.isAnimating; }
+
+            resize() {
+                if(this.container.clientWidth === 0) return;
+                this.camera.aspect = this.container.clientWidth / this.container.clientHeight;
+                this.camera.updateProjectionMatrix();
+                this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
+            }
+            animate() {
+                requestAnimationFrame(() => this.animate());
+                this.controls.update();
+                if(this.isAnimating) {
+                    this.gears.forEach(g => g.mesh.rotation.z += g.speed);
+                }
+                this.renderer.render(this.scene, this.camera);
+            }
+        }
+
+        /**
+         * 3. WEBRTC COLLABORATION SIMULATOR
+         * Handles chat, system logs, and fake network interactions
+         */
+        class WebRTCSimulator {
+            constructor() {
+                this.chatBox = document.getElementById('chat-box');
+                this.form = document.getElementById('chat-form');
+                this.input = document.getElementById('chat-msg');
+                
+                this.bindEvents();
+                this.pingLoop();
+            }
+
+            bindEvents() {
+                this.form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const msg = this.input.value.trim();
+                    if(msg !== '') {
+                        this.addMessage('You (Admin)', msg, 'msg-local');
+                        this.input.value = '';
+                        this.simulateResponse(msg);
+                    }
+                });
+            }
+
+            addMessage(author, text, type) {
+                const html = `
+                    <div class="msg ${type}">
+                        ${type !== 'msg-sys' ? `<div class="msg-author">${author}</div>` : ''}
+                        ${text}
+                    </div>`;
+                this.chatBox.insertAdjacentHTML('beforeend', html);
+                this.chatBox.scrollTop = this.chatBox.scrollHeight;
+            }
+
+            logSys(text) { this.addMessage('SYSTEM', text, 'msg-sys'); }
+
+            syncCanvas() {
+                this.logSys("Syncing Canvas Vectors over DataChannel...");
+                setTimeout(() => {
+                    this.logSys("Sync Complete. Peer received blueprint data.");
+                    setTimeout(() => {
+                        this.addMessage('Alex M.', "Got the update. Measurements look accurate to the CAD model.", 'msg-remote');
+                    }, 1500);
+                }, 800);
+            }
+
+            simulateResponse(triggerMsg) {
+                setTimeout(() => {
+                    let reply = "Copy that. I'm updating the variables on my end.";
+                    if(triggerMsg.toLowerCase().includes('gear') || triggerMsg.toLowerCase().includes('cad')) {
+                        reply = "I'm looking at the CAD viewer now. The gear ratio is 2:1. Torque transfer looks good.";
+                        if(window.CADEngine) window.CADEngine.toggleWireframe(); // Simulate remote user interaction
+                        this.logSys("Peer changed CAD view mode.");
+                    }
+                    else if(triggerMsg.toLowerCase().includes('measure')) {
+                        reply = "Can you draw a measurement line across the drive shaft housing?";
+                    }
+                    this.addMessage('Alex M.', reply, 'msg-remote');
+                }, 2000 + Math.random() * 1000);
+            }
+
+            pingLoop() {
+                setInterval(() => {
+                    document.getElementById('ping').innerText = Math.floor(12 + Math.random() * 8);
+                }, 2000);
+            }
+        }
+
+        // ==========================================================================
+        // SYSTEM BOOTSTRAP
+        // ==========================================================================
+        window.onload = () => {
+            window.Blueprint = new BlueprintCanvas();
+            window.CADEngine = new CADViewer();
+            window.WebRTCSim = new WebRTCSimulator();
+        };
+
+    </script>
+</body>
+</html>
