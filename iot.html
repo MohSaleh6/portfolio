@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ENG.MOHAMMAD | Automotive Enterprise Systems</title>
+    <title>ENG.MOHAMMAD SALEH | Automotive Enterprise Systems</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=Syncopate:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
-    <!-- Three.js & GSAP -->
+    <!-- Core Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
     <style>
         /* ==========================================================================
-           01. SYSTEM VARIABLES & INDUSTRIAL THEME
+           01. ENTERPRISE CSS ARCHITECTURE
            ========================================================================== */
         :root {
-            --bg-deep: #05070a; --bg-panel: rgba(12, 16, 24, 0.85); --bg-glass: rgba(15, 20, 30, 0.7);
+            --bg-deep: #030407; --bg-panel: rgba(12, 16, 24, 0.85); --bg-glass: rgba(15, 20, 30, 0.7);
             --border-core: rgba(74, 144, 226, 0.25); --border-glow: rgba(74, 144, 226, 0.5);
             --primary: #4A90E2; --accent: #FF9F1C; --danger: #ff2a2a; --success: #00ff41;
             --text-main: #f0f4f8; --text-muted: #64748b;
@@ -29,14 +29,13 @@
         body { font-family: var(--font-main); background-color: var(--bg-deep); color: var(--text-main); height: 100vh; overflow: hidden; display: flex; }
         ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: var(--bg-deep); } ::-webkit-scrollbar-thumb { background: var(--primary); }
 
-        /* Industrial Grid Background */
         .engineering-grid { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; background-color: var(--bg-deep); background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px); background-size: 30px 30px; }
         .engineering-grid::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 50%, transparent 0%, var(--bg-deep) 100%); }
 
         /* ==========================================================================
-           02. GATEWAY HUB (HARDWARE BLUETOOTH ENFORCEMENT)
+           02. GATEWAY HUB
            ========================================================================== */
-        #gateway-hub { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(5, 7, 10, 0.98); backdrop-filter: blur(15px); z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: transform 0.8s cubic-bezier(0.8, 0, 0.2, 1), opacity 0.5s; }
+        #gateway-hub { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(3, 4, 7, 0.98); backdrop-filter: blur(15px); z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: transform 0.8s cubic-bezier(0.8, 0, 0.2, 1), opacity 0.5s; }
         .gw-title { text-align: center; margin-bottom: 40px; }
         .gw-title h1 { font-family: var(--font-head); font-size: 36px; letter-spacing: 2px; }
         .gw-title span { color: var(--primary); }
@@ -111,7 +110,6 @@
         .form-group { display: flex; flex-direction: column; gap: 8px; }
         .form-group label { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
         .form-group select, .form-group input { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 10px; font-family: var(--font-mono); font-size: 12px; border-radius: 4px; outline: none; }
-        .form-group select:focus { border-color: var(--primary); }
         
         .at-terminal { flex: 1; background: #000; padding: 15px; font-family: var(--font-mono); font-size: 11px; color: var(--success); overflow-y: auto; display: flex; flex-direction: column; gap: 4px; border-top: 1px solid #111; }
         .log-tx { color: var(--primary); } .log-rx { color: var(--success); } .log-err { color: var(--danger); } .log-sys { color: var(--text-muted); }
@@ -131,7 +129,7 @@
         .v-val { font-family: var(--font-mono); font-size: 20px; font-weight: bold; color: var(--text-main); margin-top: 5px; }
 
         /* --- SIGNAL OSCILLOSCOPE & 3D ECU VIEW --- */
-        .osc-layout { display: grid; grid-template-columns: 1fr 350px; gap: 20px; flex: 1; }
+        .osc-layout { display: grid; grid-template-columns: 1fr 380px; gap: 20px; flex: 1; }
         
         .osc-panel { display: flex; flex-direction: column; gap: 15px; padding: 15px; }
         .chart-box { flex: 1; background: #010203; border: 1px solid #111; border-radius: 6px; position: relative; overflow: hidden; box-shadow: inset 0 0 20px #000; display: flex; flex-direction: column; }
@@ -139,11 +137,11 @@
         .chart-head span { font-weight: bold; font-size: 12px; margin-left: 5px; }
         .chart-canvas { width: 100%; height: 100%; flex: 1; }
 
-        /* 3D ECU Microchip */
-        .ecu-container { background: #000; border: 1px solid var(--border-core); border-radius: 8px; position: relative; overflow: hidden; box-shadow: inset 0 0 50px rgba(0,0,0,0.9); }
+        /* 3D Realistic ECU Module */
+        .ecu-container { background: radial-gradient(circle at center, #0a111a, #010203); border: 1px solid var(--border-core); border-radius: 8px; position: relative; overflow: hidden; box-shadow: inset 0 0 50px rgba(0,0,0,0.9); }
         #webgl-ecu { width: 100%; height: 100%; position: absolute; top: 0; left: 0; outline: none; }
         .ecu-overlay { position: absolute; top: 15px; left: 15px; pointer-events: none; }
-        .ecu-title { font-family: var(--font-head); font-size: 14px; color: #fff; }
+        .ecu-title { font-family: var(--font-head); font-size: 16px; color: #fff; text-shadow: 0 0 10px var(--primary); }
         .ecu-desc { font-family: var(--font-mono); font-size: 10px; color: var(--accent); margin-top: 5px; }
 
         /* --- OBD-II SCANNER VIEW --- */
@@ -158,7 +156,7 @@
         .fc-loc { font-family: var(--font-mono); font-size: 9px; background: var(--danger); color: #fff; padding: 3px 8px; border-radius: 4px; }
         .fc-title { font-weight: bold; font-size: 13px; margin-bottom: 8px; color: #fff; }
         .fc-text { font-size: 11px; color: var(--text-muted); line-height: 1.5; margin-bottom: 10px; }
-        .fc-fix { font-family: var(--font-mono); font-size: 10px; color: var(--success); background: rgba(0, 255, 65, 0.05); padding: 8px; border-radius: 4px; }
+        .fc-fix { font-family: var(--font-mono); font-size: 10px; color: var(--success); background: rgba(0, 255, 65, 0.05); padding: 8px; border-radius: 4px; border-left: 2px solid var(--success); }
 
         .actions-col { display: flex; flex-direction: column; gap: 15px; }
         .btn-obd { padding: 12px; border-radius: 6px; font-family: var(--font-mono); font-size: 11px; font-weight: bold; cursor: pointer; transition: 0.3s; border: 1px solid transparent; display: flex; align-items: center; justify-content: center; gap: 8px; }
@@ -192,7 +190,7 @@
     <div class="engineering-grid"></div>
 
     <!-- ==========================================================================
-         GATEWAY HUB (Enforces Bluetooth Connection)
+         GATEWAY HUB (Hardware Bluetooth Enforcement)
          ========================================================================== -->
     <div id="gateway-hub">
         <div class="gw-title">
@@ -205,14 +203,14 @@
                 <div class="hw-badge">WEB BLUETOOTH API</div>
                 <i class="fab fa-bluetooth-b"></i>
                 <h2>Pair OBD-II Hardware</h2>
-                <p>Initiate navigator.bluetooth to pair with ELM327 modules. Extracts and translates live CAN-BUS Hex data from the physical ECU.</p>
+                <p>Initiate navigator.bluetooth to pair with physical ELM327 modules. Extracts and translates live CAN-BUS Hex data from the ECU.</p>
             </div>
             
             <!-- SIMULATION BUTTON -->
             <div class="split-card sim-card" onclick="window.App.bootSystem('sim')">
                 <i class="fas fa-microchip"></i>
                 <h2>Virtual Sandbox</h2>
-                <p>Bypass hardware requirements. Run the internal kinematic equations and view the Signal Oscilloscope processing fake telemetry.</p>
+                <p>Bypass hardware requirements. Run the internal kinematic equations and view the Signal Oscilloscope processing mathematical telemetry.</p>
             </div>
         </div>
         <div id="bt-error-msg"></div>
@@ -225,13 +223,13 @@
         
         <!-- SIDEBAR -->
         <aside class="sidebar">
-            <div class="brand"><i class="fas fa-satellite-dish"></i> IoT<span>.</span>LINK</div>
+            <div class="brand"><i class="fas fa-microchip"></i> IoT<span>.</span>LINK</div>
             
             <nav class="nav-menu">
                 <a class="nav-item active" data-target="v-conn"><i class="fas fa-wifi"></i> Setup</a>
                 <a class="nav-item" data-target="v-dash"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
                 <a class="nav-item" data-target="v-osc"><i class="fas fa-wave-square"></i> Oscilloscope</a>
-                <a class="nav-item" data-target="v-obd"><i class="fas fa-search"></i> Diagnostics</a>
+                <a class="nav-item" data-target="v-obd"><i class="fas fa-stethoscope"></i> Diagnostics</a>
             </nav>
 
             <div class="sys-controls">
@@ -239,7 +237,7 @@
                     <i class="fas fa-power-off"></i><span id="ignite-text">START ENGINE</span>
                 </button>
                 <div class="audio-toggle" onclick="window.App.audio.toggle()">
-                    <div class="audio-text">Engine Audio</div>
+                    <div class="audio-text">Engine Synth</div>
                     <i class="fas fa-volume-mute audio-icon" id="audio-icon"></i>
                 </div>
             </div>
@@ -254,34 +252,24 @@
                     <div class="view-title"><h1>Connection Matrix</h1><p>Hardware Protocol Configuration</p></div>
                     <div class="sys-badge" id="mode-badge"><div class="pulse"></div> <span id="mode-text">OFFLINE</span></div>
                 </div>
-                
                 <div class="conn-grid">
                     <div class="panel">
                         <div class="panel-head">OBD-II Parameters</div>
                         <div class="settings-form">
-                            <div class="form-group">
-                                <label>Hardware Interface</label>
-                                <input type="text" id="hw-name" value="No Device Paired" disabled>
-                            </div>
+                            <div class="form-group"><label>Hardware Interface</label><input type="text" id="hw-name" value="No Device Paired" disabled></div>
                             <div class="form-group">
                                 <label>Communication Protocol</label>
-                                <select>
-                                    <option>ISO 15765-4 CAN (11 bit, 500 Kbaud)</option>
-                                    <option>SAE J1850 PWM (41.6 Kbaud)</option>
-                                    <option>ISO 9141-2 (5 baud init)</option>
-                                </select>
+                                <select><option>ISO 15765-4 CAN (11 bit, 500 Kbaud)</option><option>SAE J1850 PWM</option></select>
                             </div>
                             <div class="form-group">
                                 <label>Baud Rate</label>
-                                <select><option>38400</option><option>9600</option><option>115200</option></select>
+                                <select><option>38400</option><option>115200</option></select>
                             </div>
                         </div>
                     </div>
                     <div class="panel">
                         <div class="panel-head">AT Command Handshake</div>
-                        <div class="at-terminal" id="at-terminal">
-                            <div class="log-sys">> SYSTEM WAITING FOR BOOT...</div>
-                        </div>
+                        <div class="at-terminal" id="at-terminal"><div class="log-sys">> SYSTEM WAITING FOR BOOT...</div></div>
                     </div>
                 </div>
             </section>
@@ -314,16 +302,14 @@
             <!-- VIEW 3: SIGNAL OSCILLOSCOPE & 3D ECU -->
             <section class="view" id="v-osc">
                 <div class="view-header">
-                    <div class="view-title"><h1>Signal Oscilloscope & Processor</h1><p>Live waveform analysis of sensor voltages and 3D ECU Data Flow</p></div>
+                    <div class="view-title"><h1>Signal Oscilloscope & Processor</h1><p>Live waveform analysis of sensor voltages and 3D ECU architecture</p></div>
                 </div>
                 <div class="osc-layout">
                     <div class="panel osc-panel">
-                        <!-- Chart 1: O2 Sensor -->
                         <div class="chart-box">
                             <div class="chart-head">O2 Sensor Bank 1 (PID 14) <span style="color:var(--primary);" id="o2-val">0.45V</span></div>
                             <canvas class="chart-canvas" id="osc-o2"></canvas>
                         </div>
-                        <!-- Chart 2: Throttle Position -->
                         <div class="chart-box">
                             <div class="chart-head">Throttle Pedal Position (PID 11) <span style="color:var(--accent);" id="tps-val">0%</span></div>
                             <canvas class="chart-canvas" id="osc-tps"></canvas>
@@ -421,9 +407,8 @@
         class Oscilloscope {
             constructor(id, color, type) {
                 this.canvas = document.getElementById(id); this.ctx = this.canvas ? this.canvas.getContext('2d') : null;
-                this.color = color; this.type = type; // 'sine' or 'line'
-                this.data = new Array(100).fill(0);
-                this.time = 0;
+                this.color = color; this.type = type; 
+                this.data = new Array(100).fill(0); this.time = 0;
                 this.resize(); this.draw();
                 window.addEventListener('resize', () => this.resize());
             }
@@ -438,21 +423,20 @@
                     const w = this.canvas.width, h = this.canvas.height;
                     this.ctx.clearRect(0,0,w,h);
                     
-                    // Draw Grid
+                    // Grid
                     this.ctx.strokeStyle = 'rgba(255,255,255,0.05)'; this.ctx.lineWidth = 1;
                     this.ctx.beginPath();
                     for(let i=0; i<w; i+=40) { this.ctx.moveTo(i,0); this.ctx.lineTo(i,h); }
                     for(let i=0; i<h; i+=40) { this.ctx.moveTo(0,i); this.ctx.lineTo(w,i); }
                     this.ctx.stroke();
 
-                    // Draw Wave
+                    // Wave
                     this.ctx.beginPath(); this.ctx.strokeStyle = this.color; this.ctx.lineWidth = 2;
                     const step = w / (this.data.length - 1);
                     
                     for(let i=0; i<this.data.length; i++) {
                         let y = h - (this.data[i] * h);
                         if(this.type === 'sine' && window.App && window.App.isRunning) {
-                            // Add organic sine wave noise representing O2 sensor voltage (0.1v to 0.9v)
                             y += Math.sin(this.time + i*0.1) * 20 * this.data[i];
                         }
                         if(i===0) this.ctx.moveTo(0, y); else this.ctx.lineTo(i*step, y);
@@ -465,7 +449,8 @@
         }
 
         /**
-         * 3. 3D ECU MICROCHIP (THREE.JS)
+         * 3. 3D REALISTIC ECU MICROCHIP (THREE.JS PROCEDURAL)
+         * Highly detailed procedural model with Heatsinks, PCB, and Capacitors
          */
         class ECU3D {
             constructor() {
@@ -473,62 +458,109 @@
                 if(!this.container) return;
                 this.scene = new THREE.Scene();
                 this.camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
-                this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+                this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: "high-performance" });
                 this.container.appendChild(this.renderer.domElement);
 
                 this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
                 this.controls.enableDamping = true; this.controls.autoRotate = true; this.controls.autoRotateSpeed = 2.0;
-                this.camera.position.set(0, 10, 15);
+                this.controls.maxPolarAngle = Math.PI / 2; // Don't go below the PCB
 
+                this.camera.position.set(12, 15, 20);
                 this.buildCore();
-                this.resize();
-                window.addEventListener('resize', () => this.resize());
+                
+                this.resize(); window.addEventListener('resize', () => this.resize());
                 this.animate();
             }
+
             buildCore() {
                 this.group = new THREE.Group(); this.scene.add(this.group);
                 
-                // The Chip
-                const chipGeo = new THREE.BoxGeometry(4, 0.5, 4);
-                this.chipMat = new THREE.MeshBasicMaterial({ color: 0x111111, wireframe: false });
-                const chip = new THREE.Mesh(chipGeo, this.chipMat);
-                
-                // The glowing circuits (Wireframe box)
-                this.circuitMat = new THREE.MeshBasicMaterial({ color: 0x4A90E2, wireframe: true, transparent: true, opacity: 0.5 });
-                const circuit = new THREE.Mesh(chipGeo, this.circuitMat);
-                circuit.scale.set(1.05, 1.05, 1.05);
+                // Lighting for metallic realism
+                const ambLight = new THREE.AmbientLight(0xffffff, 0.4); this.scene.add(ambLight);
+                const spotLight = new THREE.SpotLight(0xffffff, 1.5); 
+                spotLight.position.set(10, 20, 10); this.scene.add(spotLight);
 
-                this.group.add(chip, circuit);
+                // 1. PCB (Green Board)
+                const pcbGeo = new THREE.BoxGeometry(12, 0.2, 10);
+                const pcbMat = new THREE.MeshStandardMaterial({ color: 0x003300, roughness: 0.8, metalness: 0.2 });
+                const pcb = new THREE.Mesh(pcbGeo, pcbMat);
+                this.group.add(pcb);
 
-                // Data Particles
-                const pGeo = new THREE.BufferGeometry(); const pos = new Float32Array(500 * 3);
-                for(let i=0; i<pos.length; i++) pos[i] = (Math.random()-0.5)*10;
-                pGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-                this.pMat = new THREE.PointsMaterial({ size: 0.1, color: 0xFF9F1C, transparent: true, opacity: 0.6 });
-                this.particles = new THREE.Points(pGeo, this.pMat);
-                this.group.add(this.particles);
+                // 2. Connector Port (Black Plastic)
+                const connGeo = new THREE.BoxGeometry(10, 1.5, 2);
+                const connMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.9 });
+                const conn = new THREE.Mesh(connGeo, connMat);
+                conn.position.set(0, 0.85, 5.5);
+                this.group.add(conn);
+
+                // Connector Gold Pins
+                const pinGeo = new THREE.CylinderGeometry(0.05, 0.05, 0.5);
+                const pinMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 1 });
+                for(let i=-4; i<=4; i+=0.5) {
+                    let pin = new THREE.Mesh(pinGeo, pinMat);
+                    pin.rotation.x = Math.PI/2; pin.position.set(i, 0.8, 6.6);
+                    this.group.add(pin);
+                }
+
+                // 3. Main Heatsink (Aluminum)
+                this.heatsinkGroup = new THREE.Group();
+                const hsBaseGeo = new THREE.BoxGeometry(8, 0.5, 7);
+                const metalMat = new THREE.MeshStandardMaterial({ color: 0x888888, metalness: 0.8, roughness: 0.3 });
+                const hsBase = new THREE.Mesh(hsBaseGeo, metalMat);
+                hsBase.position.set(0, 0.35, -1);
+                this.heatsinkGroup.add(hsBase);
+
+                // Cooling Fins
+                for(let i=-3.5; i<=3.5; i+=0.7) {
+                    let fin = new THREE.Mesh(new THREE.BoxGeometry(0.2, 1.5, 7), metalMat);
+                    fin.position.set(i, 1.35, -1);
+                    this.heatsinkGroup.add(fin);
+                }
+                this.group.add(this.heatsinkGroup);
+
+                // 4. Processing Core (Glowing Glass)
+                const coreGeo = new THREE.BoxGeometry(3, 1, 3);
+                this.coreMat = new THREE.MeshStandardMaterial({ color: 0x4A90E2, emissive: 0x4A90E2, emissiveIntensity: 0.5, transparent: true, opacity: 0.9 });
+                this.core = new THREE.Mesh(coreGeo, this.coreMat);
+                this.core.position.set(0, 1, -1);
+                this.group.add(this.core);
+
+                // 5. Capacitors (Cylinders on the side)
+                const capGeo = new THREE.CylinderGeometry(0.4, 0.4, 1.2);
+                const capMat = new THREE.MeshStandardMaterial({ color: 0x222222, metalness: 0.5 });
+                for(let i=-3; i<=3; i+=1.5) {
+                    let cap = new THREE.Mesh(capGeo, capMat);
+                    cap.position.set(5, 0.7, i);
+                    this.group.add(cap);
+                }
             }
+
             update(rpm) {
-                if(!this.circuitMat) return;
+                if(!this.coreMat) return;
                 const ratio = MathUtils.clamp(rpm/8000, 0, 1);
-                // Color transition Blue -> Red
+                
+                // Core glows from Blue to Red
                 const r = MathUtils.lerp(0.29, 1.0, ratio);
                 const g = MathUtils.lerp(0.56, 0.1, ratio);
                 const b = MathUtils.lerp(0.88, 0.1, ratio);
-                this.circuitMat.color.setRGB(r, g, b);
-                this.pMat.color.setRGB(r, g, b);
+                
+                this.coreMat.color.setRGB(r, g, b);
+                this.coreMat.emissive.setRGB(r, g, b);
+                this.coreMat.emissiveIntensity = 0.5 + (ratio * 1.5); // Glows brighter at high RPM
+
                 this.controls.autoRotateSpeed = 2.0 + (ratio*10);
             }
+
             resize() {
                 if(this.container.clientWidth === 0) return;
                 this.camera.aspect = this.container.clientWidth / this.container.clientHeight;
                 this.camera.updateProjectionMatrix();
                 this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
             }
+
             animate() {
                 requestAnimationFrame(() => this.animate());
                 this.controls.update();
-                this.particles.rotation.y += 0.01;
                 this.renderer.render(this.scene, this.camera);
             }
         }
@@ -550,8 +582,8 @@
             toggle() {
                 this.isMuted = !this.isMuted;
                 const i = document.getElementById('audio-icon');
-                if(this.isMuted) { i.className='fas fa-volume-mute'; i.style.color='var(--color-danger)'; if(this.gain) this.gain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.1); }
-                else { i.className='fas fa-volume-up'; i.style.color='var(--color-success)'; this.init(); if(this.isRunning) this.gain.gain.setTargetAtTime(0.3, this.ctx.currentTime, 0.1); }
+                if(this.isMuted) { i.className='fas fa-volume-mute'; i.style.color='var(--danger)'; if(this.gain) this.gain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.1); }
+                else { i.className='fas fa-volume-up'; i.style.color='var(--success)'; this.init(); if(this.isRunning) this.gain.gain.setTargetAtTime(0.3, this.ctx.currentTime, 0.1); }
             }
             play() { this.isRunning = true; this.init(); if(!this.isMuted) this.gain.gain.setTargetAtTime(0.3, this.ctx.currentTime, 0.5); }
             stop() { this.isRunning = false; if(this.gain) this.gain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.5); }
@@ -576,7 +608,7 @@
                     this.log(`RX: 43 ${this.faults.length} FAULTS`, "err");
                     this.faults.forEach((c, i) => {
                         const d = DTC_DB[c];
-                        setTimeout(() => this.b.insertAdjacentHTML('beforeend', `<div class="fault-card"><div class="fc-header"><div class="fc-code">${c}</div><div class="fc-loc"><i class="fas fa-microchip"></i> ECU LOGGED</div></div><div class="fc-title">${d.title}</div><div class="fc-text">${d.desc}</div><div class="fc-fix"><b>Action:</b> ${d.fix}</div></div>`), i*500);
+                        setTimeout(() => this.b.insertAdjacentHTML('beforeend', `<div class="fault-card"><div class="fc-header"><div class="fc-code">${c}</div></div><div class="fc-title">${d.title}</div><div class="fc-text">${d.desc}</div><div class="fc-fix"><b>Action:</b> ${d.fix}</div></div>`), i*500);
                     });
                 }, 1000);
             }
@@ -622,7 +654,7 @@
                     const app = document.getElementById('main-app');
                     app.style.visibility = 'visible'; app.style.opacity = '1';
                     
-                    // Initialize Heavy objects now that they have physical dimensions
+                    // Initialize Heavy Canvas/3D AFTER visible
                     this.gRpm = new CustomGauge('cvs-rpm', 8000, '#FF9F1C');
                     this.gSpd = new CustomGauge('cvs-speed', 260, '#4A90E2');
                     this.oscO2 = new Oscilloscope('osc-o2', '#4A90E2', 'sine');
@@ -665,25 +697,26 @@
                 this.isRunning = !this.isRunning;
                 if(this.isRunning) {
                     btn.classList.add('on'); document.getElementById('ignite-text').innerText = 'CUT IGNITION';
-                    this.rpm = 1200; this.audio.play();
-                    this.simLoop = setInterval(() => this.tick(), 100);
+                    this.rpm = 1200; this.audio.play(); this.diag.log("IGNITION SEQUENCE STARTED", "sys");
+                    this.simLoop = setInterval(() => this.physicsTick(), 100);
                 } else {
                     btn.classList.remove('on'); document.getElementById('ignite-text').innerText = 'START ENGINE';
                     clearInterval(this.simLoop); this.rpm = 0; this.speed = 0; this.throttle = 0;
                     this.updateUI(); this.audio.stop(); if(this.ecu3d) this.ecu3d.update(0);
+                    this.diag.log("IGNITION CUT.", "err");
                 }
             }
 
-            tick() {
+            physicsTick() {
                 if(Math.random() > 0.85) this.throttle = MathUtils.lerp(this.throttle, 60+Math.random()*40, 0.5); else this.throttle = MathUtils.lerp(this.throttle, 0, 0.1);
                 this.rpm = MathUtils.lerp(this.rpm, 800 + (this.throttle/100)*7000, 0.15);
                 if(this.throttle > 10) this.speed = Math.min(260, this.speed + (this.rpm/8000)*2); else this.speed = Math.max(0, this.speed - 0.5);
                 if(this.temp < 92) this.temp += 0.05;
+                
                 this.updateUI();
                 this.audio.update(this.rpm);
                 if(this.ecu3d) this.ecu3d.update(this.rpm);
                 
-                // Update Oscilloscopes
                 this.oscO2.pushData(0.5 + (this.rpm/8000)*0.5);
                 this.oscTps.pushData(this.throttle/100);
                 document.getElementById('tps-val').innerText = Math.round(this.throttle) + '%';
