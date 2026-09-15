@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ENG.MOHAMMAD | Operations Research Optimizer</title>
+    <title>ENG.MOHAMMAD | Operations Research</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=Syncopate:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -13,67 +13,65 @@
            01. ENTERPRISE CSS ARCHITECTURE
            ========================================================================== */
         :root {
-            --bg-deep: #020617; --bg-panel: rgba(15, 23, 42, 0.9); --bg-glass: rgba(30, 41, 59, 0.7);
-            --border-core: rgba(56, 189, 248, 0.25); --border-glow: rgba(56, 189, 248, 0.5);
-            --primary: #38bdf8; --accent: #818cf8; --warning: #fbbf24; --danger: #ef4444; --success: #10b981;
+            --bg-deep: #020617; --bg-panel: rgba(15, 23, 42, 0.95); --bg-glass: rgba(30, 41, 59, 0.7);
+            --border-core: rgba(56, 189, 248, 0.3); --border-glow: rgba(56, 189, 248, 0.6);
+            --primary: #38bdf8; --accent: #818cf8; --warning: #f59e0b; --danger: #ef4444; --success: #10b981;
             --text-main: #f8fafc; --text-muted: #94a3b8;
             --font-main: 'Space Grotesk', sans-serif; --font-mono: 'Share Tech Mono', monospace; --font-head: 'Syncopate', sans-serif;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: var(--font-main); background-color: var(--bg-deep); color: var(--text-main); height: 100vh; overflow: hidden; display: flex; user-select: none; }
-        ::-webkit-scrollbar { width: 5px; } ::-webkit-scrollbar-track { background: var(--bg-deep); } ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 5px; }
-
-        /* Dynamic Map Grid Background */
-        .tech-grid { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; background-color: var(--bg-deep); background-image: radial-gradient(rgba(56, 189, 248, 0.15) 1px, transparent 1px); background-size: 35px 35px; }
+        
+        /* High-Tech Grid Background */
+        .tech-grid { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; background-color: var(--bg-deep); background-image: radial-gradient(rgba(56, 189, 248, 0.15) 1px, transparent 1px); background-size: 40px 40px; }
         .tech-grid::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 50%, transparent 0%, var(--bg-deep) 100%); }
 
         /* ==========================================================================
            02. SIDEBAR (LOGISTICS CONTROL PANEL)
            ========================================================================== */
-        .sidebar { width: 340px; background: rgba(2, 6, 23, 0.95); border-right: 1px solid var(--border-core); display: flex; flex-direction: column; padding: 25px; box-shadow: 10px 0 40px rgba(0,0,0,0.9); z-index: 100; backdrop-filter: blur(15px); overflow-y: auto; }
+        .sidebar { width: 340px; background: rgba(4, 9, 20, 0.95); border-right: 1px solid var(--border-core); display: flex; flex-direction: column; padding: 25px; box-shadow: 10px 0 40px rgba(0,0,0,0.9); z-index: 100; backdrop-filter: blur(15px); overflow-y: auto; }
         .brand { font-family: var(--font-head); font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 5px; display: flex; align-items: center; gap: 10px; }
         .brand span { color: var(--primary); text-shadow: 0 0 15px var(--primary); }
-        .brand-sub { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); letter-spacing: 2px; margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px; text-transform: uppercase; }
+        .brand-sub { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); letter-spacing: 2px; margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px; text-transform: uppercase; }
 
-        /* Status & Controls */
-        .control-group { background: rgba(0,0,0,0.5); border: 1px solid rgba(56, 189, 248, 0.1); border-radius: 8px; padding: 18px; margin-bottom: 20px; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
-        .cg-title { font-family: var(--font-mono); font-size: 12px; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 8px; }
+        /* Control Groups */
+        .control-group { background: rgba(0,0,0,0.6); border: 1px solid rgba(56, 189, 248, 0.15); border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); position: relative; overflow: hidden; }
+        .control-group::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--primary); }
+        .cg-title { font-family: var(--font-mono); font-size: 11px; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 8px; font-weight: bold;}
         
         .stat-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 12px; font-family: var(--font-mono); }
         .stat-row:last-child { margin-bottom: 0; }
         .stat-label { color: var(--text-muted); }
         .stat-val { font-weight: bold; color: #fff; font-size: 14px; }
         
-        .algo-badge { padding: 6px 12px; border-radius: 4px; font-weight: bold; font-size: 11px; background: rgba(251, 191, 36, 0.1); color: var(--warning); border: 1px solid var(--warning); display: flex; align-items: center; gap: 8px; }
-        .algo-badge.optimized { background: rgba(16, 185, 129, 0.1); color: var(--success); border-color: var(--success); box-shadow: 0 0 15px rgba(16, 185, 129, 0.2); }
-        .pulse { width: 6px; height: 6px; border-radius: 50%; background: currentColor; animation: blink 1s infinite; }
+        .algo-badge { padding: 6px 15px; border-radius: 4px; font-weight: bold; font-size: 11px; background: rgba(245, 158, 11, 0.1); color: var(--warning); border: 1px solid var(--warning); display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 1px;}
+        .algo-badge.optimized { background: rgba(16, 185, 129, 0.1); color: var(--success); border-color: var(--success); box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); }
+        .pulse { width: 8px; height: 8px; border-radius: 50%; background: currentColor; animation: blink 1s infinite; box-shadow: 0 0 10px currentColor; }
 
         /* Sliders */
         .slider-wrap { margin-bottom: 20px; }
         .slider-wrap:last-child { margin-bottom: 0; }
         .slider-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); margin-bottom: 10px; }
-        .slider-val { color: var(--primary); font-weight: bold; font-size: 13px; }
+        .slider-val { color: var(--primary); font-weight: bold; font-size: 13px; background: rgba(56, 189, 248, 0.1); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(56, 189, 248, 0.3); }
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
         input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: var(--primary); cursor: pointer; box-shadow: 0 0 15px var(--primary); margin-top: -6px; border: 2px solid #fff; }
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; }
 
-        /* Action Buttons */
+        /* Buttons */
         .btn-group { display: flex; flex-direction: column; gap: 12px; margin-top: auto; }
         .btn { padding: 15px; font-family: var(--font-mono); font-size: 12px; font-weight: bold; text-transform: uppercase; border-radius: 6px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; border: 1px solid transparent; letter-spacing: 1px; }
         
         .btn-opt { background: rgba(16, 185, 129, 0.1); border-color: var(--success); color: var(--success); }
-        .btn-opt:hover { background: var(--success); color: #000; box-shadow: 0 0 25px rgba(16, 185, 129, 0.5); }
-        .btn-opt.active { background: var(--success); color: #000; box-shadow: 0 0 25px rgba(16, 185, 129, 0.5); }
+        .btn-opt:hover, .btn-opt.active { background: var(--success); color: #000; box-shadow: 0 0 25px rgba(16, 185, 129, 0.5); }
 
         .btn-traffic { background: rgba(239, 68, 68, 0.1); border-color: var(--danger); color: var(--danger); }
-        .btn-traffic:hover { background: var(--danger); color: #fff; box-shadow: 0 0 25px rgba(239, 68, 68, 0.5); }
-        .btn-traffic.active { background: var(--danger); color: #fff; box-shadow: 0 0 25px rgba(239, 68, 68, 0.5); animation: borderPulse 2s infinite; }
+        .btn-traffic:hover, .btn-traffic.active { background: var(--danger); color: #fff; box-shadow: 0 0 25px rgba(239, 68, 68, 0.5); }
 
         .btn-reset { background: rgba(56, 189, 248, 0.1); border-color: var(--primary); color: var(--primary); }
         .btn-reset:hover { background: var(--primary); color: #000; box-shadow: 0 0 25px rgba(56, 189, 248, 0.5); }
         
-        .btn-exit { margin-top: 20px; color: var(--text-muted); text-decoration: none; font-size: 11px; text-align: center; border: 1px solid rgba(255,255,255,0.1); padding: 12px; border-radius: 6px; transition: 0.3s; font-family: var(--font-mono); }
+        .btn-exit { margin-top: 20px; color: var(--text-muted); text-decoration: none; font-size: 11px; text-align: center; border: 1px solid rgba(255,255,255,0.1); padding: 12px; border-radius: 6px; transition: 0.3s; font-family: var(--font-mono); display: block; }
         .btn-exit:hover { background: var(--primary); color: #000; border-color: var(--primary); }
 
         /* ==========================================================================
@@ -82,34 +80,34 @@
         .main-stage { flex: 1; display: flex; flex-direction: column; padding: 25px; gap: 25px; position: relative; overflow-y: auto; }
         
         /* TOP: INTERACTIVE MAP */
-        .map-container { flex: 2; min-height: 450px; background: rgba(15, 23, 42, 0.5); border: 1px solid var(--border-core); border-radius: 12px; position: relative; overflow: hidden; box-shadow: inset 0 0 50px rgba(0,0,0,0.8); backdrop-filter: blur(8px); }
-        #network-canvas { width: 100%; height: 100%; display: block; cursor: crosshair; touch-action: none; }
+        .map-container { flex: 2; min-height: 450px; background: rgba(10, 15, 25, 0.8); border: 1px solid var(--border-core); border-radius: 12px; position: relative; overflow: hidden; box-shadow: inset 0 0 50px rgba(0,0,0,0.8); backdrop-filter: blur(10px); }
+        #network-canvas { width: 100%; height: 100%; display: block; cursor: crosshair; touch-action: none; position: absolute; top: 0; left: 0; }
         
         .map-overlay { position: absolute; top: 25px; left: 25px; pointer-events: none; }
-        .map-title { font-family: var(--font-head); font-size: 22px; color: #fff; text-shadow: 0 0 15px var(--primary); }
-        .map-desc { font-family: var(--font-mono); font-size: 12px; color: var(--primary); margin-top: 5px; letter-spacing: 1px; }
+        .map-title { font-family: var(--font-head); font-size: 24px; color: #fff; text-shadow: 0 0 20px var(--primary); letter-spacing: 2px; }
+        .map-desc { font-family: var(--font-mono); font-size: 11px; color: var(--primary); margin-top: 5px; letter-spacing: 2px; text-transform: uppercase; background: rgba(56,189,248,0.1); padding: 5px 10px; border-left: 2px solid var(--primary); display: inline-block; }
 
-        .legend { position: absolute; top: 25px; right: 25px; background: rgba(0,0,0,0.6); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); font-family: var(--font-mono); font-size: 10px; color: var(--text-main); display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
-        .legend-item { display: flex; align-items: center; gap: 8px; }
-        .l-box { width: 12px; height: 12px; border-radius: 2px; }
-        .l-clear { background: rgba(56, 189, 248, 0.2); border: 1px solid var(--primary); }
-        .l-heavy { background: rgba(239, 68, 68, 0.3); border: 1px solid var(--danger); }
-        .l-opt { background: var(--success); box-shadow: 0 0 8px var(--success); height: 3px; width: 15px; }
+        .legend { position: absolute; top: 25px; right: 25px; background: rgba(0,0,0,0.8); padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); font-family: var(--font-mono); font-size: 11px; color: var(--text-main); display: flex; flex-direction: column; gap: 10px; pointer-events: none; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .legend-item { display: flex; align-items: center; gap: 10px; }
+        .l-box { width: 15px; height: 4px; border-radius: 2px; }
+        .l-clear { background: var(--primary); opacity: 0.5; }
+        .l-heavy { background: var(--danger); box-shadow: 0 0 8px var(--danger); }
+        .l-opt { background: var(--success); box-shadow: 0 0 10px var(--success); height: 4px; }
 
-        .instructions { position: absolute; bottom: 25px; left: 25px; font-family: var(--font-mono); font-size: 11px; color: #fff; background: rgba(0,0,0,0.8); padding: 10px 15px; border-radius: 6px; pointer-events: none; border-left: 3px solid var(--accent); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .instructions { position: absolute; bottom: 25px; left: 25px; font-family: var(--font-mono); font-size: 11px; color: #fff; background: rgba(0,0,0,0.8); padding: 12px 20px; border-radius: 6px; pointer-events: none; border-left: 3px solid var(--accent); box-shadow: 0 5px 20px rgba(0,0,0,0.5); letter-spacing: 1px; }
 
         /* BOTTOM: ANALYTICS DASHBOARD */
-        .analytics-panel { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; min-height: 200px; }
+        .analytics-panel { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; min-height: 220px; }
         
-        .kpi-card { background: var(--bg-panel); border: 1px solid var(--border-core); border-radius: 12px; padding: 25px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; backdrop-filter: blur(10px); box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
-        .kpi-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--primary); }
+        .kpi-card { background: rgba(0,0,0,0.5); border: 1px solid var(--border-core); border-radius: 12px; padding: 25px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; backdrop-filter: blur(10px); box-shadow: inset 0 0 30px rgba(0,0,0,0.5); }
+        .kpi-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--primary); }
         
-        .kpi-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .kpi-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .kpi-label { font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
-        .kpi-icon { color: var(--primary); font-size: 16px; opacity: 0.8; }
+        .kpi-icon { color: var(--primary); font-size: 18px; opacity: 0.8; }
         
-        .kpi-val { font-family: var(--font-mono); font-size: 42px; font-weight: bold; color: #fff; line-height: 1; }
-        .kpi-sub { font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); margin-top: 10px; }
+        .kpi-val { font-family: var(--font-mono); font-size: 45px; font-weight: bold; color: #fff; line-height: 1; margin-top: 10px; }
+        .kpi-sub { font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); margin-top: 10px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 10px; }
 
         .kpi-card.cost-card::before { background: var(--success); }
         .kpi-card.cost-card .kpi-icon { color: var(--success); }
@@ -117,17 +115,16 @@
 
         .kpi-card.env-card::before { background: var(--warning); }
         .kpi-card.env-card .kpi-icon { color: var(--warning); }
-        .kpi-card.env-card .kpi-val { color: var(--warning); text-shadow: 0 0 20px rgba(251, 191, 36, 0.4); }
+        .kpi-card.env-card .kpi-val { color: var(--warning); text-shadow: 0 0 20px rgba(245, 158, 11, 0.4); }
 
         /* Cost Breakdown Bar */
-        .cost-bar-wrap { width: 100%; height: 10px; background: rgba(255,255,255,0.05); border-radius: 5px; margin-top: 20px; display: flex; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
+        .cost-bar-wrap { width: 100%; height: 12px; background: rgba(255,255,255,0.05); border-radius: 6px; margin-top: 15px; display: flex; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
         .cb-fuel { height: 100%; background: var(--warning); transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
         .cb-labor { height: 100%; background: var(--primary); transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
         .cb-maint { height: 100%; background: var(--danger); transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        .cb-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); font-family: var(--font-mono); margin-top: 8px; font-weight: bold; }
+        .cb-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); font-family: var(--font-mono); margin-top: 10px; font-weight: bold; text-transform: uppercase; }
 
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-        @keyframes borderPulse { 0% { border-color: var(--danger); } 50% { border-color: transparent; } 100% { border-color: var(--danger); } }
 
         @media (max-width: 1200px) {
             body { flex-direction: column; overflow-y: auto; }
@@ -143,48 +140,44 @@
     <div class="tech-grid"></div>
 
     <!-- ==========================================================================
-         SIDEBAR (LOGISTICS CONTROLS)
+         SIDEBAR
          ========================================================================== -->
     <aside class="sidebar">
-        <div class="brand"><i class="fas fa-project-diagram"></i> LOGISTICS<span>.</span>AI</div>
+        <div class="brand"><i class="fas fa-network-wired"></i> LOGISTICS<span>.</span>AI</div>
         <div class="brand-sub">Operations Research & Routing</div>
 
-        <!-- Network Status -->
         <div class="control-group">
             <div class="cg-title"><span>Network Status</span> <i class="fas fa-server"></i></div>
-            <div class="stat-row"><span class="stat-label">Logistics Hubs</span> <span class="stat-val" id="val-nodes">0</span></div>
-            <div class="stat-row"><span class="stat-label">Available Routes</span> <span class="stat-val" id="val-edges">0</span></div>
+            <div class="stat-row"><span class="stat-label">Active Hubs</span> <span class="stat-val" id="val-nodes">0</span></div>
+            <div class="stat-row"><span class="stat-label">Active Edges</span> <span class="stat-val" id="val-edges">0</span></div>
+            <div class="stat-row"><span class="stat-label">Total Fleet Size</span> <span class="stat-val">45 Trucks</span></div>
             <div class="stat-row" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
                 <span class="stat-label">Algorithm</span> 
                 <div class="algo-badge" id="val-algo"><div class="pulse"></div> AWAITING RUN</div>
             </div>
         </div>
 
-        <!-- Economic Parameters -->
         <div class="control-group">
-            <div class="cg-title"><span>Economic Parameters</span> <i class="fas fa-sliders-h"></i></div>
-            
+            <div class="cg-title"><span>Economic Variables</span> <i class="fas fa-sliders-h"></i></div>
             <div class="slider-wrap">
                 <div class="slider-labels"><span>Fuel Price ($/L)</span> <span class="slider-val" id="lbl-fuel">$1.5</span></div>
-                <input type="range" id="sim-fuel" min="0.5" max="3" step="0.1" value="1.5">
+                <input type="range" id="sim-fuel" min="0.5" max="3" step="0.1" value="1.5" oninput="window.App.updateParams()">
             </div>
-            
             <div class="slider-wrap">
                 <div class="slider-labels"><span>Fleet Speed (KM/H)</span> <span class="slider-val" id="lbl-speed">80</span></div>
-                <input type="range" id="sim-speed" min="40" max="120" step="5" value="80">
+                <input type="range" id="sim-speed" min="40" max="120" step="5" value="80" oninput="window.App.updateParams()">
             </div>
         </div>
 
-        <!-- Actions -->
         <div class="btn-group">
-            <button class="btn btn-opt" id="btn-run">
+            <button class="btn btn-opt" id="btn-run" onclick="window.App.runOptimizer()">
                 <i class="fas fa-bolt"></i> <span>Execute Dijkstra</span>
             </button>
-            <button class="btn btn-traffic" id="btn-traffic">
+            <button class="btn btn-traffic" id="btn-traffic" onclick="window.App.toggleTraffic()">
                 <i class="fas fa-traffic-light"></i> <span>Simulate Traffic</span>
             </button>
-            <button class="btn btn-reset" id="btn-reset">
-                <i class="fas fa-random"></i> <span>Generate New Network</span>
+            <button class="btn btn-reset" onclick="window.App.resetNetwork()">
+                <i class="fas fa-random"></i> <span>Generate New Topology</span>
             </button>
         </div>
         
@@ -192,11 +185,11 @@
     </aside>
 
     <!-- ==========================================================================
-         MAIN STAGE (MAP & ANALYTICS)
+         MAIN STAGE
          ========================================================================== -->
     <main class="main-stage">
         
-        <!-- INTERACTIVE NETWORK MAP -->
+        <!-- MAP -->
         <div class="map-container" id="map-wrap">
             <canvas id="network-canvas"></canvas>
             
@@ -207,8 +200,8 @@
 
             <div class="legend">
                 <div class="legend-item"><div class="l-box l-clear"></div> Clear Route (Fast)</div>
-                <div class="legend-item"><div class="l-box l-heavy"></div> Heavy Traffic (Slow)</div>
-                <div class="legend-item"><div class="l-opt"></div> Optimal Path</div>
+                <div class="legend-item"><div class="l-box l-heavy"></div> Congestion (Slow)</div>
+                <div class="legend-item"><div class="l-box l-opt"></div> Optimal AI Path</div>
             </div>
 
             <div class="instructions">
@@ -216,34 +209,29 @@
             </div>
         </div>
 
-        <!-- ANALYTICS DASHBOARD -->
+        <!-- ANALYTICS -->
         <div class="analytics-panel">
             
-            <!-- Distance Metric -->
             <div class="kpi-card">
-                <div class="kpi-head"><span class="kpi-label">Total Route Distance</span><i class="fas fa-route kpi-icon"></i></div>
+                <div class="kpi-head"><span class="kpi-label">Route Distance</span><i class="fas fa-route kpi-icon"></i></div>
                 <div>
                     <div class="kpi-val" id="kpi-dist">0.0</div>
-                    <div class="kpi-sub">Kilometers (Shortest Path)</div>
+                    <div class="kpi-sub">Kilometers (Optimal Shortest Path)</div>
                 </div>
             </div>
             
-            <!-- CO2 Emissions Metric -->
             <div class="kpi-card env-card">
                 <div class="kpi-head"><span class="kpi-label">Est. CO2 Emissions</span><i class="fas fa-leaf kpi-icon"></i></div>
                 <div>
                     <div class="kpi-val" id="kpi-co2">0.0</div>
-                    <div class="kpi-sub">Kilograms (Based on Fuel Burn)</div>
+                    <div class="kpi-sub">Kilograms (Based on Diesel Burn Rate)</div>
                 </div>
             </div>
 
-            <!-- Cost Metric -->
             <div class="kpi-card cost-card">
                 <div class="kpi-head"><span class="kpi-label">Total Transport Cost</span><i class="fas fa-dollar-sign kpi-icon"></i></div>
                 <div>
                     <div class="kpi-val" id="kpi-cost">$0.00</div>
-                    
-                    <!-- Cost Breakdown -->
                     <div class="cost-bar-wrap">
                         <div class="cb-fuel" id="bar-fuel" style="width: 0%;"></div>
                         <div class="cb-labor" id="bar-labor" style="width: 0%;"></div>
@@ -266,136 +254,108 @@
          ========================================================================== -->
     <script>
         /**
-         * 1. CORE MATH & UTILITIES
+         * 1. CORE MATH & LOGISTICS DATA
          */
         const MathUtils = {
-            lerp: (start, end, factor) => start + (end - start) * factor,
-            clamp: (val, min, max) => Math.min(Math.max(val, min), max),
+            lerp: (s, e, f) => s + (e - s) * f,
+            clamp: (v, min, max) => Math.min(Math.max(v, min), max),
             distance: (n1, n2) => Math.sqrt(Math.pow(n2.x - n1.x, 2) + Math.pow(n2.y - n1.y, 2))
         };
 
-        // Real Logistics Hubs in Jordan (Adding immense value and realism)
         const JORDAN_HUBS = [
-            "Aqaba Port", "Amman HQ", "Zarqa Ind. Estate", "Irbid Center", 
-            "Mafraq Transit", "Karak Depot", "Salt Hub", "Madaba", 
-            "Ma'an Logistics", "Jerash", "Ramtha Border", "Dead Sea"
+            "Aqaba Port", "Amman HQ", "Zarqa Ind.", "Irbid Center", 
+            "Mafraq Depot", "Karak Hub", "Salt Transit", "Madaba", 
+            "Ma'an", "Jerash", "Ramtha Border", "Dead Sea"
         ];
 
         /**
-         * 2. SUPPLY CHAIN OPTIMIZATION SYSTEM (DIJKSTRA ALGORITHM)
+         * 2. SUPPLY CHAIN ENGINE (DIJKSTRA & RENDERER)
          */
-        class SupplyChainOptimizer {
+        class SupplyChainEngine {
             constructor() {
                 this.canvas = document.getElementById('network-canvas');
-                this.ctx = this.canvas ? this.canvas.getContext('2d') : null;
+                this.ctx = this.canvas.getContext('2d');
                 this.wrap = document.getElementById('map-wrap');
                 
-                // State
+                // Core Data
                 this.nodes = [];
                 this.edges = [];
-                this.optimalPath = []; // Array of Node IDs
+                this.optimalPath = []; 
                 this.isOptimized = false;
                 
-                // Physics & Traffic
+                // Interaction
                 this.draggedNode = null;
-                this.trafficInterval = null;
                 this.isTrafficActive = false;
+                this.trafficInterval = null;
                 
-                // Economics
+                // Econ Parameters
                 this.fuelPrice = 1.5;
                 this.truckSpeed = 80;
                 
-                this.initSystem();
+                // Animation Time
+                this.time = 0;
+
+                this.init();
             }
 
-            initSystem() {
-                if(!this.canvas) return;
+            init() {
                 this.resize();
                 window.addEventListener('resize', () => this.resize());
                 this.bindEvents();
                 this.generateNetwork();
-                requestAnimationFrame(() => this.render());
+                this.render(); // Start loop
             }
 
             resize() {
-                const rect = this.wrap.getBoundingClientRect();
-                if(rect.width === 0) return; // Prevent Zero-Dimension crash
-                
+                if(!this.wrap || this.wrap.clientWidth === 0) return; // Prevent Crash
                 const dpr = window.devicePixelRatio || 1;
-                this.canvas.width = rect.width * dpr;
-                this.canvas.height = rect.height * dpr;
-                this.ctx.scale(dpr, dpr);
-                this.width = rect.width;
-                this.height = rect.height;
-
-                // Adjust nodes to stay within new bounds if resized
-                this.nodes.forEach(n => {
-                    n.x = MathUtils.clamp(n.x, 30, this.width - 30);
-                    n.y = MathUtils.clamp(n.y, 30, this.height - 30);
-                });
-            }
-
-            // --- EVENT BINDING (Bulletproof) ---
-            bindEvents() {
-                // Mouse Events
-                this.canvas.addEventListener('mousedown', (e) => this.startDrag(this.getMousePos(e)));
-                this.canvas.addEventListener('mousemove', (e) => this.doDrag(this.getMousePos(e)));
-                window.addEventListener('mouseup', () => this.endDrag());
+                const w = this.wrap.clientWidth;
+                const h = this.wrap.clientHeight;
                 
-                // Touch Events (iPad support)
-                this.canvas.addEventListener('touchstart', (e) => {
-                    e.preventDefault(); // Prevent scrolling while drawing
-                    this.startDrag(this.getTouchPos(e));
-                }, { passive: false });
-                this.canvas.addEventListener('touchmove', (e) => {
-                    e.preventDefault();
-                    this.doDrag(this.getTouchPos(e));
-                }, { passive: false });
+                this.canvas.width = w * dpr;
+                this.canvas.height = h * dpr;
+                this.ctx.scale(dpr, dpr);
+                this.width = w;
+                this.height = h;
+
+                // Keep nodes in bounds if resized
+                this.nodes.forEach(n => {
+                    n.x = MathUtils.clamp(n.x, 40, this.width - 40);
+                    n.y = MathUtils.clamp(n.y, 40, this.height - 40);
+                });
+            }
+
+            bindEvents() {
+                const getPos = (e) => {
+                    const rect = this.canvas.getBoundingClientRect();
+                    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+                };
+                const getTouchPos = (e) => {
+                    const rect = this.canvas.getBoundingClientRect();
+                    return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
+                };
+
+                // Mouse
+                this.canvas.addEventListener('mousedown', (e) => this.startDrag(getPos(e)));
+                this.canvas.addEventListener('mousemove', (e) => this.doDrag(getPos(e)));
+                window.addEventListener('mouseup', () => this.endDrag());
+
+                // Touch (iPad)
+                this.canvas.addEventListener('touchstart', (e) => { e.preventDefault(); this.startDrag(getTouchPos(e)); }, { passive: false });
+                this.canvas.addEventListener('touchmove', (e) => { e.preventDefault(); this.doDrag(getTouchPos(e)); }, { passive: false });
                 window.addEventListener('touchend', () => this.endDrag());
-
-                // UI Controls
-                document.getElementById('sim-fuel').addEventListener('input', (e) => { 
-                    this.fuelPrice = parseFloat(e.target.value); 
-                    document.getElementById('lbl-fuel').innerText = '$' + this.fuelPrice.toFixed(1);
-                    this.updateEconomics();
-                });
-                document.getElementById('sim-speed').addEventListener('input', (e) => { 
-                    this.truckSpeed = parseFloat(e.target.value); 
-                    document.getElementById('lbl-speed').innerText = this.truckSpeed;
-                    this.updateEconomics();
-                });
-
-                document.getElementById('btn-run').addEventListener('click', () => {
-                    document.getElementById('btn-run').classList.add('active');
-                    this.runDijkstra();
-                });
-                document.getElementById('btn-traffic').addEventListener('click', () => this.toggleTraffic());
-                document.getElementById('btn-reset').addEventListener('click', () => {
-                    document.getElementById('btn-run').classList.remove('active');
-                    this.generateNetwork();
-                });
-            }
-
-            getMousePos(e) {
-                const rect = this.canvas.getBoundingClientRect();
-                return { x: e.clientX - rect.left, y: e.clientY - rect.top };
-            }
-            getTouchPos(e) {
-                const rect = this.canvas.getBoundingClientRect();
-                return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
             }
 
             startDrag(pos) {
-                // Find clicked node
-                this.draggedNode = this.nodes.find(n => MathUtils.distance(n, pos) < 20);
+                this.draggedNode = this.nodes.find(n => MathUtils.distance(n, pos) < 25);
                 if(this.draggedNode) this.canvas.style.cursor = 'grabbing';
             }
 
             doDrag(pos) {
                 if(this.draggedNode) {
-                    this.draggedNode.x = MathUtils.clamp(pos.x, 30, this.width - 30);
-                    this.draggedNode.y = MathUtils.clamp(pos.y, 30, this.height - 30);
-                    if(this.isOptimized) this.runDijkstra(); // Live rerouting!
+                    this.draggedNode.x = MathUtils.clamp(pos.x, 40, this.width - 40);
+                    this.draggedNode.y = MathUtils.clamp(pos.y, 40, this.height - 40);
+                    if(this.isOptimized) this.runOptimizer(); // Live recalculation!
                 }
             }
 
@@ -404,138 +364,117 @@
                 this.canvas.style.cursor = 'crosshair';
             }
 
-            // --- NETWORK GENERATION ---
+            // --- NETWORK BUILDER ---
             generateNetwork() {
-                this.nodes = [];
-                this.edges = [];
-                this.optimalPath = [];
-                this.isOptimized = false;
+                this.nodes = []; this.edges = []; this.optimalPath = []; this.isOptimized = false;
                 
-                const numNodes = 8 + Math.floor(Math.random() * 4); // 8 to 11 nodes
+                // Ensure dimensions exist before generating
+                const w = this.width || 800; const h = this.height || 500;
+                const numNodes = 8 + Math.floor(Math.random() * 4); // 8-11 nodes
                 const pad = 60;
-
+                
                 // Shuffle names
                 const names = [...JORDAN_HUBS].sort(() => 0.5 - Math.random());
 
-                // 1. Generate Nodes
+                // Create Nodes
                 for(let i=0; i<numNodes; i++) {
                     this.nodes.push({
                         id: i,
-                        x: pad + Math.random() * (this.width - pad*2),
-                        y: pad + Math.random() * (this.height - pad*2),
+                        x: pad + Math.random() * (w - pad*2),
+                        y: pad + Math.random() * (h - pad*2),
                         label: names[i]
                     });
                 }
 
-                // 2. Generate Edges (Mesh Network)
+                // Create Edges (Distance based)
                 for(let i=0; i<this.nodes.length; i++) {
                     for(let j=i+1; j<this.nodes.length; j++) {
-                        const dist = MathUtils.distance(this.nodes[i], this.nodes[j]);
-                        // Connect if within range
-                        if(dist < (this.width * 0.45)) {
-                            this.edges.push({ 
-                                source: i, 
-                                target: j,
-                                trafficMult: 1.0 // 1.0 = clear, >1.0 = traffic
-                            });
+                        if(MathUtils.distance(this.nodes[i], this.nodes[j]) < (w * 0.45)) {
+                            this.edges.push({ source: i, target: j, traffic: 1.0 });
                         }
                     }
                 }
 
-                // Ensure Source (0) and Destination (last) have connections to avoid isolated graphs
-                this.edges.push({ source: 0, target: 1, trafficMult: 1.0 });
-                this.edges.push({ source: numNodes-2, target: numNodes-1, trafficMult: 1.0 });
+                // Guarantee start/end connections
+                this.edges.push({ source: 0, target: 1, traffic: 1.0 });
+                this.edges.push({ source: numNodes-2, target: numNodes-1, traffic: 1.0 });
 
-                this.updateUIStatus();
-            }
-
-            // --- OPERATIONS RESEARCH: DIJKSTRA'S ALGORITHM ---
-            runDijkstra() {
-                if(this.nodes.length === 0) return;
-                
+                // UI Update
+                document.getElementById('val-nodes').innerText = this.nodes.length;
+                document.getElementById('val-edges').innerText = this.edges.length;
                 const badge = document.getElementById('val-algo');
                 badge.className = 'algo-badge';
-                badge.innerHTML = '<div class="pulse" style="background:var(--primary)"></div> CALCULATING...';
-
-                // We want to find path from 0 to (length-1)
-                const startNode = 0;
-                const destNode = this.nodes.length - 1;
+                badge.innerHTML = '<div class="pulse" style="background:var(--warning)"></div> AWAITING RUN';
+                document.getElementById('btn-run').classList.remove('active');
                 
-                // 1. Build Adjacency List using Maps for strict typing
+                this.updateEconomics();
+            }
+
+            // --- DIJKSTRA ALGORITHM (Map/Set based for speed) ---
+            runOptimizer() {
+                if(this.nodes.length === 0) return;
+                
+                const startNode = 0; const destNode = this.nodes.length - 1;
+                
+                // 1. Build Graph Map
                 const graph = new Map();
                 this.nodes.forEach(n => graph.set(n.id, []));
                 
                 this.edges.forEach(e => {
-                    const baseDist = MathUtils.distance(this.nodes[e.source], this.nodes[e.target]);
-                    const cost = baseDist * e.trafficMult; // Cost incorporates traffic!
-                    
+                    const dist = MathUtils.distance(this.nodes[e.source], this.nodes[e.target]);
+                    const cost = dist * e.traffic; // Traffic affects cost
                     graph.get(e.source).push({ node: e.target, cost: cost });
                     graph.get(e.target).push({ node: e.source, cost: cost });
                 });
 
-                // 2. Initialize Dijkstra Data Structures
-                const distances = new Map();
-                const previous = new Map();
-                const unvisited = new Set();
-                
-                this.nodes.forEach(n => {
-                    distances.set(n.id, Infinity);
-                    unvisited.add(n.id);
-                });
+                // 2. Initialize
+                const distances = new Map(); const previous = new Map(); const unvisited = new Set();
+                this.nodes.forEach(n => { distances.set(n.id, Infinity); unvisited.add(n.id); });
                 distances.set(startNode, 0);
 
                 // 3. Main Loop
                 while(unvisited.size > 0) {
-                    // Find node with minimum distance
-                    let currNode = null;
-                    let minDst = Infinity;
-                    
-                    for(let nodeId of unvisited) {
-                        if(distances.get(nodeId) < minDst) {
-                            minDst = distances.get(nodeId);
-                            currNode = nodeId;
-                        }
+                    let curr = null; let minDst = Infinity;
+                    for(let id of unvisited) {
+                        if(distances.get(id) < minDst) { minDst = distances.get(id); curr = id; }
                     }
+                    if(curr === null || curr === destNode) break;
+                    unvisited.delete(curr);
 
-                    if(currNode === null || currNode === destNode) break; // Reached target or stuck
-
-                    unvisited.delete(currNode);
-
-                    // Update neighbors
-                    const neighbors = graph.get(currNode);
+                    const neighbors = graph.get(curr);
                     for(let i=0; i<neighbors.length; i++) {
                         const neighborId = neighbors[i].node;
-                        const edgeCost = neighbors[i].cost;
-                        
                         if(unvisited.has(neighborId)) {
-                            const alt = distances.get(currNode) + edgeCost;
+                            const alt = distances.get(curr) + neighbors[i].cost;
                             if(alt < distances.get(neighborId)) {
                                 distances.set(neighborId, alt);
-                                previous.set(neighborId, currNode);
+                                previous.set(neighborId, curr);
                             }
                         }
                     }
                 }
 
-                // 4. Reconstruct Optimal Path
+                // 4. Trace Path
                 this.optimalPath = [];
-                let current = destNode;
-                
-                if(previous.has(current) || current === startNode) {
-                    while(current !== undefined) {
-                        this.optimalPath.unshift(current);
-                        current = previous.get(current);
+                let step = destNode;
+                if(previous.has(step) || step === startNode) {
+                    while(step !== undefined) {
+                        this.optimalPath.unshift(step);
+                        step = previous.get(step);
                     }
                 }
 
-                // Verify Path
+                // 5. Update UI
+                const badge = document.getElementById('val-algo');
                 if(this.optimalPath.length > 1 && this.optimalPath[0] === startNode) {
                     this.isOptimized = true;
                     badge.className = 'algo-badge optimized';
                     badge.innerHTML = '<div class="pulse"></div> OPTIMIZED';
+                    document.getElementById('btn-run').classList.add('active');
                 } else {
                     this.optimalPath = [];
-                    badge.innerHTML = 'NO ROUTE FOUND';
+                    badge.className = 'algo-badge';
+                    badge.innerHTML = 'NO ROUTE';
                     badge.style.color = 'var(--danger)'; badge.style.borderColor = 'var(--danger)';
                 }
 
@@ -549,96 +488,77 @@
                 
                 if(this.isTrafficActive) {
                     btn.classList.add('active');
-                    btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> <span>TRAFFIC ACTIVE</span>';
-                    
                     this.trafficInterval = setInterval(() => {
-                        // Randomly modify edge weights
                         this.edges.forEach(e => {
-                            // 20% chance to become heavy traffic
-                            if(Math.random() > 0.8) e.trafficMult = 1.5 + Math.random() * 2.0; 
-                            else e.trafficMult = 1.0; // Clear
+                            if(Math.random() > 0.8) e.traffic = 2.0 + Math.random() * 2.0; // Heavy traffic
+                            else e.traffic = 1.0; // Clear
                         });
-                        // Reroute dynamically
-                        if(this.isOptimized) this.runDijkstra();
-                    }, 3000);
+                        if(this.isOptimized) this.runOptimizer(); // Reroute
+                    }, 2500);
                 } else {
                     btn.classList.remove('active');
-                    btn.innerHTML = '<i class="fas fa-traffic-light"></i> <span>SIMULATE TRAFFIC</span>';
                     clearInterval(this.trafficInterval);
-                    this.edges.forEach(e => e.trafficMult = 1.0);
-                    if(this.isOptimized) this.runDijkstra();
+                    this.edges.forEach(e => e.traffic = 1.0);
+                    if(this.isOptimized) this.runOptimizer();
                 }
             }
 
             // --- ENGINEERING ECONOMICS ---
+            updateParams() {
+                this.fuelPrice = parseFloat(document.getElementById('sim-fuel').value);
+                this.truckSpeed = parseFloat(document.getElementById('sim-speed').value);
+                document.getElementById('lbl-fuel').innerText = '$' + this.fuelPrice.toFixed(1);
+                document.getElementById('lbl-speed').innerText = this.truckSpeed;
+                if(this.isOptimized) this.updateEconomics();
+            }
+
             updateEconomics() {
                 if(!this.isOptimized || this.optimalPath.length < 2) {
                     document.getElementById('kpi-dist').innerText = "0.0";
                     document.getElementById('kpi-time').innerText = "0.0";
                     document.getElementById('kpi-cost').innerText = "$0.00";
                     document.getElementById('kpi-co2').innerText = "0.0";
+                    document.getElementById('bar-fuel').style.width = '0%';
+                    document.getElementById('bar-labor').style.width = '0%';
+                    document.getElementById('bar-maint').style.width = '0%';
                     return;
                 }
 
-                // Calculate actual physical distance of the path
+                // Calculate total physical distance
                 let pxDist = 0;
                 for(let i=0; i<this.optimalPath.length-1; i++) {
-                    const n1 = this.nodes[this.optimalPath[i]];
-                    const n2 = this.nodes[this.optimalPath[i+1]];
-                    pxDist += MathUtils.distance(n1, n2);
+                    pxDist += MathUtils.distance(this.nodes[this.optimalPath[i]], this.nodes[this.optimalPath[i+1]]);
                 }
 
-                // 1 px = 1.5 KM (Scale factor for realism)
-                const realDistKm = pxDist * 1.5;
+                const realDistKm = pxDist * 1.5; // Scale factor
+                const timeHrs = realDistKm / this.truckSpeed;
                 
-                // Time
-                const timeHours = realDistKm / this.truckSpeed;
-                
-                // Fuel (assuming 35L / 100km for heavy trucks)
-                const fuelLiters = (realDistKm / 100) * 35;
+                // Costs
+                const fuelLiters = (realDistKm / 100) * 35; // 35L/100km truck
                 const fuelCost = fuelLiters * this.fuelPrice;
-                
-                // CO2 Emissions (2.68 kg CO2 per liter of diesel)
-                const co2Emissions = fuelLiters * 2.68;
-
-                // Labor ($25/hr)
-                const laborCost = timeHours * 25;
-                
-                // Maintenance ($0.15/km)
-                const maintCost = realDistKm * 0.15;
+                const co2 = fuelLiters * 2.68; // kg CO2
+                const laborCost = timeHrs * 25; // $25/hr
+                const maintCost = realDistKm * 0.15; // $0.15/km wear
 
                 const totalCost = fuelCost + laborCost + maintCost;
 
-                // Update DOM
                 document.getElementById('kpi-dist').innerText = realDistKm.toFixed(1);
-                document.getElementById('kpi-co2').innerText = co2Emissions.toFixed(1);
+                document.getElementById('kpi-co2').innerText = co2.toFixed(1);
                 document.getElementById('kpi-cost').innerText = '$' + totalCost.toFixed(2);
                 
-                // Bars
-                const pFuel = (fuelCost/totalCost)*100;
-                const pLabor = (laborCost/totalCost)*100;
-                const pMaint = (maintCost/totalCost)*100;
-                document.getElementById('bar-fuel').style.width = `${pFuel}%`;
-                document.getElementById('bar-labor').style.width = `${pLabor}%`;
-                document.getElementById('bar-maint').style.width = `${pMaint}%`;
+                document.getElementById('bar-fuel').style.width = `${(fuelCost/totalCost)*100}%`;
+                document.getElementById('bar-labor').style.width = `${(laborCost/totalCost)*100}%`;
+                document.getElementById('bar-maint').style.width = `${(maintCost/totalCost)*100}%`;
             }
 
-            updateUIStatus() {
-                document.getElementById('val-nodes').innerText = this.nodes.length;
-                document.getElementById('val-edges').innerText = this.edges.length;
-                const badge = document.getElementById('val-algo');
-                badge.className = 'algo-badge';
-                badge.innerHTML = '<div class="pulse"></div> AWAITING RUN';
-                
-                // Reset economics
-                this.optimalPath = []; this.updateEconomics();
-                document.getElementById('btn-run').classList.remove('active');
-            }
-
-            // --- RENDER KERNEL ---
+            // --- CANVAS RENDER LOOP (Bulletproof) ---
             render() {
-                if(!this.ctx || this.width === 0) { requestAnimationFrame(() => this.render()); return; }
+                // ALWAYS REQUEST FRAME FIRST
+                requestAnimationFrame(() => this.render());
                 
+                if(!this.ctx || !this.width || this.width === 0) return; // Prevent crash if invisible
+                
+                this.time += 0.02;
                 this.ctx.clearRect(0, 0, this.width, this.height);
 
                 // 1. Draw Edges
@@ -646,51 +566,41 @@
                     const n1 = this.nodes[e.source]; const n2 = this.nodes[e.target];
                     this.ctx.beginPath(); this.ctx.moveTo(n1.x, n1.y); this.ctx.lineTo(n2.x, n2.y);
                     
-                    if(e.trafficMult > 1.2) {
-                        this.ctx.strokeStyle = 'rgba(239, 68, 68, 0.4)'; // Red traffic
-                        this.ctx.lineWidth = 2;
+                    if(e.traffic > 1.5) {
+                        this.ctx.strokeStyle = 'rgba(239, 68, 68, 0.5)'; // Traffic Red
+                        this.ctx.lineWidth = 3;
                     } else {
-                        this.ctx.strokeStyle = 'rgba(56, 189, 248, 0.15)'; // Clear
+                        this.ctx.strokeStyle = 'rgba(56, 189, 248, 0.15)'; // Normal Blue
                         this.ctx.lineWidth = 1;
                     }
                     this.ctx.stroke();
                 });
 
-                // 2. Draw Optimal Path
+                // 2. Draw Optimal Path (Thick Green Glow)
                 if(this.isOptimized && this.optimalPath.length > 1) {
                     this.ctx.beginPath();
-                    const startN = this.nodes[this.optimalPath[0]];
-                    this.ctx.moveTo(startN.x, startN.y);
-                    
+                    this.ctx.moveTo(this.nodes[this.optimalPath[0]].x, this.nodes[this.optimalPath[0]].y);
                     for(let i=1; i<this.optimalPath.length; i++) {
-                        const n = this.nodes[this.optimalPath[i]];
-                        this.ctx.lineTo(n.x, n.y);
+                        this.ctx.lineTo(this.nodes[this.optimalPath[i]].x, this.nodes[this.optimalPath[i]].y);
                     }
-                    
-                    this.ctx.strokeStyle = '#10b981'; // Success Green
-                    this.ctx.lineWidth = 4;
+                    this.ctx.strokeStyle = '#10b981'; this.ctx.lineWidth = 4;
                     this.ctx.shadowColor = '#10b981'; this.ctx.shadowBlur = 15;
-                    this.ctx.lineJoin = 'round';
-                    this.ctx.stroke();
+                    this.ctx.lineJoin = 'round'; this.ctx.stroke();
                     this.ctx.shadowBlur = 0; // Reset
                     
-                    // Animated Truck Entity
-                    const time = Date.now() * 0.0015;
-                    const segments = this.optimalPath.length - 1;
-                    const pIndex = Math.floor(time) % segments;
-                    const pFrac = time % 1;
+                    // Moving Truck Animation
+                    const segs = this.optimalPath.length - 1;
+                    const pIdx = Math.floor(this.time) % segs;
+                    const pFrac = this.time % 1;
                     
-                    const p1 = this.nodes[this.optimalPath[pIndex]];
-                    const p2 = this.nodes[this.optimalPath[pIndex+1]];
-                    
-                    if(p1 && p2) { // Safety check
-                        const dotX = MathUtils.lerp(p1.x, p2.x, pFrac);
-                        const dotY = MathUtils.lerp(p1.y, p2.y, pFrac);
-                        
-                        // Draw truck box
+                    const p1 = this.nodes[this.optimalPath[pIdx]];
+                    const p2 = this.nodes[this.optimalPath[pIdx+1]];
+                    if(p1 && p2) {
+                        const tx = MathUtils.lerp(p1.x, p2.x, pFrac);
+                        const ty = MathUtils.lerp(p1.y, p2.y, pFrac);
                         this.ctx.fillStyle = '#fff';
                         this.ctx.shadowColor = '#fff'; this.ctx.shadowBlur = 10;
-                        this.ctx.fillRect(dotX - 5, dotY - 5, 10, 10);
+                        this.ctx.fillRect(tx - 6, ty - 6, 12, 12);
                         this.ctx.shadowBlur = 0;
                     }
                 }
@@ -701,52 +611,65 @@
                     const isDest = i === this.nodes.length - 1;
                     const isOpt = this.optimalPath.includes(n.id);
 
+                    // Radar pulse effect for start/dest
+                    if(isStart || isDest) {
+                        this.ctx.beginPath();
+                        this.ctx.arc(n.x, n.y, 15 + Math.sin(this.time * 3) * 5, 0, Math.PI*2);
+                        this.ctx.fillStyle = isStart ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)';
+                        this.ctx.fill();
+                    }
+
+                    // Node Circle
                     this.ctx.beginPath();
                     this.ctx.arc(n.x, n.y, 10, 0, Math.PI*2);
-                    
-                    if(isStart) this.ctx.fillStyle = '#10b981'; // Green Source
-                    else if(isDest) this.ctx.fillStyle = '#ef4444'; // Red Dest
-                    else if(isOpt) this.ctx.fillStyle = '#38bdf8'; // Blue Path
-                    else this.ctx.fillStyle = '#1e293b'; // Slate
-
+                    if(isStart) this.ctx.fillStyle = '#10b981';
+                    else if(isDest) this.ctx.fillStyle = '#ef4444';
+                    else if(isOpt) this.ctx.fillStyle = '#38bdf8';
+                    else this.ctx.fillStyle = '#1e293b';
                     this.ctx.fill();
+                    
                     this.ctx.strokeStyle = isOpt ? '#fff' : 'rgba(56, 189, 248, 0.5)';
-                    this.ctx.lineWidth = 2;
-                    this.ctx.stroke();
+                    this.ctx.lineWidth = 2; this.ctx.stroke();
 
-                    // Node Label (Jordanian Hubs)
-                    this.ctx.fillStyle = isOpt ? '#fff' : '#94a3b8';
+                    // Label Box
+                    const txt = n.label;
                     this.ctx.font = isOpt ? 'bold 11px "Space Grotesk"' : '10px "Space Grotesk"';
-                    this.ctx.textAlign = 'center';
+                    const tw = this.ctx.measureText(txt).width;
                     
-                    // Box behind text for readability
-                    const textWidth = this.ctx.measureText(n.label).width;
                     this.ctx.fillStyle = 'rgba(2, 6, 23, 0.8)';
-                    this.ctx.fillRect(n.x - textWidth/2 - 4, n.y - 28, textWidth + 8, 14);
+                    this.ctx.fillRect(n.x - tw/2 - 4, n.y - 30, tw + 8, 16);
                     
-                    // Text
+                    // Label Text
                     this.ctx.fillStyle = isOpt ? '#38bdf8' : '#94a3b8';
-                    this.ctx.fillText(n.label, n.x, n.y - 18);
+                    this.ctx.textAlign = 'center';
+                    this.ctx.fillText(txt, n.x, n.y - 19);
                     
-                    if(isStart) { this.ctx.fillStyle = '#10b981'; this.ctx.fillText("[ SOURCE ]", n.x, n.y + 22); }
+                    if(isStart) { this.ctx.fillStyle = '#10b981'; this.ctx.fillText("[ START ]", n.x, n.y + 22); }
                     if(isDest) { this.ctx.fillStyle = '#ef4444'; this.ctx.fillText("[ DESTINATION ]", n.x, n.y + 22); }
                 });
-
-                requestAnimationFrame(() => this.render());
             }
         }
 
         // ==========================================================================
-        // SYSTEM BOOTSTRAP
+        // SYSTEM BOOTSTRAP (DEFENSIVE INIT)
         // ==========================================================================
         document.addEventListener("DOMContentLoaded", () => {
+            // Global Instance for HTML onclicks
+            window.App = {
+                engine: null,
+                runOptimizer: () => { if(window.App.engine) window.App.engine.runOptimizer(); },
+                toggleTraffic: () => { if(window.App.engine) window.App.engine.toggleTraffic(); },
+                resetNetwork: () => { if(window.App.engine) window.App.engine.generateNetwork(); },
+                updateParams: () => { if(window.App.engine) window.App.engine.updateParams(); }
+            };
+
             try {
-                // Defensive Init to prevent Zero-Dimension bug
-                const mapWrap = document.getElementById('map-wrap');
-                if(mapWrap.clientWidth === 0) mapWrap.style.minHeight = '450px';
+                // Ensure dimensions exist before init
+                const wrap = document.getElementById('map-wrap');
+                if(wrap.clientWidth === 0) wrap.style.minHeight = '450px';
                 
-                window.SupplyChain = new SupplyChainOptimizer();
-                console.log("Operations Research System Online.");
+                window.App.engine = new SupplyChainEngine();
+                console.log("Operations Research Core Online.");
             } catch (err) {
                 console.error("Initialization Error: ", err);
             }
