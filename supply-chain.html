@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ENG.MOHAMMAD | Operations Research</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ENG.MOHAMMAD | Smart Factory Digital Twin</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=Syncopate:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -14,617 +14,621 @@
 
     <style>
         /* ==========================================================================
-           01. ENTERPRISE COMMAND CENTER VARIABLES
+           01. INDUSTRIAL UI VARIABLES
            ========================================================================== */
         :root {
-            --bg-deep: #02050f; --panel-bg: rgba(6, 11, 25, 0.85);
-            --border-core: rgba(0, 195, 255, 0.3); --border-glow: rgba(0, 195, 255, 0.6);
-            --primary: #00c3ff; --accent: #7b2cbf; --warning: #ffaa00; --danger: #ff003c; --success: #00ff55;
-            --text-main: #ffffff; --text-muted: #64748b;
+            --bg-base: #020406; --bg-panel: rgba(8, 12, 18, 0.9);
+            --border-core: rgba(0, 255, 255, 0.2); --border-glow: rgba(0, 255, 255, 0.5);
+            --primary: #00ffff; --accent: #ff00ff; --warning: #ffb700; --danger: #ff003c; --success: #00ff41;
+            --text-main: #e0f2fe; --text-muted: #475569;
             --font-main: 'Space Grotesk', sans-serif; --font-mono: 'Share Tech Mono', monospace; --font-head: 'Syncopate', sans-serif;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: var(--font-main); background-color: var(--bg-deep); color: var(--text-main); height: 100vh; overflow: hidden; }
+        body { font-family: var(--font-main); background-color: var(--bg-base); color: var(--text-main); height: 100vh; overflow: hidden; display: flex; }
+        ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: var(--bg-base); } ::-webkit-scrollbar-thumb { background: var(--primary); }
 
-        /* Full Screen 3D Background */
-        #webgl-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; background: radial-gradient(circle at center, #060b19, #010205); outline: none; }
-
-        /* Grid Overlay */
-        .grid-overlay { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 2; pointer-events: none; background-image: radial-gradient(rgba(0, 195, 255, 0.1) 1px, transparent 1px); background-size: 40px 40px; }
+        .scada-grid { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; background-image: linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px); background-size: 40px 40px; }
 
         /* ==========================================================================
-           02. ABSOLUTE UI PANELS (Fixes all iPad scrolling/overlap issues)
+           02. SCADA SIDEBAR CONTROLS
            ========================================================================== */
-        .glass-panel { position: absolute; background: var(--panel-bg); border: 1px solid var(--border-core); border-radius: 12px; backdrop-filter: blur(15px); box-shadow: 0 10px 40px rgba(0,0,0,0.8); z-index: 10; display: flex; flex-direction: column; overflow-y: auto; }
-        .glass-panel::-webkit-scrollbar { width: 4px; } .glass-panel::-webkit-scrollbar-thumb { background: var(--primary); }
+        .sidebar { width: 320px; background: rgba(4, 6, 10, 0.95); border-right: 1px solid var(--border-core); display: flex; flex-direction: column; padding: 25px; box-shadow: 10px 0 40px rgba(0,0,0,0.8); z-index: 100; backdrop-filter: blur(10px); }
+        .brand { font-family: var(--font-head); font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 5px; display: flex; align-items: center; gap: 10px; }
+        .brand span { color: var(--primary); text-shadow: 0 0 10px var(--primary); }
+        .brand-sub { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); letter-spacing: 2px; margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px; }
 
-        /* LEFT PANEL: CONTROLS */
-        #left-panel { top: 20px; left: 20px; bottom: 20px; width: 340px; padding: 25px; }
+        .control-group { margin-bottom: 25px; background: rgba(0,0,0,0.4); padding: 15px; border-radius: 8px; border: 1px solid rgba(0,255,255,0.05); }
+        .cg-title { font-family: var(--font-mono); font-size: 11px; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
         
-        /* RIGHT PANEL: ANALYTICS */
-        #right-panel { top: 20px; right: 20px; bottom: 20px; width: 360px; padding: 25px; }
-
-        /* TOP BAR: BRANDING */
-        #top-bar { position: absolute; top: 20px; left: 380px; right: 400px; height: 70px; z-index: 10; display: flex; justify-content: space-between; align-items: center; background: rgba(6, 11, 25, 0.6); border: 1px solid var(--border-core); border-radius: 12px; padding: 0 25px; backdrop-filter: blur(10px); }
-
-        /* TERMINAL LOGS */
-        #terminal-panel { position: absolute; bottom: 20px; left: 380px; right: 400px; height: 120px; z-index: 10; background: rgba(0, 0, 0, 0.8); border: 1px solid #222; border-radius: 12px; padding: 15px; font-family: var(--font-mono); font-size: 11px; overflow-y: auto; box-shadow: inset 0 0 20px rgba(0,0,0,0.9); }
-        .log-sys { color: var(--text-muted); } .log-opt { color: var(--success); } .log-err { color: var(--danger); text-shadow: 0 0 5px var(--danger); } .log-run { color: var(--primary); }
-
-        /* ==========================================================================
-           03. UI COMPONENTS STYLING
-           ========================================================================== */
-        .brand { font-family: var(--font-head); font-size: 20px; font-weight: bold; text-shadow: 0 0 15px var(--primary); letter-spacing: 2px; }
-        .brand span { color: var(--primary); }
-        .sub-brand { font-family: var(--font-mono); font-size: 11px; color: var(--primary); letter-spacing: 2px; }
-
-        /* Left Panel Sections */
-        .panel-section { border: 1px solid rgba(0, 195, 255, 0.1); background: rgba(0,0,0,0.4); border-radius: 8px; padding: 15px; margin-bottom: 20px; }
-        .sec-title { font-family: var(--font-mono); font-size: 11px; color: var(--primary); text-transform: uppercase; margin-bottom: 15px; display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 8px; }
-
-        .stat-row { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 12px; margin-bottom: 10px; }
-        .stat-row:last-child { margin-bottom: 0; }
-        .stat-val { color: #fff; font-weight: bold; font-size: 14px; }
-        
-        .badge { padding: 5px 12px; border-radius: 4px; font-size: 10px; font-weight: bold; border: 1px solid; display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); }
-        .badge-standby { background: rgba(255, 170, 0, 0.1); color: var(--warning); border-color: var(--warning); }
-        .badge-opt { background: rgba(0, 255, 85, 0.1); color: var(--success); border-color: var(--success); box-shadow: 0 0 15px rgba(0,255,85,0.3); }
-        .pulse { width: 6px; height: 6px; border-radius: 50%; background: currentColor; animation: blink 1s infinite; box-shadow: 0 0 8px currentColor; }
-
         /* Sliders */
         .slider-wrap { margin-bottom: 15px; }
-        .s-label { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
-        .s-val { color: var(--primary); font-weight: bold; background: rgba(0,195,255,0.1); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(0,195,255,0.3); }
+        .slider-wrap:last-child { margin-bottom: 0; }
+        .slider-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); font-family: var(--font-mono); margin-bottom: 8px; }
+        .slider-val { color: #fff; font-weight: bold; }
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: var(--primary); cursor: pointer; box-shadow: 0 0 15px var(--primary); margin-top: -6px; border: 2px solid #fff; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 8px; background: var(--primary); cursor: pointer; box-shadow: 0 0 10px var(--primary); border-radius: 2px; margin-top: -6px; }
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; }
+        input[type=range].danger-slider::-webkit-slider-thumb { background: var(--danger); box-shadow: 0 0 10px var(--danger); }
 
         /* Buttons */
-        .btn-group { display: flex; flex-direction: column; gap: 12px; margin-top: auto; }
-        .btn { padding: 15px; font-family: var(--font-mono); font-size: 12px; font-weight: bold; text-transform: uppercase; border-radius: 6px; cursor: pointer; transition: 0.3s; display: flex; justify-content: center; align-items: center; gap: 10px; border: 1px solid transparent; letter-spacing: 1px; }
-        .btn-opt { background: rgba(0, 255, 85, 0.1); border-color: var(--success); color: var(--success); }
-        .btn-opt:hover, .btn-opt.active { background: var(--success); color: #000; box-shadow: 0 0 25px rgba(0, 255, 85, 0.5); }
-        .btn-traf { background: rgba(255, 0, 60, 0.1); border-color: var(--danger); color: var(--danger); }
-        .btn-traf:hover, .btn-traf.active { background: var(--danger); color: #fff; box-shadow: 0 0 25px rgba(255, 0, 60, 0.5); animation: borderPulse 1s infinite; }
-        .btn-reset { background: rgba(0, 195, 255, 0.1); border-color: var(--primary); color: var(--primary); }
-        .btn-reset:hover { background: var(--primary); color: #000; box-shadow: 0 0 25px rgba(0, 195, 255, 0.5); }
-        .btn-exit { color: var(--text-muted); text-decoration: none; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.5); }
-        .btn-exit:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
+        .sys-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: auto; }
+        .btn { padding: 12px; font-family: var(--font-mono); font-size: 11px; font-weight: bold; text-transform: uppercase; border-radius: 6px; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; gap: 5px; border: 1px solid transparent; letter-spacing: 1px; }
+        .btn i { font-size: 16px; }
+        .btn-maint { background: rgba(255, 183, 0, 0.1); border-color: var(--warning); color: var(--warning); }
+        .btn-maint:hover { background: var(--warning); color: #000; box-shadow: 0 0 20px rgba(255, 183, 0, 0.4); }
+        .btn-reset { background: rgba(0, 255, 255, 0.1); border-color: var(--primary); color: var(--primary); }
+        .btn-reset:hover { background: var(--primary); color: #000; box-shadow: 0 0 20px rgba(0, 255, 255, 0.4); }
 
-        /* Right Panel KPIs */
-        .kpi-card { background: rgba(0,0,0,0.6); border: 1px solid var(--border-core); border-radius: 8px; padding: 20px; margin-bottom: 20px; position: relative; overflow: hidden; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
-        .kpi-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--primary); }
-        .kpi-head { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
-        .kpi-icon { color: var(--primary); font-size: 16px; }
-        .kpi-val { font-family: var(--font-mono); font-size: 38px; font-weight: bold; color: #fff; margin-top: 10px; line-height: 1; }
-        .kpi-sub { font-size: 10px; color: var(--text-muted); font-family: var(--font-mono); margin-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 10px; }
+        .btn-estop { grid-column: span 2; background: rgba(255, 0, 60, 0.1); border-color: var(--danger); color: var(--danger); padding: 20px; font-size: 14px; margin-top: 10px; }
+        .btn-estop:hover, .btn-estop.active { background: var(--danger); color: #fff; box-shadow: 0 0 30px rgba(255, 0, 60, 0.6); animation: pulse-red 1s infinite; }
 
-        .kpi-card.cost::before { background: var(--success); } .kpi-card.cost .kpi-icon { color: var(--success); } .kpi-card.cost .kpi-val { color: var(--success); text-shadow: 0 0 20px rgba(0,255,85,0.4); }
-        .kpi-card.env::before { background: var(--warning); } .kpi-card.env .kpi-icon { color: var(--warning); } .kpi-card.env .kpi-val { color: var(--warning); text-shadow: 0 0 20px rgba(255,170,0,0.4); }
+        .btn-exit { margin-top: 20px; color: var(--text-muted); text-decoration: none; font-size: 11px; text-align: center; border: 1px solid #222; padding: 10px; border-radius: 6px; transition: 0.3s; font-family: var(--font-mono); }
+        .btn-exit:hover { background: var(--primary); color: #000; border-color: var(--primary); }
 
-        /* Floating 3D Labels */
-        .node-label { position: absolute; transform: translate(-50%, -100%); font-family: var(--font-mono); font-size: 11px; background: rgba(0,0,0,0.8); border: 1px solid var(--border-core); color: var(--text-main); padding: 5px 10px; border-radius: 4px; pointer-events: none; transition: 0.2s; white-space: nowrap; z-index: 5; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        .node-label.active { border-color: var(--primary); color: var(--primary); font-weight: bold; box-shadow: 0 0 15px rgba(0,195,255,0.4); }
-        .node-label.start { border-color: var(--success); color: var(--success); }
-        .node-label.dest { border-color: var(--danger); color: var(--danger); }
+        /* ==========================================================================
+           03. MAIN DASHBOARD (OEE & 3D)
+           ========================================================================== */
+        .main-stage { flex: 1; display: flex; flex-direction: column; padding: 20px; gap: 20px; position: relative; }
+        
+        /* TOP: 3D DIGITAL TWIN */
+        .twin-container { flex: 2; border-radius: 12px; border: 1px solid var(--border-core); position: relative; overflow: hidden; background: radial-gradient(circle at center, #060b14, #010203); box-shadow: inset 0 0 50px #000; }
+        #webgl-factory { width: 100%; height: 100%; position: absolute; top: 0; left: 0; outline: none; }
+        
+        .hud-overlay { position: absolute; top: 20px; left: 20px; pointer-events: none; }
+        .hud-title { font-family: var(--font-head); font-size: 20px; color: #fff; text-shadow: 0 0 10px var(--primary); }
+        .hud-desc { font-family: var(--font-mono); font-size: 11px; color: var(--success); margin-top: 5px; }
+        .hud-desc.error { color: var(--danger); animation: blink 1s infinite; }
+
+        .cam-controls { position: absolute; bottom: 20px; right: 20px; display: flex; gap: 10px; z-index: 10; }
+        .btn-cam { background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 12px; font-family: var(--font-mono); font-size: 10px; cursor: pointer; border-radius: 4px; transition: 0.3s; }
+        .btn-cam:hover, .btn-cam.active { background: var(--primary); border-color: var(--primary); color: #000; }
+
+        /* BOTTOM: OEE CALCULATIONS (Industrial Engineering) */
+        .oee-panel { flex: 1; background: var(--bg-panel); border: 1px solid var(--border-core); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; backdrop-filter: blur(10px); }
+        .oee-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px; margin-bottom: 15px; }
+        .oee-title { font-family: var(--font-mono); font-size: 14px; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; }
+        .oee-formula { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 4px; }
+
+        .oee-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; height: 100%; }
+        
+        .kpi-card { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
+        .kpi-card::before { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 3px; background: var(--primary); }
+        .kpi-label { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .kpi-val { font-family: var(--font-mono); font-size: 32px; font-weight: bold; color: #fff; margin-top: 5px; }
+        .kpi-sub { font-size: 9px; color: var(--text-muted); font-family: var(--font-main); margin-top: 5px; }
+        
+        .kpi-card.total-oee { background: rgba(0, 255, 255, 0.05); border-color: var(--primary); }
+        .kpi-card.total-oee::before { width: 100%; height: 3px; background: var(--primary); }
+        .kpi-card.total-oee .kpi-val { color: var(--primary); text-shadow: 0 0 15px var(--primary); font-size: 40px; }
+
+        .chart-container { position: relative; height: 40px; width: 100%; margin-top: 10px; }
+        .kpi-canvas { width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
+
+        /* Global Overlays */
+        #alarm-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(255,0,0,0.15); z-index: 999; pointer-events: none; opacity: 0; transition: 0.3s; }
+        #alarm-overlay.active { opacity: 1; animation: flash-alarm 1s infinite; }
 
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-        @keyframes borderPulse { 0%, 100% { border-color: var(--danger); } 50% { border-color: transparent; } }
+        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(255,0,60,0.7); } 70% { box-shadow: 0 0 0 15px rgba(255,0,60,0); } 100% { box-shadow: 0 0 0 0 rgba(255,0,60,0); } }
+        @keyframes flash-alarm { 0%, 100% { background: rgba(255,0,0,0.05); } 50% { background: rgba(255,0,0,0.25); } }
 
-        /* Responsive Fix for Mobile/Small Screens */
         @media (max-width: 1024px) {
-            body { overflow-y: auto; display: block; }
-            #webgl-container { position: relative; height: 50vh; width: 100vw; }
-            #top-bar { position: relative; top: 0; left: 0; right: 0; width: 100%; border-radius: 0; }
-            #left-panel, #right-panel { position: relative; top: 0; left: 0; right: 0; width: 100%; bottom: auto; border-radius: 0; padding: 20px; }
-            #terminal-panel { position: relative; top: 0; left: 0; right: 0; width: 100%; border-radius: 0; }
+            body { flex-direction: column; overflow-y: auto; }
+            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border-core); }
+            .oee-grid { grid-template-columns: 1fr 1fr; }
+            .twin-container { min-height: 400px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="grid-overlay"></div>
+    <div class="scada-grid"></div>
+    <div id="alarm-overlay"></div>
 
-    <div id="webgl-container"></div>
-    <div id="labels-container"></div>
+    <!-- ==========================================================================
+         SCADA SIDEBAR (CONTROLS)
+         ========================================================================== -->
+    <aside class="sidebar">
+        <div class="brand"><i class="fas fa-industry"></i> SMART<span>.</span>FACTORY</div>
+        <div class="brand-sub">DIGITAL TWIN & OEE SCADA</div>
 
-    <div id="top-bar">
-        <div class="brand">JORDAN_LOGISTICS<span>.AI</span></div>
-        <div class="sub-brand">3D Operations Research Visualizer</div>
-        <a href="index.html" class="btn btn-exit" style="padding: 8px 15px; margin: 0;"><i class="fas fa-sign-out-alt"></i> Exit</a>
-    </div>
-
-    <div class="glass-panel" id="left-panel">
-        <div class="panel-section">
-            <div class="sec-title"><span>Network Topology</span> <i class="fas fa-server"></i></div>
-            <div class="stat-row"><span class="stat-label">Active Hubs</span> <span class="stat-val" id="val-nodes">0</span></div>
-            <div class="stat-row"><span class="stat-label">Neural Edges</span> <span class="stat-val" id="val-edges">0</span></div>
-            <div class="stat-row" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
-                <span class="stat-label">Dijkstra Core</span> 
-                <div class="badge badge-standby" id="val-algo"><div class="pulse"></div> STANDBY</div>
-            </div>
-        </div>
-
-        <div class="panel-section">
-            <div class="sec-title"><span>Logistics Variables</span> <i class="fas fa-sliders-h"></i></div>
+        <div class="control-group">
+            <div class="cg-title"><span>Production Speed</span> <i class="fas fa-tachometer-alt"></i></div>
             <div class="slider-wrap">
-                <div class="s-label"><span>Fuel Price ($/L)</span> <span class="s-val" id="lbl-fuel">$1.5</span></div>
-                <input type="range" id="sim-fuel" min="0.5" max="3" step="0.1" value="1.5" oninput="window.App.updateParams()">
+                <div class="slider-labels"><span>Conveyor Velocity</span> <span class="slider-val" id="val-speed">1.0x</span></div>
+                <input type="range" id="sim-speed" min="0.5" max="3" step="0.1" value="1.0" oninput="FactorySCADA.updateParams()">
             </div>
             <div class="slider-wrap">
-                <div class="s-label"><span>Truck Speed (KM/H)</span> <span class="s-val" id="lbl-speed">80</span></div>
-                <input type="range" id="sim-speed" min="40" max="120" step="5" value="80" oninput="window.App.updateParams()">
+                <div class="slider-labels"><span>Robot Kinematics</span> <span class="slider-val" id="val-robot">1.0x</span></div>
+                <input type="range" id="sim-robot" min="0.5" max="3" step="0.1" value="1.0" oninput="FactorySCADA.updateParams()">
             </div>
         </div>
 
-        <div class="btn-group">
-            <button class="btn btn-opt" id="btn-run" onclick="window.App.runOptimizer()">
-                <i class="fas fa-bolt"></i> <span>Execute Dijkstra</span>
+        <div class="control-group">
+            <div class="cg-title" style="color: var(--danger);"><span>Quality Control</span> <i class="fas fa-bug"></i></div>
+            <div class="slider-wrap">
+                <div class="slider-labels"><span>Defect Probability</span> <span class="slider-val" id="val-defect">5%</span></div>
+                <input type="range" class="danger-slider" id="sim-defect" min="0" max="30" step="1" value="5" oninput="FactorySCADA.updateParams()">
+            </div>
+            <div class="slider-labels" style="margin-top: 10px;"><span>Defective Items</span> <span class="slider-val" style="color:var(--danger);" id="val-bad-count">0</span></div>
+        </div>
+
+        <div class="sys-btns">
+            <button class="btn btn-maint" id="btn-maint" onclick="FactorySCADA.toggleMaintenance()">
+                <i class="fas fa-wrench"></i> <span>Maintenance</span>
             </button>
-            <button class="btn btn-traf" id="btn-traffic" onclick="window.App.toggleTraffic()">
-                <i class="fas fa-traffic-light"></i> <span>Simulate Traffic</span>
+            <button class="btn btn-reset" onclick="FactorySCADA.resetData()">
+                <i class="fas fa-redo"></i> <span>Reset Data</span>
             </button>
-            <button class="btn btn-reset" onclick="window.App.resetNetwork()">
-                <i class="fas fa-random"></i> <span>Generate New Topology</span>
+            <button class="btn btn-estop" id="btn-estop" onclick="FactorySCADA.triggerEStop()">
+                <i class="fas fa-hand-paper"></i> <span>EMERGENCY STOP</span>
             </button>
         </div>
-    </div>
+        
+        <a href="index.html" class="btn-exit"><i class="fas fa-arrow-left"></i> Return to Portfolio</a>
+    </aside>
 
-    <div class="glass-panel" id="right-panel">
-        <div class="kpi-card">
-            <div class="kpi-head"><span class="kpi-label">Optimal Distance</span><i class="fas fa-route kpi-icon"></i></div>
-            <div class="kpi-val" id="kpi-dist">0.0</div>
-            <div class="kpi-sub">Total Kilometers of calculated route</div>
-        </div>
+    <!-- ==========================================================================
+         MAIN STAGE (3D TWIN & OEE DASHBOARD)
+         ========================================================================== -->
+    <main class="main-stage">
+        
+        <!-- 3D WEBGL FACTORY -->
+        <div class="twin-container">
+            <div id="webgl-factory"></div>
+            
+            <div class="hud-overlay">
+                <div class="hud-title">ASSEMBLY LINE ALPHA</div>
+                <div class="hud-desc" id="hud-status">SYSTEM RUNNING OPTIMALLY</div>
+            </div>
 
-        <div class="kpi-card">
-            <div class="kpi-head"><span class="kpi-label">Routing Efficiency</span><i class="fas fa-chart-line kpi-icon"></i></div>
-            <div class="kpi-val" id="kpi-eff" style="color:var(--primary)">0%</div>
-            <div class="kpi-sub">Distance saved compared to unoptimized paths</div>
-        </div>
-
-        <div class="kpi-card env">
-            <div class="kpi-head"><span class="kpi-label">CO2 Emissions</span><i class="fas fa-leaf kpi-icon"></i></div>
-            <div class="kpi-val" id="kpi-co2">0.0</div>
-            <div class="kpi-sub">Kilograms (Based on Diesel consumption)</div>
-        </div>
-
-        <div class="kpi-card cost">
-            <div class="kpi-head"><span class="kpi-label">Transport Cost</span><i class="fas fa-dollar-sign kpi-icon"></i></div>
-            <div class="kpi-val" id="kpi-cost">$0.00</div>
-            <div class="kpi-sub" style="display:flex; justify-content:space-between; margin-top:15px; border:none; padding:0; font-weight:bold;">
-                <span style="color:var(--warning)">Fuel <span id="cb-fuel">0%</span></span>
-                <span style="color:var(--primary)">Labor <span id="cb-labor">0%</span></span>
-                <span style="color:var(--danger)">Maint <span id="cb-maint">0%</span></span>
+            <div class="cam-controls">
+                <button class="btn-cam active" onclick="Factory3D.setCamera('iso', this)">ISO</button>
+                <button class="btn-cam" onclick="Factory3D.setCamera('top', this)">TOP</button>
+                <button class="btn-cam" onclick="Factory3D.setCamera('side', this)">SIDE</button>
             </div>
         </div>
-    </div>
 
-    <div id="terminal-panel">
-        <div class="log-sys">> SYSTEM KERNEL INITIALIZED.</div>
-    </div>
+        <!-- OEE INDUSTRIAL ENGINEERING MATH DASHBOARD -->
+        <div class="oee-panel">
+            <div class="oee-header">
+                <div class="oee-title"><i class="fas fa-chart-line"></i> Overall Equipment Effectiveness (OEE)</div>
+                <div class="oee-formula">OEE = Availability × Performance × Quality</div>
+            </div>
+            
+            <div class="oee-grid">
+                <!-- Availability -->
+                <div class="kpi-card" style="border-left-color: var(--warning);">
+                    <div class="kpi-label">Availability (A)</div>
+                    <div class="kpi-val" id="kpi-a">100%</div>
+                    <div class="kpi-sub">Operating Time / Planned Time</div>
+                    <div class="chart-container"><canvas class="kpi-canvas" id="chart-a"></canvas></div>
+                </div>
+                
+                <!-- Performance -->
+                <div class="kpi-card" style="border-left-color: #4A90E2;">
+                    <div class="kpi-label">Performance (P)</div>
+                    <div class="kpi-val" id="kpi-p">100%</div>
+                    <div class="kpi-sub">Actual Rate / Ideal Rate</div>
+                    <div class="chart-container"><canvas class="kpi-canvas" id="chart-p"></canvas></div>
+                </div>
 
+                <!-- Quality -->
+                <div class="kpi-card" style="border-left-color: var(--success);">
+                    <div class="kpi-label">Quality (Q)</div>
+                    <div class="kpi-val" id="kpi-q">100%</div>
+                    <div class="kpi-sub">Good Parts / Total Parts (<span id="total-parts">0</span>)</div>
+                    <div class="chart-container"><canvas class="kpi-canvas" id="chart-q"></canvas></div>
+                </div>
+
+                <!-- Total OEE -->
+                <div class="kpi-card total-oee">
+                    <div class="kpi-label">SYSTEM OEE</div>
+                    <div class="kpi-val" id="kpi-oee">100%</div>
+                    <div class="kpi-sub">World Class Target: > 85%</div>
+                    <div class="chart-container"><canvas class="kpi-canvas" id="chart-oee"></canvas></div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ==========================================================================
+         ENTERPRISE JAVASCRIPT KERNEL
+         ========================================================================== -->
     <script>
         /**
-         * TERMINAL LOGGER
+         * 1. MINI CHARTS FOR DASHBOARD (Zero Dependency)
          */
-        const Terminal = {
-            el: document.getElementById('terminal-panel'),
-            log: function(msg, type='sys') {
-                if(!this.el) return;
-                const time = new Date().toISOString().substring(11,19);
-                this.el.insertAdjacentHTML('beforeend', `<div class="log-${type}">[${time}] ${msg}</div>`);
-                if(this.el.children.length > 50) this.el.removeChild(this.el.firstChild);
-                this.el.scrollTop = this.el.scrollHeight;
+        class MiniTrendChart {
+            constructor(canvasId, color) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas ? this.canvas.getContext('2d') : null;
+                this.color = color;
+                this.data = new Array(30).fill(100); // Initialize with 100%
+                this.resize(); window.addEventListener('resize', () => this.resize());
             }
-        };
-
-        const MathUtils = { clamp: (v, min, max) => Math.min(Math.max(v, min), max) };
-        const JORDAN_HUBS = ["Aqaba Port", "Amman HQ", "Zarqa Ind.", "Irbid Center", "Mafraq Depot", "Karak Hub", "Salt Transit", "Madaba", "Ma'an", "Jerash", "Ramtha", "Dead Sea"];
+            resize() {
+                if(!this.canvas || this.canvas.parentElement.clientWidth === 0) return;
+                this.canvas.width = this.canvas.parentElement.clientWidth;
+                this.canvas.height = this.canvas.parentElement.clientHeight;
+            }
+            update(val) {
+                if(!this.ctx || this.canvas.width === 0) return;
+                this.data.push(val); this.data.shift();
+                
+                const w = this.canvas.width, h = this.canvas.height;
+                this.ctx.clearRect(0,0,w,h);
+                this.ctx.beginPath(); this.ctx.moveTo(0, h);
+                
+                const step = w / 29;
+                this.data.forEach((v, i) => {
+                    // Map 0-100 to canvas height. Base is 0, Top is 100.
+                    const y = h - (Math.max(0, Math.min(100, v)) / 100) * h;
+                    this.ctx.lineTo(i * step, y);
+                });
+                
+                this.ctx.strokeStyle = this.color; this.ctx.lineWidth = 2; this.ctx.stroke();
+                this.ctx.lineTo(w, h);
+                this.ctx.fillStyle = this.color.replace(')', ', 0.15)').replace('rgb', 'rgba').replace('#', '');
+                // Basic hex to rgba for fill
+                if(this.color.startsWith('#')) {
+                    const r = parseInt(this.color.slice(1,3), 16), g = parseInt(this.color.slice(3,5), 16), b = parseInt(this.color.slice(5,7), 16);
+                    this.ctx.fillStyle = `rgba(${r},${g},${b},0.15)`;
+                }
+                this.ctx.fill();
+            }
+        }
 
         /**
-         * 3D SUPPLY CHAIN ENGINE (THREE.JS + DIJKSTRA)
+         * 2. 3D PROCEDURAL FACTORY (THREE.JS)
+         * Simulates Conveyor Belt and SCARA Robotic Arms
          */
-        class SupplyChain3D {
+        class SmartFactory3D {
             constructor() {
-                this.container = document.getElementById('webgl-container');
-                this.labelsContainer = document.getElementById('labels-container');
-                
+                this.container = document.getElementById('webgl-factory');
                 this.scene = new THREE.Scene();
-                this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-                this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: "high-performance" });
+                this.camera = new THREE.PerspectiveCamera(45, this.container.clientWidth / this.container.clientHeight, 0.1, 1000);
+                this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+                this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
                 this.container.appendChild(this.renderer.domElement);
 
                 this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
-                this.controls.enableDamping = true; this.controls.maxPolarAngle = Math.PI / 2.1;
-                this.camera.position.set(0, 40, 55);
+                this.controls.enableDamping = true; this.controls.maxPolarAngle = Math.PI / 2;
                 
-                // Data
-                this.nodes = []; this.edges = []; this.optimalPath = [];
-                this.isOptimized = false; this.isTrafficActive = false;
-                this.trafficInterval = null; this.time = 0;
-                this.fuelPrice = 1.5; this.truckSpeed = 80;
-
-                // 3D Objects
-                this.nodeMeshes = []; this.edgeMeshes = []; this.labels = []; this.truck = null;
+                // Factory State
+                this.boxes = [];
+                this.robots = [];
+                this.conveyorSpeed = 1.0;
+                this.robotSpeed = 1.0;
+                this.isPaused = false;
+                this.time = 0;
 
                 // Materials
                 this.mats = {
-                    hub: new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.8, roughness: 0.2 }),
-                    hubOpt: new THREE.MeshStandardMaterial({ color: 0x00c3ff, emissive: 0x00c3ff, emissiveIntensity: 0.6 }),
-                    hubStart: new THREE.MeshStandardMaterial({ color: 0x00ff55, emissive: 0x00ff55, emissiveIntensity: 0.8 }),
-                    hubDest: new THREE.MeshStandardMaterial({ color: 0xff003c, emissive: 0xff003c, emissiveIntensity: 0.8 }),
-                    roadDef: new THREE.MeshBasicMaterial({ color: 0x00c3ff, transparent: true, opacity: 0.15 }),
-                    roadTraf: new THREE.MeshBasicMaterial({ color: 0xff003c, transparent: true, opacity: 0.7 }),
-                    roadOpt: new THREE.MeshBasicMaterial({ color: 0x00ff55, transparent: true, opacity: 0.9 })
+                    metal: new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.8, roughness: 0.2 }),
+                    robotBase: new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.9 }),
+                    robotArm: new THREE.MeshStandardMaterial({ color: 0x00ffff, wireframe: true, transparent: true, opacity: 0.6 }),
+                    boxGood: new THREE.MeshStandardMaterial({ color: 0x4A90E2 }),
+                    boxBad: new THREE.MeshStandardMaterial({ color: 0xff003c, emissive: 0xff0000, emissiveIntensity: 0.5 }),
+                    belt: new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.9 })
                 };
 
-                this.init();
-            }
-
-            init() {
-                this.scene.add(new THREE.AmbientLight(0xffffff, 0.3));
-                const dirLight = new THREE.DirectionalLight(0xffffff, 1.5); dirLight.position.set(10, 30, 20); this.scene.add(dirLight);
+                this.buildEnvironment();
+                this.setCamera('iso');
                 
-                // Tech Grid Floor
-                const grid = new THREE.GridHelper(100, 50, 0x00c3ff, 0x111122);
-                grid.position.y = -0.5; this.scene.add(grid);
-
-                // Build Awesome 3D Truck
-                this.buildTruck();
-
                 window.addEventListener('resize', () => this.resize());
-                this.resize();
-                this.generateNetwork();
                 this.animate();
             }
 
-            buildTruck() {
-                this.truck = new THREE.Group();
-                const trailerMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2 });
-                const cabMat = new THREE.MeshStandardMaterial({ color: 0xff003c, metalness: 0.8 });
-                
-                const trailer = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.5, 3), trailerMat);
-                trailer.position.set(0, 1.25, -0.5);
-                const cab = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.2, 1), cabMat);
-                cab.position.set(0, 1.1, 1.5);
-                
-                // Headlights
-                const lightMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-                const l1 = new THREE.Mesh(new THREE.BoxGeometry(0.3,0.3,0.1), lightMat); l1.position.set(-0.4, 0.8, 2.05);
-                const l2 = new THREE.Mesh(new THREE.BoxGeometry(0.3,0.3,0.1), lightMat); l2.position.set(0.4, 0.8, 2.05);
+            buildEnvironment() {
+                this.scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+                const dirLight = new THREE.DirectionalLight(0xffffff, 1.2); dirLight.position.set(10, 20, 10); this.scene.add(dirLight);
+                const grid = new THREE.GridHelper(100, 50, 0x00ffff, 0x111122); grid.position.y = -2; this.scene.add(grid);
 
-                this.truck.add(trailer, cab, l1, l2);
-                this.truck.visible = false;
-                this.scene.add(this.truck);
+                // 1. Conveyor Belt
+                this.belt = new THREE.Mesh(new THREE.BoxGeometry(40, 1, 4), this.mats.belt);
+                this.scene.add(this.belt);
+                
+                // Rollers
+                for(let i=-19; i<=19; i+=2) {
+                    let roller = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 4.2, 16), this.mats.metal);
+                    roller.rotation.x = Math.PI/2; roller.position.set(i, 0.5, 0);
+                    this.scene.add(roller);
+                }
+
+                // 2. Robotic Arms (SCARA Type)
+                this.createRobot(-10, 2); // Assembly Robot
+                this.createRobot(0, -2);  // Welding Robot
+                this.createRobot(10, 2);  // Inspection Robot
+            }
+
+            createRobot(x, z) {
+                const group = new THREE.Group(); group.position.set(x, 0, z);
+                
+                // Base
+                const base = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 2, 2), this.mats.robotBase);
+                base.position.y = 1; group.add(base);
+
+                // Shoulder Joint (Rotates Y)
+                const shoulder = new THREE.Group(); shoulder.position.y = 2;
+                const sMesh = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 1.5), this.mats.robotArm); sMesh.rotation.x = Math.PI/2;
+                shoulder.add(sMesh);
+
+                // Upper Arm
+                const upArm = new THREE.Mesh(new THREE.BoxGeometry(1, 4, 1), this.mats.robotArm);
+                upArm.position.y = 2; shoulder.add(upArm);
+
+                // Elbow Joint (Rotates Z)
+                const elbow = new THREE.Group(); elbow.position.y = 4;
+                const eMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.8, 1.2), this.mats.metal); eMesh.rotation.x = Math.PI/2;
+                elbow.add(eMesh);
+
+                // Forearm
+                const foreArm = new THREE.Mesh(new THREE.BoxGeometry(0.8, 4, 0.8), this.mats.robotArm);
+                foreArm.position.y = 2; elbow.add(foreArm);
+
+                // Effector (Tool)
+                const tool = new THREE.Mesh(new THREE.ConeGeometry(0.5, 1.5), this.mats.metal);
+                tool.position.y = 4.5; tool.rotation.x = Math.PI; elbow.add(tool);
+
+                shoulder.add(elbow); base.add(shoulder); this.scene.add(group);
+                
+                this.robots.push({ group, shoulder, elbow, baseOffset: x });
+            }
+
+            spawnBox(isDefective) {
+                if(this.isPaused) return;
+                const geo = new THREE.BoxGeometry(1.5, 1.5, 1.5);
+                const mesh = new THREE.Mesh(geo, isDefective ? this.mats.boxBad : this.mats.boxGood);
+                mesh.position.set(-20, 1.5, 0); // Start at beginning of conveyor
+                this.scene.add(mesh);
+                this.boxes.push({ mesh, isDefective, processedBy: [] });
+            }
+
+            updatePhysics() {
+                if(this.isPaused) return;
+                this.time += 0.05 * this.robotSpeed;
+
+                // Move Boxes
+                for(let i=this.boxes.length-1; i>=0; i--) {
+                    let b = this.boxes[i];
+                    b.mesh.position.x += 0.1 * this.conveyorSpeed;
+
+                    // Defective boxes get pushed off the line at x = 12
+                    if(b.isDefective && b.mesh.position.x > 12 && b.mesh.position.z < 5) {
+                        b.mesh.position.z += 0.2; // Push off
+                        b.mesh.position.y -= 0.1; // Fall
+                    }
+
+                    // Remove if out of bounds
+                    if(b.mesh.position.x > 22 || b.mesh.position.y < -5) {
+                        this.scene.remove(b.mesh);
+                        this.boxes.splice(i, 1);
+                    }
+                }
+
+                // Animate Robots (Procedural Kinematics simulating work)
+                this.robots.forEach((r, idx) => {
+                    // Find nearest box
+                    let nearest = this.boxes.find(b => Math.abs(b.mesh.position.x - r.baseOffset) < 2);
+                    
+                    if(nearest) {
+                        // Work Animation (Bend down to box)
+                        r.shoulder.rotation.z = MathUtils.lerp(r.shoulder.rotation.z, -Math.PI/4, 0.1 * this.robotSpeed);
+                        r.elbow.rotation.z = MathUtils.lerp(r.elbow.rotation.z, Math.PI/2, 0.1 * this.robotSpeed);
+                        // Follow box slightly on Y axis
+                        r.shoulder.rotation.y = MathUtils.lerp(r.shoulder.rotation.y, (nearest.mesh.position.x - r.baseOffset) * 0.5, 0.1);
+                    } else {
+                        // Idle Animation (Scan around)
+                        r.shoulder.rotation.y = Math.sin(this.time + idx) * 0.5;
+                        r.shoulder.rotation.z = MathUtils.lerp(r.shoulder.rotation.z, 0, 0.05 * this.robotSpeed);
+                        r.elbow.rotation.z = MathUtils.lerp(r.elbow.rotation.z, Math.PI/4, 0.05 * this.robotSpeed);
+                    }
+                });
+            }
+
+            setCamera(view, btnElement) {
+                if(btnElement) { document.querySelectorAll('.btn-cam').forEach(b => b.classList.remove('active')); btnElement.classList.add('active'); }
+                if(view === 'iso') gsap.to(this.camera.position, {x: 0, y: 20, z: 30, duration: 1});
+                if(view === 'top') gsap.to(this.camera.position, {x: 0, y: 35, z: 0, duration: 1});
+                if(view === 'side') gsap.to(this.camera.position, {x: -30, y: 10, z: 15, duration: 1});
+                gsap.to(this.controls.target, {x: 0, y: 0, z: 0, duration: 1});
+            }
+
+            triggerEStop(isActive) {
+                this.isPaused = isActive;
+                if(isActive) {
+                    this.scene.background = new THREE.Color(0x220000);
+                    // Drop robots
+                    this.robots.forEach(r => {
+                        gsap.to(r.shoulder.rotation, { z: Math.PI/3, duration: 0.5 });
+                        gsap.to(r.elbow.rotation, { z: Math.PI/1.5, duration: 0.5 });
+                    });
+                } else {
+                    this.scene.background = null;
+                }
             }
 
             resize() {
-                const w = window.innerWidth; const h = window.innerHeight;
-                this.camera.aspect = w / h;
+                if(this.container.clientWidth === 0) return;
+                this.camera.aspect = this.container.clientWidth / this.container.clientHeight;
                 this.camera.updateProjectionMatrix();
-                this.renderer.setSize(w, h);
+                this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
             }
-
-            // --- 3D NETWORK GENERATION ---
-            generateNetwork() {
-                // Clean up scene
-                this.nodeMeshes.forEach(m => this.scene.remove(m));
-                this.edgeMeshes.forEach(m => this.scene.remove(m.mesh));
-                this.labelsContainer.innerHTML = '';
-                
-                this.nodes = []; this.edges = []; this.optimalPath = []; this.isOptimized = false;
-                this.nodeMeshes = []; this.edgeMeshes = []; this.labels = []; this.truck.visible = false;
-
-                const numNodes = 8 + Math.floor(Math.random() * 4);
-                const bounds = 25;
-                const names = [...JORDAN_HUBS].sort(() => 0.5 - Math.random());
-
-                // 1. Create Hubs (3D Cylinders)
-                const hubGeo = new THREE.CylinderGeometry(1, 1, 2, 16);
-                for(let i=0; i<numNodes; i++) {
-                    const x = (Math.random() - 0.5) * bounds * 2;
-                    const z = (Math.random() - 0.5) * bounds * 2;
-                    const pos = new THREE.Vector3(x, 0, z);
-                    
-                    this.nodes.push({ id: i, pos: pos, label: names[i] });
-
-                    const mesh = new THREE.Mesh(hubGeo, this.mats.hub);
-                    mesh.position.set(x, 1, z);
-                    this.scene.add(mesh);
-                    this.nodeMeshes.push(mesh);
-
-                    // HTML Label
-                    const lbl = document.createElement('div');
-                    lbl.className = 'node-label'; lbl.innerText = names[i];
-                    this.labelsContainer.appendChild(lbl);
-                    this.labels.push({ el: lbl, pos: new THREE.Vector3(x, 3.5, z) });
-                }
-
-                // 2. Create Edges (3D Tubes instead of lines for realism)
-                for(let i=0; i<this.nodes.length; i++) {
-                    for(let j=i+1; j<this.nodes.length; j++) {
-                        const d = this.nodes[i].pos.distanceTo(this.nodes[j].pos);
-                        if(d < 25) {
-                            this.edges.push({ source: i, target: j, traffic: 1.0 });
-                        }
-                    }
-                }
-                this.edges.push({ source: 0, target: 1, traffic: 1.0 });
-                this.edges.push({ source: numNodes-2, target: numNodes-1, traffic: 1.0 });
-
-                // Draw 3D Roads
-                this.edges.forEach(e => {
-                    const p1 = this.nodes[e.source].pos; const p2 = this.nodes[e.target].pos;
-                    const distance = p1.distanceTo(p2);
-                    const cylGeo = new THREE.CylinderGeometry(0.2, 0.2, distance, 8);
-                    const mesh = new THREE.Mesh(cylGeo, this.mats.roadDef);
-                    
-                    // Orient cylinder correctly
-                    mesh.position.copy(p1).lerp(p2, 0.5);
-                    mesh.position.y = 0.5; // Slightly above ground
-                    mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), p2.clone().sub(p1).normalize());
-                    
-                    this.scene.add(mesh);
-                    this.edgeMeshes.push({ mesh: mesh, data: e });
-                });
-
-                document.getElementById('val-nodes').innerText = this.nodes.length;
-                document.getElementById('val-edges').innerText = this.edges.length;
-                
-                const badge = document.getElementById('val-algo');
-                badge.className = 'badge badge-standby'; badge.innerHTML = '<div class="pulse"></div> STANDBY';
-                document.getElementById('btn-run').classList.remove('active');
-                
-                this.update3DVisuals();
-                this.updateEconomics();
-                Terminal.log(`Generated new 3D Topology: ${this.nodes.length} Hubs, ${this.edges.length} Routes.`, 'sys');
-            }
-
-            // --- OPERATIONS RESEARCH: DIJKSTRA ---
-            runOptimizer(isSilent = false) {
-                if(this.nodes.length === 0) return;
-                if(!isSilent) Terminal.log("Executing Dijkstra's Algorithm across 3D Nodes...", "run");
-                
-                const start = 0; const dest = this.nodes.length - 1;
-                const graph = new Map();
-                this.nodes.forEach(n => graph.set(n.id, []));
-                
-                let maxPossibleDist = 0;
-
-                this.edges.forEach(e => {
-                    const dist = this.nodes[e.source].pos.distanceTo(this.nodes[e.target].pos);
-                    maxPossibleDist += dist;
-                    const cost = dist * e.traffic; // Heavy traffic increases cost!
-                    graph.get(e.source).push({ node: e.target, cost: cost });
-                    graph.get(e.target).push({ node: e.source, cost: cost });
-                });
-
-                const distances = new Map(); const previous = new Map(); const unvisited = new Set();
-                this.nodes.forEach(n => { distances.set(n.id, Infinity); unvisited.add(n.id); });
-                distances.set(start, 0);
-
-                while(unvisited.size > 0) {
-                    let curr = null; let minDst = Infinity;
-                    for(let id of unvisited) { if(distances.get(id) < minDst) { minDst = distances.get(id); curr = id; } }
-                    if(curr === null || curr === dest) break;
-                    unvisited.delete(curr);
-
-                    const neighbors = graph.get(curr);
-                    for(let i=0; i<neighbors.length; i++) {
-                        const nid = neighbors[i].node;
-                        if(unvisited.has(nid)) {
-                            const alt = distances.get(curr) + neighbors[i].cost;
-                            if(alt < distances.get(nid)) { distances.set(nid, alt); previous.set(nid, curr); }
-                        }
-                    }
-                }
-
-                this.optimalPath = []; let step = dest;
-                if(previous.has(step) || step === start) {
-                    while(step !== undefined) { this.optimalPath.unshift(step); step = previous.get(step); }
-                }
-
-                const badge = document.getElementById('val-algo');
-                if(this.optimalPath.length > 1 && this.optimalPath[0] === start) {
-                    this.isOptimized = true; this.truck.visible = true;
-                    badge.className = 'badge badge-opt'; badge.innerHTML = '<div class="pulse"></div> OPTIMIZED';
-                    document.getElementById('btn-run').classList.add('active');
-                    if(!isSilent) Terminal.log(`Optimal Path Secured: ${this.optimalPath.map(id => this.nodes[id].label).join(' -> ')}`, 'opt');
-                } else {
-                    this.optimalPath = []; this.isOptimized = false; this.truck.visible = false;
-                    badge.className = 'badge'; badge.innerHTML = 'NO ROUTE'; badge.style.borderColor = 'var(--danger)'; badge.style.color = 'var(--danger)';
-                    if(!isSilent) Terminal.log("Error: Destination unreachable from source.", "err");
-                }
-
-                this.update3DVisuals();
-                this.updateEconomics(maxPossibleDist);
-            }
-
-            toggleTraffic() {
-                const btn = document.getElementById('btn-traffic');
-                this.isTrafficActive = !this.isTrafficActive;
-                
-                if(this.isTrafficActive) {
-                    btn.classList.add('active');
-                    Terminal.log("Simulating Live Traffic & Road Congestion...", "err");
-                    this.trafficInterval = setInterval(() => {
-                        let congested = 0;
-                        this.edges.forEach(e => {
-                            if(Math.random() > 0.8) { e.traffic = 3.0 + Math.random()*2; congested++; } // Massive cost penalty
-                            else e.traffic = 1.0;
-                        });
-                        this.update3DVisuals();
-                        if(congested > 0 && this.isOptimized) {
-                            Terminal.log(`Traffic detected on ${congested} routes. AI Recalculating...`, "err");
-                            this.runOptimizer(true);
-                        }
-                    }, 3000);
-                } else {
-                    btn.classList.remove('active');
-                    clearInterval(this.trafficInterval);
-                    this.edges.forEach(e => e.traffic = 1.0);
-                    Terminal.log("Traffic cleared. Conditions optimal.", "opt");
-                    this.update3DVisuals();
-                    if(this.isOptimized) this.runOptimizer(true);
-                }
-            }
-
-            // --- 3D VISUALS UPDATER ---
-            update3DVisuals() {
-                const start = 0; const dest = this.nodes.length - 1;
-
-                // Color Nodes
-                this.nodeMeshes.forEach((mesh, i) => {
-                    const isOpt = this.optimalPath.includes(i);
-                    if(i === start) mesh.material = this.mats.hubStart;
-                    else if(i === dest) mesh.material = this.mats.hubDest;
-                    else if(isOpt) mesh.material = this.mats.hubOpt;
-                    else mesh.material = this.mats.hub;
-                });
-
-                // Color 3D Roads
-                this.edgeMeshes.forEach(em => {
-                    const p1 = em.data.source; const p2 = em.data.target;
-                    const isOpt = this.isOptimized && this.optimalPath.includes(p1) && this.optimalPath.includes(p2) && Math.abs(this.optimalPath.indexOf(p1) - this.optimalPath.indexOf(p2)) === 1;
-                    
-                    if(isOpt) { em.mesh.material = this.mats.roadOpt; em.mesh.scale.set(1.5, 1, 1.5); } // Make optimal path thicker
-                    else if(em.data.traffic > 1.5) { em.mesh.material = this.mats.roadTraf; em.mesh.scale.set(2, 1, 2); } // Traffic is thick red
-                    else { em.mesh.material = this.mats.roadDef; em.mesh.scale.set(1, 1, 1); }
-                });
-
-                // Update HTML Labels
-                this.labels.forEach((lblObj, i) => {
-                    lblObj.el.className = 'node-label';
-                    const isOpt = this.optimalPath.includes(i);
-                    if(i === start) { lblObj.el.classList.add('active', 'start'); lblObj.el.innerHTML = `${this.nodes[i].label}<br>[ START ]`; }
-                    else if(i === dest) { lblObj.el.classList.add('active', 'dest'); lblObj.el.innerHTML = `${this.nodes[i].label}<br>[ DEST ]`; }
-                    else if(isOpt) { lblObj.el.classList.add('active'); lblObj.el.innerHTML = this.nodes[i].label; }
-                    else { lblObj.el.innerHTML = this.nodes[i].label; }
-                });
-            }
-
-            // Project 3D positions to 2D screen for labels
-            updateLabelsProjection() {
-                const w = window.innerWidth; const h = window.innerHeight;
-                this.labels.forEach(lblObj => {
-                    if(!lblObj.el.classList.contains('active') && this.isOptimized) {
-                        lblObj.el.style.opacity = '0.2'; // Dim non-optimal
-                    } else {
-                        lblObj.el.style.opacity = '1';
-                    }
-
-                    const pos = lblObj.pos.clone();
-                    pos.project(this.camera);
-                    
-                    if(pos.z > 1) { lblObj.el.style.display = 'none'; return; } // Behind camera
-                    lblObj.el.style.display = 'block';
-
-                    const x = (pos.x * .5 + .5) * w;
-                    const y = (pos.y * -.5 + .5) * h;
-                    lblObj.el.style.left = `${x}px`;
-                    lblObj.el.style.top = `${y}px`;
-                });
-            }
-
-            // --- ECONOMICS ---
-            updateParams() {
-                this.fuelPrice = parseFloat(document.getElementById('sim-fuel').value);
-                this.truckSpeed = parseFloat(document.getElementById('sim-speed').value);
-                document.getElementById('lbl-fuel').innerText = '$' + this.fuelPrice.toFixed(1);
-                document.getElementById('lbl-speed').innerText = this.truckSpeed;
-                if(this.isOptimized) this.updateEconomics();
-            }
-
-            updateEconomics(maxDistRef = 1000) {
-                if(!this.isOptimized || this.optimalPath.length < 2) {
-                    document.getElementById('kpi-dist').innerText = "0.0";
-                    document.getElementById('kpi-eff').innerText = "0%";
-                    document.getElementById('kpi-cost').innerText = "$0.00";
-                    document.getElementById('kpi-co2').innerText = "0.0";
-                    document.getElementById('bar-fuel').style.width = '0%'; document.getElementById('bar-labor').style.width = '0%'; document.getElementById('bar-maint').style.width = '0%';
-                    return;
-                }
-
-                let pxDist = 0;
-                for(let i=0; i<this.optimalPath.length-1; i++) {
-                    pxDist += this.nodes[this.optimalPath[i]].pos.distanceTo(this.nodes[this.optimalPath[i+1]].pos);
-                }
-
-                const realDistKm = pxDist * 15; // 3D Scale to KM
-                const timeHrs = realDistKm / this.truckSpeed;
-                const fuelLiters = (realDistKm / 100) * 35;
-                const fuelCost = fuelLiters * this.fuelPrice;
-                const co2 = fuelLiters * 2.68;
-                const laborCost = timeHrs * 25;
-                const maintCost = realDistKm * 0.15;
-                const totalCost = fuelCost + laborCost + maintCost;
-
-                const eff = MathUtils.clamp(100 - (pxDist / (maxDistRef * 0.1) * 100), 45, 98);
-
-                document.getElementById('kpi-dist').innerText = realDistKm.toFixed(1);
-                document.getElementById('kpi-eff').innerText = eff.toFixed(1) + '%';
-                document.getElementById('kpi-co2').innerText = co2.toFixed(1);
-                document.getElementById('kpi-cost').innerText = '$' + totalCost.toFixed(2);
-                
-                const pTotal = totalCost;
-                document.getElementById('bar-fuel').style.width = `${(fuelCost/pTotal)*100}%`;
-                document.getElementById('bar-labor').style.width = `${(laborCost/pTotal)*100}%`;
-                document.getElementById('bar-maint').style.width = `${(maintCost/pTotal)*100}%`;
-                
-                document.getElementById('cb-fuel').innerText = ((fuelCost/pTotal)*100).toFixed(0) + '%';
-                document.getElementById('cb-labor').innerText = ((laborCost/pTotal)*100).toFixed(0) + '%';
-                document.getElementById('cb-maint').innerText = ((maintCost/pTotal)*100).toFixed(0) + '%';
-            }
-
             animate() {
                 requestAnimationFrame(() => this.animate());
                 this.controls.update();
-                this.time += 0.02;
-
-                // Move 3D Truck
-                if(this.isOptimized && this.optimalPath.length > 1) {
-                    const segs = this.optimalPath.length - 1;
-                    const pIdx = Math.floor(this.time * 2) % segs;
-                    const pFrac = (this.time * 2) % 1;
-                    
-                    const p1 = this.nodes[this.optimalPath[pIdx]].pos;
-                    const p2 = this.nodes[this.optimalPath[pIdx+1]].pos;
-                    
-                    const currentPos = new THREE.Vector3().lerpVectors(p1, p2, pFrac);
-                    this.truck.position.copy(currentPos);
-                    
-                    // Look at next point smoothly
-                    const lookTarget = new THREE.Vector3().lerpVectors(p1, p2, pFrac + 0.01);
-                    this.truck.lookAt(lookTarget);
-                }
-
-                // Make start/end nodes pulse
-                if(this.nodes.length > 0) {
-                    this.nodeMeshes[0].scale.setScalar(1 + Math.sin(this.time * 5) * 0.2);
-                    this.nodeMeshes[this.nodes.length-1].scale.setScalar(1 + Math.sin(this.time * 5) * 0.2);
-                }
-
-                this.updateLabelsProjection();
+                this.updatePhysics();
                 this.renderer.render(this.scene, this.camera);
+            }
+        }
+
+        /**
+         * 3. INDUSTRIAL ENGINEERING OEE MATH LOGIC
+         * Handles SCADA calculations and state
+         */
+        class FactoryController {
+            constructor() {
+                this.state = {
+                    speed: 1.0, robotSpd: 1.0, defectRate: 5,
+                    isRunning: true, isEStop: false, isMaint: false,
+                    totalParts: 0, badParts: 0,
+                    plannedTime: 0, runTime: 0,
+                    idealCycleTime: 2000 // ms per part ideally
+                };
+
+                // Init Charts
+                this.charts = {
+                    a: new MiniTrendChart('chart-a', '#ffb700'),
+                    p: new MiniTrendChart('chart-p', '#4A90E2'),
+                    q: new MiniTrendChart('chart-q', '#00ff41'),
+                    oee: new MiniTrendChart('chart-oee', '#00ffff')
+                };
+
+                this.timer = setInterval(() => this.tick(), 1000); // 1 sec tick
+                this.spawner = null;
+                this.setSpawner();
+            }
+
+            setSpawner() {
+                if(this.spawner) clearInterval(this.spawner);
+                const delay = 2000 / this.state.speed;
+                this.spawner = setInterval(() => {
+                    if(!this.state.isRunning) return;
+                    this.state.totalParts++;
+                    document.getElementById('total-parts').innerText = this.state.totalParts;
+                    
+                    const isDefect = (Math.random() * 100) < this.state.defectRate;
+                    if(isDefect) {
+                        this.state.badParts++;
+                        document.getElementById('val-bad-count').innerText = this.state.badParts;
+                    }
+                    
+                    if(window.Factory3D) window.Factory3D.spawnBox(isDefect);
+                }, delay);
+            }
+
+            updateParams() {
+                if(this.state.isEStop) return;
+                this.state.speed = parseFloat(document.getElementById('sim-speed').value);
+                this.state.robotSpd = parseFloat(document.getElementById('sim-robot').value);
+                this.state.defectRate = parseInt(document.getElementById('sim-defect').value);
+                
+                document.getElementById('val-speed').innerText = this.state.speed.toFixed(1) + 'x';
+                document.getElementById('val-robot').innerText = this.state.robotSpd.toFixed(1) + 'x';
+                document.getElementById('val-defect').innerText = this.state.defectRate + '%';
+                
+                if(window.Factory3D) {
+                    window.Factory3D.conveyorSpeed = this.state.speed;
+                    window.Factory3D.robotSpeed = this.state.robotSpd;
+                }
+                this.setSpawner();
+            }
+
+            toggleMaintenance() {
+                if(this.state.isEStop) return;
+                this.state.isMaint = !this.state.isMaint;
+                const btn = document.getElementById('btn-maint');
+                const hud = document.getElementById('hud-status');
+                
+                if(this.state.isMaint) {
+                    this.state.isRunning = false;
+                    btn.style.background = 'var(--warning)'; btn.style.color = '#000';
+                    hud.innerText = "MAINTENANCE DOWNTIME ACTIVE"; hud.className = "hud-desc error";
+                    if(window.Factory3D) window.Factory3D.isPaused = true;
+                } else {
+                    this.state.isRunning = true;
+                    btn.style.background = ''; btn.style.color = '';
+                    hud.innerText = "SYSTEM RUNNING OPTIMALLY"; hud.className = "hud-desc";
+                    if(window.Factory3D) window.Factory3D.isPaused = false;
+                }
+            }
+
+            triggerEStop() {
+                this.state.isEStop = !this.state.isEStop;
+                const btn = document.getElementById('btn-estop');
+                const overlay = document.getElementById('alarm-overlay');
+                const hud = document.getElementById('hud-status');
+
+                if(this.state.isEStop) {
+                    this.state.isRunning = false;
+                    btn.classList.add('active'); overlay.classList.add('active');
+                    hud.innerText = "CRITICAL: EMERGENCY STOP ENGAGED"; hud.className = "hud-desc error";
+                    // Disable inputs
+                    document.getElementById('sim-speed').disabled = true;
+                    document.getElementById('sim-defect').disabled = true;
+                    if(window.Factory3D) window.Factory3D.triggerEStop(true);
+                } else {
+                    this.state.isRunning = true;
+                    btn.classList.remove('active'); overlay.classList.remove('active');
+                    hud.innerText = "SYSTEM RUNNING OPTIMALLY"; hud.className = "hud-desc";
+                    document.getElementById('sim-speed').disabled = false;
+                    document.getElementById('sim-defect').disabled = false;
+                    if(window.Factory3D) window.Factory3D.triggerEStop(false);
+                }
+            }
+
+            resetData() {
+                this.state.totalParts = 0; this.state.badParts = 0;
+                this.state.plannedTime = 0; this.state.runTime = 0;
+                document.getElementById('total-parts').innerText = '0';
+                document.getElementById('val-bad-count').innerText = '0';
+                this.updateUI(100, 100, 100, 100); // Reset visual to 100%
+            }
+
+            tick() {
+                // Time Math
+                this.state.plannedTime++;
+                if(this.state.isRunning) this.state.runTime++;
+
+                // OEE MATH (Industrial Engineering Core)
+                let A = 100, P = 100, Q = 100;
+
+                // 1. Availability (A) = Operating Time / Planned Production Time
+                if(this.state.plannedTime > 0) A = (this.state.runTime / this.state.plannedTime) * 100;
+
+                // 2. Performance (P) = (Total Parts / Operating Time) / Ideal Run Rate
+                // Ideal rate = 1 part every 2 secs (0.5 parts/sec)
+                if(this.state.runTime > 0) {
+                    const actualRate = this.state.totalParts / this.state.runTime;
+                    P = (actualRate / 0.5) * 100;
+                }
+
+                // 3. Quality (Q) = Good Parts / Total Parts
+                if(this.state.totalParts > 0) {
+                    const goodParts = this.state.totalParts - this.state.badParts;
+                    Q = (goodParts / this.state.totalParts) * 100;
+                }
+
+                // Protect against infinity/NaN and clamp to 100% max for visuals
+                A = MathUtils.clamp(A, 0, 100);
+                P = MathUtils.clamp(P, 0, 100);
+                Q = MathUtils.clamp(Q, 0, 100);
+                
+                const OEE = (A/100) * (P/100) * (Q/100) * 100;
+
+                this.updateUI(A, P, Q, OEE);
+            }
+
+            updateUI(a, p, q, oee) {
+                document.getElementById('kpi-a').innerText = a.toFixed(1) + '%';
+                document.getElementById('kpi-p').innerText = p.toFixed(1) + '%';
+                document.getElementById('kpi-q').innerText = q.toFixed(1) + '%';
+                document.getElementById('kpi-oee').innerText = oee.toFixed(1) + '%';
+
+                this.charts.a.update(a); this.charts.p.update(p);
+                this.charts.q.update(q); this.charts.oee.update(oee);
             }
         }
 
         // ==========================================================================
         // SYSTEM BOOTSTRAP
         // ==========================================================================
-        window.App = {
-            engine: null,
-            runOptimizer: () => { if(window.App.engine) window.App.engine.runOptimizer(); },
-            toggleTraffic: () => { if(window.App.engine) window.App.engine.toggleTraffic(); },
-            resetNetwork: () => { if(window.App.engine) window.App.engine.generateNetwork(); },
-            updateParams: () => { if(window.App.engine) window.App.engine.updateParams(); }
-        };
-
         window.onload = () => {
-            window.App.engine = new SupplyChain3D();
-            Terminal.log("3D WebGL Engine & Dijkstra Logic Online.", "opt");
+            window.Factory3D = new SmartFactory3D();
+            window.FactorySCADA = new FactoryController();
         };
 
     </script>
