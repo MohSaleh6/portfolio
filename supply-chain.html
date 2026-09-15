@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ENG.MOHAMMAD | Operations Research</title>
+    <title>ENG.MOHAMMAD | AI Supply Chain Optimizer</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=Syncopate:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -13,7 +13,7 @@
            01. ENTERPRISE CSS ARCHITECTURE
            ========================================================================== */
         :root {
-            --bg-deep: #020617; --bg-panel: rgba(15, 23, 42, 0.95); --bg-glass: rgba(30, 41, 59, 0.7);
+            --bg-deep: #020617; --bg-panel: rgba(15, 23, 42, 0.85);
             --border-core: rgba(56, 189, 248, 0.3); --border-glow: rgba(56, 189, 248, 0.6);
             --primary: #38bdf8; --accent: #818cf8; --warning: #f59e0b; --danger: #ef4444; --success: #10b981;
             --text-main: #f8fafc; --text-muted: #94a3b8;
@@ -22,115 +22,113 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: var(--font-main); background-color: var(--bg-deep); color: var(--text-main); height: 100vh; overflow: hidden; display: flex; user-select: none; }
-        
-        /* High-Tech Grid Background */
-        .tech-grid { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; background-color: var(--bg-deep); background-image: radial-gradient(rgba(56, 189, 248, 0.15) 1px, transparent 1px); background-size: 40px 40px; }
+        ::-webkit-scrollbar { width: 5px; } ::-webkit-scrollbar-track { background: var(--bg-deep); } ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 5px; }
+
+        /* Dynamic Map Grid Background */
+        .tech-grid { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; background-color: var(--bg-deep); background-image: radial-gradient(rgba(56, 189, 248, 0.1) 1px, transparent 1px); background-size: 40px 40px; }
         .tech-grid::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 50%, transparent 0%, var(--bg-deep) 100%); }
 
         /* ==========================================================================
            02. SIDEBAR (LOGISTICS CONTROL PANEL)
            ========================================================================== */
-        .sidebar { width: 340px; background: rgba(4, 9, 20, 0.95); border-right: 1px solid var(--border-core); display: flex; flex-direction: column; padding: 25px; box-shadow: 10px 0 40px rgba(0,0,0,0.9); z-index: 100; backdrop-filter: blur(15px); overflow-y: auto; }
+        .sidebar { width: 340px; background: rgba(2, 6, 23, 0.95); border-right: 1px solid var(--border-core); display: flex; flex-direction: column; padding: 25px; box-shadow: 10px 0 40px rgba(0,0,0,0.9); z-index: 100; backdrop-filter: blur(15px); overflow-y: auto; }
         .brand { font-family: var(--font-head); font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 5px; display: flex; align-items: center; gap: 10px; }
         .brand span { color: var(--primary); text-shadow: 0 0 15px var(--primary); }
-        .brand-sub { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); letter-spacing: 2px; margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px; text-transform: uppercase; }
+        .brand-sub { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); letter-spacing: 2px; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px; text-transform: uppercase; }
 
         /* Control Groups */
-        .control-group { background: rgba(0,0,0,0.6); border: 1px solid rgba(56, 189, 248, 0.15); border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); position: relative; overflow: hidden; }
+        .control-group { background: rgba(0,0,0,0.5); border: 1px solid rgba(56, 189, 248, 0.15); border-radius: 8px; padding: 18px; margin-bottom: 15px; position: relative; overflow: hidden; }
         .control-group::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--primary); }
         .cg-title { font-family: var(--font-mono); font-size: 11px; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 8px; font-weight: bold;}
         
-        .stat-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 12px; font-family: var(--font-mono); }
-        .stat-row:last-child { margin-bottom: 0; }
+        .stat-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 12px; font-family: var(--font-mono); }
         .stat-label { color: var(--text-muted); }
         .stat-val { font-weight: bold; color: #fff; font-size: 14px; }
         
-        .algo-badge { padding: 6px 15px; border-radius: 4px; font-weight: bold; font-size: 11px; background: rgba(245, 158, 11, 0.1); color: var(--warning); border: 1px solid var(--warning); display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 1px;}
-        .algo-badge.optimized { background: rgba(16, 185, 129, 0.1); color: var(--success); border-color: var(--success); box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); }
-        .pulse { width: 8px; height: 8px; border-radius: 50%; background: currentColor; animation: blink 1s infinite; box-shadow: 0 0 10px currentColor; }
+        .algo-badge { padding: 6px 12px; border-radius: 4px; font-weight: bold; font-size: 10px; background: rgba(245, 158, 11, 0.1); color: var(--warning); border: 1px solid var(--warning); display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 1px;}
+        .algo-badge.optimized { background: rgba(16, 185, 129, 0.1); color: var(--success); border-color: var(--success); box-shadow: 0 0 15px rgba(16, 185, 129, 0.2); }
+        .pulse { width: 6px; height: 6px; border-radius: 50%; background: currentColor; animation: blink 1s infinite; box-shadow: 0 0 10px currentColor; }
 
         /* Sliders */
-        .slider-wrap { margin-bottom: 20px; }
+        .slider-wrap { margin-bottom: 15px; }
         .slider-wrap:last-child { margin-bottom: 0; }
-        .slider-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); margin-bottom: 10px; }
-        .slider-val { color: var(--primary); font-weight: bold; font-size: 13px; background: rgba(56, 189, 248, 0.1); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(56, 189, 248, 0.3); }
+        .slider-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); font-family: var(--font-mono); margin-bottom: 8px; }
+        .slider-val { color: var(--primary); font-weight: bold; font-size: 12px; background: rgba(56, 189, 248, 0.1); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(56, 189, 248, 0.3); }
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
         input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: var(--primary); cursor: pointer; box-shadow: 0 0 15px var(--primary); margin-top: -6px; border: 2px solid #fff; }
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; }
 
-        /* Buttons */
-        .btn-group { display: flex; flex-direction: column; gap: 12px; margin-top: auto; }
-        .btn { padding: 15px; font-family: var(--font-mono); font-size: 12px; font-weight: bold; text-transform: uppercase; border-radius: 6px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; border: 1px solid transparent; letter-spacing: 1px; }
+        /* Action Buttons */
+        .btn-group { display: flex; flex-direction: column; gap: 10px; margin-top: auto; }
+        .btn { padding: 12px; font-family: var(--font-mono); font-size: 11px; font-weight: bold; text-transform: uppercase; border-radius: 6px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; border: 1px solid transparent; letter-spacing: 1px; }
         
         .btn-opt { background: rgba(16, 185, 129, 0.1); border-color: var(--success); color: var(--success); }
-        .btn-opt:hover, .btn-opt.active { background: var(--success); color: #000; box-shadow: 0 0 25px rgba(16, 185, 129, 0.5); }
+        .btn-opt:hover, .btn-opt.active { background: var(--success); color: #000; box-shadow: 0 0 20px rgba(16, 185, 129, 0.5); }
 
         .btn-traffic { background: rgba(239, 68, 68, 0.1); border-color: var(--danger); color: var(--danger); }
-        .btn-traffic:hover, .btn-traffic.active { background: var(--danger); color: #fff; box-shadow: 0 0 25px rgba(239, 68, 68, 0.5); }
+        .btn-traffic:hover, .btn-traffic.active { background: var(--danger); color: #fff; box-shadow: 0 0 20px rgba(239, 68, 68, 0.5); }
 
         .btn-reset { background: rgba(56, 189, 248, 0.1); border-color: var(--primary); color: var(--primary); }
-        .btn-reset:hover { background: var(--primary); color: #000; box-shadow: 0 0 25px rgba(56, 189, 248, 0.5); }
+        .btn-reset:hover { background: var(--primary); color: #000; box-shadow: 0 0 20px rgba(56, 189, 248, 0.5); }
         
-        .btn-exit { margin-top: 20px; color: var(--text-muted); text-decoration: none; font-size: 11px; text-align: center; border: 1px solid rgba(255,255,255,0.1); padding: 12px; border-radius: 6px; transition: 0.3s; font-family: var(--font-mono); display: block; }
+        .btn-exit { margin-top: 15px; color: var(--text-muted); text-decoration: none; font-size: 11px; text-align: center; border: 1px solid rgba(255,255,255,0.1); padding: 10px; border-radius: 6px; transition: 0.3s; font-family: var(--font-mono); display: block; }
         .btn-exit:hover { background: var(--primary); color: #000; border-color: var(--primary); }
 
         /* ==========================================================================
            03. MAIN STAGE (MAP & ANALYTICS)
            ========================================================================== */
-        .main-stage { flex: 1; display: flex; flex-direction: column; padding: 25px; gap: 25px; position: relative; overflow-y: auto; }
+        .main-stage { flex: 1; display: flex; flex-direction: column; padding: 20px; gap: 20px; position: relative; overflow-y: auto; }
         
-        /* TOP: INTERACTIVE MAP */
-        .map-container { flex: 2; min-height: 450px; background: rgba(10, 15, 25, 0.8); border: 1px solid var(--border-core); border-radius: 12px; position: relative; overflow: hidden; box-shadow: inset 0 0 50px rgba(0,0,0,0.8); backdrop-filter: blur(10px); }
+        /* INTERACTIVE MAP */
+        .map-container { flex: 2; min-height: 400px; background: rgba(15, 23, 42, 0.4); border: 1px solid var(--border-core); border-radius: 12px; position: relative; overflow: hidden; box-shadow: inset 0 0 50px rgba(0,0,0,0.8); backdrop-filter: blur(5px); }
         #network-canvas { width: 100%; height: 100%; display: block; cursor: crosshair; touch-action: none; position: absolute; top: 0; left: 0; }
         
-        .map-overlay { position: absolute; top: 25px; left: 25px; pointer-events: none; }
-        .map-title { font-family: var(--font-head); font-size: 24px; color: #fff; text-shadow: 0 0 20px var(--primary); letter-spacing: 2px; }
-        .map-desc { font-family: var(--font-mono); font-size: 11px; color: var(--primary); margin-top: 5px; letter-spacing: 2px; text-transform: uppercase; background: rgba(56,189,248,0.1); padding: 5px 10px; border-left: 2px solid var(--primary); display: inline-block; }
+        .map-overlay { position: absolute; top: 20px; left: 20px; pointer-events: none; }
+        .map-title { font-family: var(--font-head); font-size: 20px; color: #fff; text-shadow: 0 0 15px var(--primary); letter-spacing: 2px; }
+        .map-desc { font-family: var(--font-mono); font-size: 10px; color: var(--primary); margin-top: 5px; letter-spacing: 2px; text-transform: uppercase; background: rgba(56,189,248,0.1); padding: 4px 8px; border-left: 2px solid var(--primary); display: inline-block; }
 
-        .legend { position: absolute; top: 25px; right: 25px; background: rgba(0,0,0,0.8); padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); font-family: var(--font-mono); font-size: 11px; color: var(--text-main); display: flex; flex-direction: column; gap: 10px; pointer-events: none; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        .legend-item { display: flex; align-items: center; gap: 10px; }
-        .l-box { width: 15px; height: 4px; border-radius: 2px; }
+        .legend { position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.8); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); font-family: var(--font-mono); font-size: 10px; color: var(--text-main); display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+        .legend-item { display: flex; align-items: center; gap: 8px; }
+        .l-box { width: 12px; height: 4px; border-radius: 2px; }
         .l-clear { background: var(--primary); opacity: 0.5; }
         .l-heavy { background: var(--danger); box-shadow: 0 0 8px var(--danger); }
         .l-opt { background: var(--success); box-shadow: 0 0 10px var(--success); height: 4px; }
 
-        .instructions { position: absolute; bottom: 25px; left: 25px; font-family: var(--font-mono); font-size: 11px; color: #fff; background: rgba(0,0,0,0.8); padding: 12px 20px; border-radius: 6px; pointer-events: none; border-left: 3px solid var(--accent); box-shadow: 0 5px 20px rgba(0,0,0,0.5); letter-spacing: 1px; }
-
-        /* BOTTOM: ANALYTICS DASHBOARD */
-        .analytics-panel { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; min-height: 220px; }
+        /* ANALYTICS DASHBOARD */
+        .analytics-panel { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
         
-        .kpi-card { background: rgba(0,0,0,0.5); border: 1px solid var(--border-core); border-radius: 12px; padding: 25px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; backdrop-filter: blur(10px); box-shadow: inset 0 0 30px rgba(0,0,0,0.5); }
-        .kpi-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--primary); }
+        .kpi-card { background: rgba(0,0,0,0.5); border: 1px solid var(--border-core); border-radius: 8px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; backdrop-filter: blur(10px); }
+        .kpi-card::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--primary); }
         
         .kpi-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .kpi-label { font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
-        .kpi-icon { color: var(--primary); font-size: 18px; opacity: 0.8; }
+        .kpi-label { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .kpi-icon { color: var(--primary); font-size: 14px; opacity: 0.8; }
         
-        .kpi-val { font-family: var(--font-mono); font-size: 45px; font-weight: bold; color: #fff; line-height: 1; margin-top: 10px; }
-        .kpi-sub { font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); margin-top: 10px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 10px; }
+        .kpi-val { font-family: var(--font-mono); font-size: 32px; font-weight: bold; color: #fff; line-height: 1; margin-top: 5px; }
+        .kpi-sub { font-size: 10px; color: var(--text-muted); font-family: var(--font-mono); margin-top: 10px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 8px; }
 
         .kpi-card.cost-card::before { background: var(--success); }
         .kpi-card.cost-card .kpi-icon { color: var(--success); }
-        .kpi-card.cost-card .kpi-val { color: var(--success); text-shadow: 0 0 20px rgba(16, 185, 129, 0.4); }
+        .kpi-card.cost-card .kpi-val { color: var(--success); text-shadow: 0 0 15px rgba(16, 185, 129, 0.4); }
 
         .kpi-card.env-card::before { background: var(--warning); }
         .kpi-card.env-card .kpi-icon { color: var(--warning); }
-        .kpi-card.env-card .kpi-val { color: var(--warning); text-shadow: 0 0 20px rgba(245, 158, 11, 0.4); }
+        .kpi-card.env-card .kpi-val { color: var(--warning); text-shadow: 0 0 15px rgba(245, 158, 11, 0.4); }
 
-        /* Cost Breakdown Bar */
-        .cost-bar-wrap { width: 100%; height: 12px; background: rgba(255,255,255,0.05); border-radius: 6px; margin-top: 15px; display: flex; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
-        .cb-fuel { height: 100%; background: var(--warning); transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        .cb-labor { height: 100%; background: var(--primary); transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        .cb-maint { height: 100%; background: var(--danger); transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        .cb-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); font-family: var(--font-mono); margin-top: 10px; font-weight: bold; text-transform: uppercase; }
+        /* LIVE SYSTEM LOGS (TERMINAL) */
+        .logs-panel { background: #000; border: 1px solid #222; border-radius: 8px; padding: 15px; font-family: var(--font-mono); font-size: 11px; color: #a3a3a3; height: 120px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); }
+        .log-sys { color: var(--text-muted); }
+        .log-run { color: var(--primary); }
+        .log-opt { color: var(--success); }
+        .log-err { color: var(--danger); }
 
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
         @media (max-width: 1200px) {
             body { flex-direction: column; overflow-y: auto; }
-            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border-core); }
-            .analytics-panel { grid-template-columns: 1fr; }
-            .map-container { min-height: 500px; }
+            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border-core); max-height: none; }
+            .analytics-panel { grid-template-columns: 1fr 1fr; }
+            .map-container { min-height: 450px; }
             .main-stage { overflow: visible; height: auto; }
         }
     </style>
@@ -140,20 +138,19 @@
     <div class="tech-grid"></div>
 
     <!-- ==========================================================================
-         SIDEBAR
+         SIDEBAR (LOGISTICS CONTROLS)
          ========================================================================== -->
     <aside class="sidebar">
         <div class="brand"><i class="fas fa-network-wired"></i> LOGISTICS<span>.</span>AI</div>
         <div class="brand-sub">Operations Research & Routing</div>
 
         <div class="control-group">
-            <div class="cg-title"><span>Network Status</span> <i class="fas fa-server"></i></div>
+            <div class="cg-title"><span>Network Topology</span> <i class="fas fa-server"></i></div>
             <div class="stat-row"><span class="stat-label">Active Hubs</span> <span class="stat-val" id="val-nodes">0</span></div>
             <div class="stat-row"><span class="stat-label">Active Edges</span> <span class="stat-val" id="val-edges">0</span></div>
-            <div class="stat-row"><span class="stat-label">Total Fleet Size</span> <span class="stat-val">45 Trucks</span></div>
             <div class="stat-row" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
-                <span class="stat-label">Algorithm</span> 
-                <div class="algo-badge" id="val-algo"><div class="pulse"></div> AWAITING RUN</div>
+                <span class="stat-label">System Status</span> 
+                <div class="algo-badge" id="val-algo"><div class="pulse"></div> STANDBY</div>
             </div>
         </div>
 
@@ -171,13 +168,13 @@
 
         <div class="btn-group">
             <button class="btn btn-opt" id="btn-run" onclick="window.App.runOptimizer()">
-                <i class="fas fa-bolt"></i> <span>Execute Dijkstra</span>
+                <i class="fas fa-magic"></i> <span>Optimize Path</span>
             </button>
             <button class="btn btn-traffic" id="btn-traffic" onclick="window.App.toggleTraffic()">
-                <i class="fas fa-traffic-light"></i> <span>Simulate Traffic</span>
+                <i class="fas fa-traffic-light"></i> <span>Live Traffic</span>
             </button>
             <button class="btn btn-reset" onclick="window.App.resetNetwork()">
-                <i class="fas fa-random"></i> <span>Generate New Topology</span>
+                <i class="fas fa-random"></i> <span>Rebuild Network</span>
             </button>
         </div>
         
@@ -194,67 +191,69 @@
             <canvas id="network-canvas"></canvas>
             
             <div class="map-overlay">
-                <div class="map-title">JORDAN LOGISTICS TOPOLOGY</div>
-                <div class="map-desc">Real-time Node & Edge Routing Network</div>
+                <div class="map-title">JORDAN LOGISTICS MAP</div>
+                <div class="map-desc">Real-Time Dijkstra Routing Network</div>
             </div>
 
             <div class="legend">
-                <div class="legend-item"><div class="l-box l-clear"></div> Clear Route (Fast)</div>
-                <div class="legend-item"><div class="l-box l-heavy"></div> Congestion (Slow)</div>
-                <div class="legend-item"><div class="l-box l-opt"></div> Optimal AI Path</div>
-            </div>
-
-            <div class="instructions">
-                <i class="fas fa-mouse-pointer"></i> DRAG WAREHOUSE HUBS TO RECALCULATE ROUTES DYNAMICALLY
+                <div class="legend-item"><div class="l-box l-clear"></div> Clear Route</div>
+                <div class="legend-item"><div class="l-box l-heavy"></div> Congestion</div>
+                <div class="legend-item"><div class="l-box l-opt"></div> Optimal Path</div>
             </div>
         </div>
 
         <!-- ANALYTICS -->
         <div class="analytics-panel">
-            
             <div class="kpi-card">
                 <div class="kpi-head"><span class="kpi-label">Route Distance</span><i class="fas fa-route kpi-icon"></i></div>
                 <div>
                     <div class="kpi-val" id="kpi-dist">0.0</div>
-                    <div class="kpi-sub">Kilometers (Optimal Shortest Path)</div>
+                    <div class="kpi-sub">Kilometers</div>
                 </div>
             </div>
             
+            <div class="kpi-card">
+                <div class="kpi-head"><span class="kpi-label">Routing Efficiency</span><i class="fas fa-chart-line kpi-icon"></i></div>
+                <div>
+                    <div class="kpi-val" id="kpi-eff" style="color:var(--primary)">0%</div>
+                    <div class="kpi-sub">Distance Saved vs Random</div>
+                </div>
+            </div>
+
             <div class="kpi-card env-card">
-                <div class="kpi-head"><span class="kpi-label">Est. CO2 Emissions</span><i class="fas fa-leaf kpi-icon"></i></div>
+                <div class="kpi-head"><span class="kpi-label">Est. CO2 Output</span><i class="fas fa-leaf kpi-icon"></i></div>
                 <div>
                     <div class="kpi-val" id="kpi-co2">0.0</div>
-                    <div class="kpi-sub">Kilograms (Based on Diesel Burn Rate)</div>
+                    <div class="kpi-sub">Kilograms of CO2</div>
                 </div>
             </div>
 
             <div class="kpi-card cost-card">
-                <div class="kpi-head"><span class="kpi-label">Total Transport Cost</span><i class="fas fa-dollar-sign kpi-icon"></i></div>
+                <div class="kpi-head"><span class="kpi-label">Total Trip Cost</span><i class="fas fa-dollar-sign kpi-icon"></i></div>
                 <div>
                     <div class="kpi-val" id="kpi-cost">$0.00</div>
-                    <div class="cost-bar-wrap">
-                        <div class="cb-fuel" id="bar-fuel" style="width: 0%;"></div>
-                        <div class="cb-labor" id="bar-labor" style="width: 0%;"></div>
-                        <div class="cb-maint" id="bar-maint" style="width: 0%;"></div>
-                    </div>
-                    <div class="cb-labels">
-                        <span style="color:var(--warning)">Fuel</span>
-                        <span style="color:var(--primary)">Labor</span>
-                        <span style="color:var(--danger)">Maint.</span>
+                    <div class="kpi-sub" style="display:flex; justify-content:space-between; margin-top:15px; border:none; padding:0;">
+                        <span style="color:var(--warning)">Fuel: <span id="cb-fuel">0%</span></span>
+                        <span style="color:var(--primary)">Labor: <span id="cb-labor">0%</span></span>
+                        <span style="color:var(--danger)">Maint: <span id="cb-maint">0%</span></span>
                     </div>
                 </div>
             </div>
+        </div>
 
+        <!-- SYSTEM LOGS -->
+        <div class="logs-panel" id="sys-logs">
+            <div class="log-sys">> SYSTEM KERNEL INITIALIZED. WAITING FOR TOPOLOGY...</div>
         </div>
 
     </main>
 
     <!-- ==========================================================================
-         ENGINEERING JAVASCRIPT KERNEL (BULLETPROOF)
+         ENGINEERING JAVASCRIPT KERNEL (BULLETPROOF & SELF-HEALING)
          ========================================================================== -->
     <script>
         /**
-         * 1. CORE MATH & LOGISTICS DATA
+         * 1. CORE MATH & DATA
          */
         const MathUtils = {
             lerp: (s, e, f) => s + (e - s) * f,
@@ -265,11 +264,25 @@
         const JORDAN_HUBS = [
             "Aqaba Port", "Amman HQ", "Zarqa Ind.", "Irbid Center", 
             "Mafraq Depot", "Karak Hub", "Salt Transit", "Madaba", 
-            "Ma'an", "Jerash", "Ramtha Border", "Dead Sea"
+            "Ma'an", "Jerash", "Ramtha", "Dead Sea Zone"
         ];
 
         /**
-         * 2. SUPPLY CHAIN ENGINE (DIJKSTRA & RENDERER)
+         * 2. LOGISTICS TERMINAL
+         */
+        const Terminal = {
+            el: document.getElementById('sys-logs'),
+            log: function(msg, type='sys') {
+                if(!this.el) return;
+                const time = new Date().toISOString().substring(11,19);
+                this.el.insertAdjacentHTML('beforeend', `<div class="log-${type}">[${time}] ${msg}</div>`);
+                if(this.el.children.length > 50) this.el.removeChild(this.el.firstChild);
+                this.el.scrollTop = this.el.scrollHeight;
+            }
+        };
+
+        /**
+         * 3. SUPPLY CHAIN ENGINE (DIJKSTRA & RENDERER)
          */
         class SupplyChainEngine {
             constructor() {
@@ -277,70 +290,63 @@
                 this.ctx = this.canvas.getContext('2d');
                 this.wrap = document.getElementById('map-wrap');
                 
-                // Core Data
-                this.nodes = [];
-                this.edges = [];
-                this.optimalPath = []; 
+                this.nodes = []; this.edges = []; this.optimalPath = []; 
                 this.isOptimized = false;
                 
-                // Interaction
                 this.draggedNode = null;
-                this.isTrafficActive = false;
-                this.trafficInterval = null;
+                this.isTrafficActive = false; this.trafficInterval = null;
                 
-                // Econ Parameters
-                this.fuelPrice = 1.5;
-                this.truckSpeed = 80;
-                
-                // Animation Time
+                this.fuelPrice = 1.5; this.truckSpeed = 80;
                 this.time = 0;
 
                 this.init();
             }
 
             init() {
-                this.resize();
-                window.addEventListener('resize', () => this.resize());
                 this.bindEvents();
                 this.generateNetwork();
-                this.render(); // Start loop
+                requestAnimationFrame(() => this.render());
             }
 
-            resize() {
-                if(!this.wrap || this.wrap.clientWidth === 0) return; // Prevent Crash
-                const dpr = window.devicePixelRatio || 1;
-                const w = this.wrap.clientWidth;
-                const h = this.wrap.clientHeight;
+            // SELF-HEALING RESIZE
+            checkSize() {
+                if(!this.wrap) return;
+                const targetW = this.wrap.clientWidth;
+                const targetH = this.wrap.clientHeight;
                 
-                this.canvas.width = w * dpr;
-                this.canvas.height = h * dpr;
-                this.ctx.scale(dpr, dpr);
-                this.width = w;
-                this.height = h;
+                if(targetW === 0 || targetH === 0) return; // Wait for CSS to load
 
-                // Keep nodes in bounds if resized
-                this.nodes.forEach(n => {
-                    n.x = MathUtils.clamp(n.x, 40, this.width - 40);
-                    n.y = MathUtils.clamp(n.y, 40, this.height - 40);
-                });
+                const dpr = window.devicePixelRatio || 1;
+                const expectedW = targetW * dpr;
+
+                if(this.canvas.width !== expectedW) {
+                    this.canvas.width = targetW * dpr;
+                    this.canvas.height = targetH * dpr;
+                    this.ctx.scale(dpr, dpr);
+                    this.width = targetW;
+                    this.height = targetH;
+                    
+                    // Re-clamp nodes if resized
+                    if(this.nodes.length > 0) {
+                        this.nodes.forEach(n => {
+                            n.x = MathUtils.clamp(n.x, 30, this.width - 30);
+                            n.y = MathUtils.clamp(n.y, 30, this.height - 30);
+                        });
+                    } else {
+                        this.generateNetwork(); // Generate if missed
+                    }
+                    Terminal.log(`Canvas resized to ${this.width}x${this.height}`, 'sys');
+                }
             }
 
             bindEvents() {
-                const getPos = (e) => {
-                    const rect = this.canvas.getBoundingClientRect();
-                    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
-                };
-                const getTouchPos = (e) => {
-                    const rect = this.canvas.getBoundingClientRect();
-                    return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
-                };
+                const getPos = (e) => { const r = this.canvas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+                const getTouchPos = (e) => { const r = this.canvas.getBoundingClientRect(); return { x: e.touches[0].clientX - r.left, y: e.touches[0].clientY - r.top }; };
 
-                // Mouse
                 this.canvas.addEventListener('mousedown', (e) => this.startDrag(getPos(e)));
                 this.canvas.addEventListener('mousemove', (e) => this.doDrag(getPos(e)));
                 window.addEventListener('mouseup', () => this.endDrag());
 
-                // Touch (iPad)
                 this.canvas.addEventListener('touchstart', (e) => { e.preventDefault(); this.startDrag(getTouchPos(e)); }, { passive: false });
                 this.canvas.addEventListener('touchmove', (e) => { e.preventDefault(); this.doDrag(getTouchPos(e)); }, { passive: false });
                 window.addEventListener('touchend', () => this.endDrag());
@@ -348,45 +354,42 @@
 
             startDrag(pos) {
                 this.draggedNode = this.nodes.find(n => MathUtils.distance(n, pos) < 25);
-                if(this.draggedNode) this.canvas.style.cursor = 'grabbing';
+                if(this.draggedNode) {
+                    this.canvas.style.cursor = 'grabbing';
+                    Terminal.log(`Dragging Node: ${this.draggedNode.label}`);
+                }
             }
 
             doDrag(pos) {
-                if(this.draggedNode) {
+                if(this.draggedNode && this.width) {
                     this.draggedNode.x = MathUtils.clamp(pos.x, 40, this.width - 40);
                     this.draggedNode.y = MathUtils.clamp(pos.y, 40, this.height - 40);
-                    if(this.isOptimized) this.runOptimizer(); // Live recalculation!
+                    if(this.isOptimized) this.runOptimizer(true); // Silent run
                 }
             }
 
             endDrag() {
+                if(this.draggedNode && this.isOptimized) Terminal.log(`Route recalculated after relocating ${this.draggedNode.label}`, 'opt');
                 this.draggedNode = null;
                 this.canvas.style.cursor = 'crosshair';
             }
 
-            // --- NETWORK BUILDER ---
             generateNetwork() {
+                // Ensure dimensions exist
+                const w = this.width || this.wrap.clientWidth || 800;
+                const h = this.height || this.wrap.clientHeight || 500;
+                if(w === 0) return; // Abort and let self-healing catch it
+
                 this.nodes = []; this.edges = []; this.optimalPath = []; this.isOptimized = false;
                 
-                // Ensure dimensions exist before generating
-                const w = this.width || 800; const h = this.height || 500;
-                const numNodes = 8 + Math.floor(Math.random() * 4); // 8-11 nodes
-                const pad = 60;
-                
-                // Shuffle names
+                const numNodes = 8 + Math.floor(Math.random() * 4);
+                const pad = 50;
                 const names = [...JORDAN_HUBS].sort(() => 0.5 - Math.random());
 
-                // Create Nodes
                 for(let i=0; i<numNodes; i++) {
-                    this.nodes.push({
-                        id: i,
-                        x: pad + Math.random() * (w - pad*2),
-                        y: pad + Math.random() * (h - pad*2),
-                        label: names[i]
-                    });
+                    this.nodes.push({ id: i, x: pad + Math.random()*(w - pad*2), y: pad + Math.random()*(h - pad*2), label: names[i] });
                 }
 
-                // Create Edges (Distance based)
                 for(let i=0; i<this.nodes.length; i++) {
                     for(let j=i+1; j<this.nodes.length; j++) {
                         if(MathUtils.distance(this.nodes[i], this.nodes[j]) < (w * 0.45)) {
@@ -395,115 +398,108 @@
                     }
                 }
 
-                // Guarantee start/end connections
                 this.edges.push({ source: 0, target: 1, traffic: 1.0 });
                 this.edges.push({ source: numNodes-2, target: numNodes-1, traffic: 1.0 });
 
-                // UI Update
                 document.getElementById('val-nodes').innerText = this.nodes.length;
                 document.getElementById('val-edges').innerText = this.edges.length;
+                
                 const badge = document.getElementById('val-algo');
-                badge.className = 'algo-badge';
-                badge.innerHTML = '<div class="pulse" style="background:var(--warning)"></div> AWAITING RUN';
+                badge.className = 'algo-badge'; badge.innerHTML = '<div class="pulse"></div> STANDBY';
                 document.getElementById('btn-run').classList.remove('active');
                 
                 this.updateEconomics();
+                Terminal.log(`Generated new topology with ${this.nodes.length} hubs and ${this.edges.length} edges.`, 'run');
             }
 
-            // --- DIJKSTRA ALGORITHM (Map/Set based for speed) ---
-            runOptimizer() {
+            runOptimizer(isSilent = false) {
                 if(this.nodes.length === 0) return;
                 
-                const startNode = 0; const destNode = this.nodes.length - 1;
+                if(!isSilent) Terminal.log("Executing Dijkstra's Algorithm...", "run");
                 
-                // 1. Build Graph Map
+                const start = 0; const dest = this.nodes.length - 1;
                 const graph = new Map();
                 this.nodes.forEach(n => graph.set(n.id, []));
                 
+                let maxPossibleDist = 0; // For efficiency calculation
+
                 this.edges.forEach(e => {
                     const dist = MathUtils.distance(this.nodes[e.source], this.nodes[e.target]);
-                    const cost = dist * e.traffic; // Traffic affects cost
+                    maxPossibleDist += dist; // Just a rough metric
+                    const cost = dist * e.traffic;
                     graph.get(e.source).push({ node: e.target, cost: cost });
                     graph.get(e.target).push({ node: e.source, cost: cost });
                 });
 
-                // 2. Initialize
                 const distances = new Map(); const previous = new Map(); const unvisited = new Set();
                 this.nodes.forEach(n => { distances.set(n.id, Infinity); unvisited.add(n.id); });
-                distances.set(startNode, 0);
+                distances.set(start, 0);
 
-                // 3. Main Loop
+                // Dijkstra Loop
                 while(unvisited.size > 0) {
                     let curr = null; let minDst = Infinity;
-                    for(let id of unvisited) {
-                        if(distances.get(id) < minDst) { minDst = distances.get(id); curr = id; }
-                    }
-                    if(curr === null || curr === destNode) break;
+                    for(let id of unvisited) { if(distances.get(id) < minDst) { minDst = distances.get(id); curr = id; } }
+                    if(curr === null || curr === dest) break;
                     unvisited.delete(curr);
 
                     const neighbors = graph.get(curr);
                     for(let i=0; i<neighbors.length; i++) {
-                        const neighborId = neighbors[i].node;
-                        if(unvisited.has(neighborId)) {
+                        const nid = neighbors[i].node;
+                        if(unvisited.has(nid)) {
                             const alt = distances.get(curr) + neighbors[i].cost;
-                            if(alt < distances.get(neighborId)) {
-                                distances.set(neighborId, alt);
-                                previous.set(neighborId, curr);
-                            }
+                            if(alt < distances.get(nid)) { distances.set(nid, alt); previous.set(nid, curr); }
                         }
                     }
                 }
 
-                // 4. Trace Path
-                this.optimalPath = [];
-                let step = destNode;
-                if(previous.has(step) || step === startNode) {
-                    while(step !== undefined) {
-                        this.optimalPath.unshift(step);
-                        step = previous.get(step);
-                    }
+                // Trace Path
+                this.optimalPath = []; let step = dest;
+                if(previous.has(step) || step === start) {
+                    while(step !== undefined) { this.optimalPath.unshift(step); step = previous.get(step); }
                 }
 
-                // 5. Update UI
                 const badge = document.getElementById('val-algo');
-                if(this.optimalPath.length > 1 && this.optimalPath[0] === startNode) {
+                if(this.optimalPath.length > 1 && this.optimalPath[0] === start) {
                     this.isOptimized = true;
-                    badge.className = 'algo-badge optimized';
-                    badge.innerHTML = '<div class="pulse"></div> OPTIMIZED';
+                    badge.className = 'algo-badge optimized'; badge.innerHTML = '<div class="pulse"></div> OPTIMIZED';
                     document.getElementById('btn-run').classList.add('active');
+                    if(!isSilent) Terminal.log(`Path found: ${this.optimalPath.map(id => this.nodes[id].label).join(' -> ')}`, 'opt');
                 } else {
-                    this.optimalPath = [];
-                    badge.className = 'algo-badge';
-                    badge.innerHTML = 'NO ROUTE';
-                    badge.style.color = 'var(--danger)'; badge.style.borderColor = 'var(--danger)';
+                    this.optimalPath = []; this.isOptimized = false;
+                    badge.className = 'algo-badge'; badge.innerHTML = 'NO ROUTE'; badge.style.color = 'var(--danger)'; badge.style.borderColor = 'var(--danger)';
+                    if(!isSilent) Terminal.log("Error: Destination unreachable from source.", "err");
                 }
 
-                this.updateEconomics();
+                this.updateEconomics(maxPossibleDist);
             }
 
-            // --- TRAFFIC SIMULATOR ---
             toggleTraffic() {
                 const btn = document.getElementById('btn-traffic');
                 this.isTrafficActive = !this.isTrafficActive;
                 
                 if(this.isTrafficActive) {
                     btn.classList.add('active');
+                    Terminal.log("Simulating dynamic traffic congestion across network.", "err");
                     this.trafficInterval = setInterval(() => {
+                        let congested = 0;
                         this.edges.forEach(e => {
-                            if(Math.random() > 0.8) e.traffic = 2.0 + Math.random() * 2.0; // Heavy traffic
-                            else e.traffic = 1.0; // Clear
+                            if(Math.random() > 0.8) { e.traffic = 2.0 + Math.random()*2; congested++; }
+                            else e.traffic = 1.0;
                         });
-                        if(this.isOptimized) this.runOptimizer(); // Reroute
-                    }, 2500);
+                        if(congested > 0 && this.isOptimized) {
+                            Terminal.log(`${congested} routes congested. Recalculating path...`, "err");
+                            this.runOptimizer(true);
+                        }
+                    }, 3000);
                 } else {
                     btn.classList.remove('active');
                     clearInterval(this.trafficInterval);
                     this.edges.forEach(e => e.traffic = 1.0);
-                    if(this.isOptimized) this.runOptimizer();
+                    Terminal.log("Traffic cleared. Conditions optimal.", "opt");
+                    if(this.isOptimized) this.runOptimizer(true);
                 }
             }
 
-            // --- ENGINEERING ECONOMICS ---
             updateParams() {
                 this.fuelPrice = parseFloat(document.getElementById('sim-fuel').value);
                 this.truckSpeed = parseFloat(document.getElementById('sim-speed').value);
@@ -512,51 +508,55 @@
                 if(this.isOptimized) this.updateEconomics();
             }
 
-            updateEconomics() {
+            updateEconomics(maxDistRef = 10000) {
                 if(!this.isOptimized || this.optimalPath.length < 2) {
                     document.getElementById('kpi-dist').innerText = "0.0";
-                    document.getElementById('kpi-time').innerText = "0.0";
+                    document.getElementById('kpi-time').innerText = "0.0"; // Removed time, using eff
+                    document.getElementById('kpi-eff').innerText = "0%";
                     document.getElementById('kpi-cost').innerText = "$0.00";
                     document.getElementById('kpi-co2').innerText = "0.0";
-                    document.getElementById('bar-fuel').style.width = '0%';
-                    document.getElementById('bar-labor').style.width = '0%';
-                    document.getElementById('bar-maint').style.width = '0%';
+                    document.getElementById('cb-fuel').innerText = "0%";
+                    document.getElementById('cb-labor').innerText = "0%";
+                    document.getElementById('cb-maint').innerText = "0%";
                     return;
                 }
 
-                // Calculate total physical distance
                 let pxDist = 0;
                 for(let i=0; i<this.optimalPath.length-1; i++) {
                     pxDist += MathUtils.distance(this.nodes[this.optimalPath[i]], this.nodes[this.optimalPath[i+1]]);
                 }
 
-                const realDistKm = pxDist * 1.5; // Scale factor
+                const realDistKm = pxDist * 1.5;
                 const timeHrs = realDistKm / this.truckSpeed;
-                
-                // Costs
-                const fuelLiters = (realDistKm / 100) * 35; // 35L/100km truck
+                const fuelLiters = (realDistKm / 100) * 35;
                 const fuelCost = fuelLiters * this.fuelPrice;
-                const co2 = fuelLiters * 2.68; // kg CO2
-                const laborCost = timeHrs * 25; // $25/hr
-                const maintCost = realDistKm * 0.15; // $0.15/km wear
-
+                const co2 = fuelLiters * 2.68;
+                const laborCost = timeHrs * 25;
+                const maintCost = realDistKm * 0.15;
                 const totalCost = fuelCost + laborCost + maintCost;
 
+                // Efficiency logic (dummy logic for presentation)
+                const eff = MathUtils.clamp(100 - (pxDist / (maxDistRef * 0.2) * 100), 40, 95);
+
                 document.getElementById('kpi-dist').innerText = realDistKm.toFixed(1);
+                document.getElementById('kpi-eff').innerText = eff.toFixed(1) + '%';
                 document.getElementById('kpi-co2').innerText = co2.toFixed(1);
                 document.getElementById('kpi-cost').innerText = '$' + totalCost.toFixed(2);
                 
-                document.getElementById('bar-fuel').style.width = `${(fuelCost/totalCost)*100}%`;
-                document.getElementById('bar-labor').style.width = `${(laborCost/totalCost)*100}%`;
-                document.getElementById('bar-maint').style.width = `${(maintCost/totalCost)*100}%`;
+                const pF = ((fuelCost/totalCost)*100).toFixed(0);
+                const pL = ((laborCost/totalCost)*100).toFixed(0);
+                const pM = ((maintCost/totalCost)*100).toFixed(0);
+
+                document.getElementById('cb-fuel').innerText = pF + '%';
+                document.getElementById('cb-labor').innerText = pL + '%';
+                document.getElementById('cb-maint').innerText = pM + '%';
             }
 
-            // --- CANVAS RENDER LOOP (Bulletproof) ---
             render() {
-                // ALWAYS REQUEST FRAME FIRST
                 requestAnimationFrame(() => this.render());
                 
-                if(!this.ctx || !this.width || this.width === 0) return; // Prevent crash if invisible
+                this.checkSize(); // Self-Healing!
+                if(!this.ctx || !this.width || this.width === 0) return; 
                 
                 this.time += 0.02;
                 this.ctx.clearRect(0, 0, this.width, this.height);
@@ -566,114 +566,96 @@
                     const n1 = this.nodes[e.source]; const n2 = this.nodes[e.target];
                     this.ctx.beginPath(); this.ctx.moveTo(n1.x, n1.y); this.ctx.lineTo(n2.x, n2.y);
                     
-                    if(e.traffic > 1.5) {
-                        this.ctx.strokeStyle = 'rgba(239, 68, 68, 0.5)'; // Traffic Red
-                        this.ctx.lineWidth = 3;
-                    } else {
-                        this.ctx.strokeStyle = 'rgba(56, 189, 248, 0.15)'; // Normal Blue
-                        this.ctx.lineWidth = 1;
-                    }
+                    if(e.traffic > 1.5) { this.ctx.strokeStyle = 'rgba(239, 68, 68, 0.4)'; this.ctx.lineWidth = 2; } 
+                    else { this.ctx.strokeStyle = 'rgba(56, 189, 248, 0.15)'; this.ctx.lineWidth = 1; }
                     this.ctx.stroke();
+
+                    // Animated Data Packets on normal lines
+                    if(e.traffic <= 1.5 && Math.random() > 0.98) {
+                        const f = (this.time * 2) % 1;
+                        this.ctx.beginPath(); this.ctx.arc(MathUtils.lerp(n1.x, n2.x, f), MathUtils.lerp(n1.y, n2.y, f), 2, 0, Math.PI*2);
+                        this.ctx.fillStyle = 'rgba(56, 189, 248, 0.5)'; this.ctx.fill();
+                    }
                 });
 
-                // 2. Draw Optimal Path (Thick Green Glow)
+                // 2. Draw Optimal Path
                 if(this.isOptimized && this.optimalPath.length > 1) {
                     this.ctx.beginPath();
                     this.ctx.moveTo(this.nodes[this.optimalPath[0]].x, this.nodes[this.optimalPath[0]].y);
-                    for(let i=1; i<this.optimalPath.length; i++) {
-                        this.ctx.lineTo(this.nodes[this.optimalPath[i]].x, this.nodes[this.optimalPath[i]].y);
-                    }
+                    for(let i=1; i<this.optimalPath.length; i++) this.ctx.lineTo(this.nodes[this.optimalPath[i]].x, this.nodes[this.optimalPath[i]].y);
+                    
                     this.ctx.strokeStyle = '#10b981'; this.ctx.lineWidth = 4;
-                    this.ctx.shadowColor = '#10b981'; this.ctx.shadowBlur = 15;
+                    this.ctx.shadowColor = '#10b981'; this.ctx.shadowBlur = 10;
                     this.ctx.lineJoin = 'round'; this.ctx.stroke();
-                    this.ctx.shadowBlur = 0; // Reset
+                    this.ctx.shadowBlur = 0; 
                     
-                    // Moving Truck Animation
+                    // Moving Truck
                     const segs = this.optimalPath.length - 1;
-                    const pIdx = Math.floor(this.time) % segs;
-                    const pFrac = this.time % 1;
+                    const pIdx = Math.floor(this.time * 1.5) % segs;
+                    const pFrac = (this.time * 1.5) % 1;
+                    const p1 = this.nodes[this.optimalPath[pIdx]]; const p2 = this.nodes[this.optimalPath[pIdx+1]];
                     
-                    const p1 = this.nodes[this.optimalPath[pIdx]];
-                    const p2 = this.nodes[this.optimalPath[pIdx+1]];
                     if(p1 && p2) {
                         const tx = MathUtils.lerp(p1.x, p2.x, pFrac);
                         const ty = MathUtils.lerp(p1.y, p2.y, pFrac);
-                        this.ctx.fillStyle = '#fff';
-                        this.ctx.shadowColor = '#fff'; this.ctx.shadowBlur = 10;
+                        this.ctx.fillStyle = '#fff'; this.ctx.shadowColor = '#fff'; this.ctx.shadowBlur = 10;
                         this.ctx.fillRect(tx - 6, ty - 6, 12, 12);
                         this.ctx.shadowBlur = 0;
                     }
                 }
 
-                // 3. Draw Nodes (Hubs)
+                // 3. Draw Nodes
                 this.nodes.forEach((n, i) => {
-                    const isStart = i === 0;
-                    const isDest = i === this.nodes.length - 1;
-                    const isOpt = this.optimalPath.includes(n.id);
+                    const isStart = i === 0; const isDest = i === this.nodes.length - 1; const isOpt = this.optimalPath.includes(n.id);
 
-                    // Radar pulse effect for start/dest
+                    // Radar Pulse
                     if(isStart || isDest) {
-                        this.ctx.beginPath();
-                        this.ctx.arc(n.x, n.y, 15 + Math.sin(this.time * 3) * 5, 0, Math.PI*2);
-                        this.ctx.fillStyle = isStart ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)';
-                        this.ctx.fill();
+                        this.ctx.beginPath(); this.ctx.arc(n.x, n.y, 15 + Math.sin(this.time * 4) * 4, 0, Math.PI*2);
+                        this.ctx.fillStyle = isStart ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'; this.ctx.fill();
                     }
 
-                    // Node Circle
-                    this.ctx.beginPath();
-                    this.ctx.arc(n.x, n.y, 10, 0, Math.PI*2);
-                    if(isStart) this.ctx.fillStyle = '#10b981';
-                    else if(isDest) this.ctx.fillStyle = '#ef4444';
-                    else if(isOpt) this.ctx.fillStyle = '#38bdf8';
-                    else this.ctx.fillStyle = '#1e293b';
+                    // Node Core
+                    this.ctx.beginPath(); this.ctx.arc(n.x, n.y, 10, 0, Math.PI*2);
+                    if(isStart) this.ctx.fillStyle = '#10b981'; else if(isDest) this.ctx.fillStyle = '#ef4444'; else if(isOpt) this.ctx.fillStyle = '#38bdf8'; else this.ctx.fillStyle = '#1e293b';
                     this.ctx.fill();
-                    
-                    this.ctx.strokeStyle = isOpt ? '#fff' : 'rgba(56, 189, 248, 0.5)';
-                    this.ctx.lineWidth = 2; this.ctx.stroke();
+                    this.ctx.strokeStyle = isOpt ? '#fff' : 'rgba(56, 189, 248, 0.5)'; this.ctx.lineWidth = 2; this.ctx.stroke();
 
-                    // Label Box
+                    // Text Box
                     const txt = n.label;
                     this.ctx.font = isOpt ? 'bold 11px "Space Grotesk"' : '10px "Space Grotesk"';
                     const tw = this.ctx.measureText(txt).width;
-                    
                     this.ctx.fillStyle = 'rgba(2, 6, 23, 0.8)';
-                    this.ctx.fillRect(n.x - tw/2 - 4, n.y - 30, tw + 8, 16);
+                    this.ctx.fillRect(n.x - tw/2 - 4, n.y - 28, tw + 8, 14);
                     
-                    // Label Text
                     this.ctx.fillStyle = isOpt ? '#38bdf8' : '#94a3b8';
-                    this.ctx.textAlign = 'center';
-                    this.ctx.fillText(txt, n.x, n.y - 19);
+                    this.ctx.textAlign = 'center'; this.ctx.fillText(txt, n.x, n.y - 18);
                     
-                    if(isStart) { this.ctx.fillStyle = '#10b981'; this.ctx.fillText("[ START ]", n.x, n.y + 22); }
-                    if(isDest) { this.ctx.fillStyle = '#ef4444'; this.ctx.fillText("[ DESTINATION ]", n.x, n.y + 22); }
+                    if(isStart) { this.ctx.fillStyle = '#10b981'; this.ctx.fillText("[ SOURCE ]", n.x, n.y + 22); }
+                    if(isDest) { this.ctx.fillStyle = '#ef4444'; this.ctx.fillText("[ DEST ]", n.x, n.y + 22); }
                 });
             }
         }
 
         // ==========================================================================
-        // SYSTEM BOOTSTRAP (DEFENSIVE INIT)
+        // SYSTEM BOOTSTRAP (BULLETPROOF INIT)
         // ==========================================================================
-        document.addEventListener("DOMContentLoaded", () => {
-            // Global Instance for HTML onclicks
-            window.App = {
-                engine: null,
-                runOptimizer: () => { if(window.App.engine) window.App.engine.runOptimizer(); },
-                toggleTraffic: () => { if(window.App.engine) window.App.engine.toggleTraffic(); },
-                resetNetwork: () => { if(window.App.engine) window.App.engine.generateNetwork(); },
-                updateParams: () => { if(window.App.engine) window.App.engine.updateParams(); }
-            };
+        window.App = {
+            engine: null,
+            runOptimizer: () => { if(window.App.engine) window.App.engine.runOptimizer(); },
+            toggleTraffic: () => { if(window.App.engine) window.App.engine.toggleTraffic(); },
+            resetNetwork: () => { if(window.App.engine) window.App.engine.generateNetwork(); },
+            updateParams: () => { if(window.App.engine) window.App.engine.updateParams(); }
+        };
 
-            try {
-                // Ensure dimensions exist before init
-                const wrap = document.getElementById('map-wrap');
-                if(wrap.clientWidth === 0) wrap.style.minHeight = '450px';
-                
+        // Aggressive initialization to prevent iPad Cloudflare blank screen
+        const initInterval = setInterval(() => {
+            const wrap = document.getElementById('map-wrap');
+            if(wrap && wrap.clientWidth > 100) { // Wait until CSS layout is fully applied
+                clearInterval(initInterval);
                 window.App.engine = new SupplyChainEngine();
-                console.log("Operations Research Core Online.");
-            } catch (err) {
-                console.error("Initialization Error: ", err);
+                Terminal.log("Supply Chain Physics Engine Mounted Successfully.", "opt");
             }
-        });
+        }, 100);
 
     </script>
 </body>
