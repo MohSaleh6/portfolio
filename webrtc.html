@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ENG.MOHAMMAD | Engineering Sync Room</title>
+    <meta name="description" content="Remote engineering collaboration hub: a measurement blueprint canvas using Euclidean distance maths alongside a procedurally generated 3D gear assembly.">
+    <meta name="theme-color" content="#020406">
     
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=Syncopate:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -11,7 +13,6 @@
     <!-- Three.js for CAD Viewer -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
     <style>
         /* ==========================================================================
@@ -194,7 +195,7 @@
                     </div>
                     <!-- Remote User (Simulated) -->
                     <div class="user-cam">
-                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop" alt="Engineer">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop" alt="Simulated remote participant" loading="lazy" onerror="this.outerHTML='&lt;i class=&quot;fas fa-user&quot; style=&quot;font-size:24px;color:var(--text-muted);&quot;&gt;&lt;/i&gt;'">
                         <span class="user-name">Alex M.</span>
                         <i class="fas fa-microphone user-mic"></i>
                     </div>
@@ -263,9 +264,16 @@
             }
 
             bindEvents() {
-                this.canvas.addEventListener('mousedown', (e) => this.startAction(e));
-                this.canvas.addEventListener('mousemove', (e) => this.doAction(e));
-                window.addEventListener('mouseup', () => this.endAction());
+                // Pointer events cover mouse, touch and stylus with one code path.
+                this.canvas.addEventListener('pointerdown', (e) => {
+                    this.canvas.setPointerCapture(e.pointerId);
+                    this.startAction(e);
+                });
+                this.canvas.addEventListener('pointermove', (e) => this.doAction(e));
+                this.canvas.addEventListener('pointerup', () => this.endAction());
+                this.canvas.addEventListener('pointercancel', () => this.endAction());
+                // Stop the browser panning/zooming the page while drawing on touch.
+                this.canvas.style.touchAction = 'none';
             }
 
             getPos(e) {
@@ -348,12 +356,18 @@
 
                         // Draw Text
                         const midX = p.x1 + dx/2; const midY = p.y1 + dy/2;
-                        this.ctx.fillStyle = '#11141d';
-                        this.ctx.fillRect(midX - 25, midY - 15, 50, 20);
-                        this.ctx.fillStyle = '#fff';
-                        this.ctx.font = '12px "Share Tech Mono"';
+                        const label = `${distMm}mm`;
+                        this.ctx.font = '12px "Share Tech Mono", monospace';
                         this.ctx.textAlign = 'center';
-                        this.ctx.fillText(`${distMm}mm`, midX, midY);
+                        this.ctx.textBaseline = 'middle';
+                        // Plate is sized to the label so long distances are not clipped.
+                        const plateW = this.ctx.measureText(label).width + 12;
+                        this.ctx.fillStyle = '#11141d';
+                        this.ctx.fillRect(midX - plateW/2, midY - 10, plateW, 20);
+                        this.ctx.strokeStyle = '#f50057'; this.ctx.lineWidth = 1;
+                        this.ctx.strokeRect(midX - plateW/2, midY - 10, plateW, 20);
+                        this.ctx.fillStyle = '#fff';
+                        this.ctx.fillText(label, midX, midY);
                     }
                 };
 
@@ -444,8 +458,9 @@
                 const geo2 = new THREE.ExtrudeGeometry(shape2, extOpts2);
                 const gear2 = new THREE.Mesh(geo2, this.matSolid);
                 gear2.rotation.x = Math.PI/2;
-                // Offset mesh mathematically to interlock teeth. Distance = radius1 + radius2
-                gear2.position.set(11.5, 0, 0); 
+                // Centre distance = sum of the PITCH radii ((outer+inner)/2): 5.5 + 11.5 = 17.
+                // Gear 1 sits at x = -6, so gear 2 goes at x = 11 for the teeth to engage.
+                gear2.position.set(11, 0, 0); 
                 // Offset rotation so teeth mesh perfectly
                 gear2.rotation.z = (Math.PI * 2) / (24 * 4); 
                 this.group.add(gear2);
@@ -504,11 +519,20 @@
                 });
             }
 
+            /** Renders text as text: typed markup must never become live DOM. */
+            static escape(value) {
+                return String(value).replace(/[&<>"']/g, c => ({
+                    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+                })[c]);
+            }
+
             addMessage(author, text, type) {
+                const safeAuthor = WebRTCSimulator.escape(author);
+                const safeText = WebRTCSimulator.escape(text);
                 const html = `
                     <div class="msg ${type}">
-                        ${type !== 'msg-sys' ? `<div class="msg-author">${author}</div>` : ''}
-                        ${text}
+                        ${type !== 'msg-sys' ? `<div class="msg-author">${safeAuthor}</div>` : ''}
+                        ${safeText}
                     </div>`;
                 this.chatBox.insertAdjacentHTML('beforeend', html);
                 this.chatBox.scrollTop = this.chatBox.scrollHeight;
@@ -553,8 +577,20 @@
         // ==========================================================================
         window.onload = () => {
             window.Blueprint = new BlueprintCanvas();
-            window.CADEngine = new CADViewer();
             window.WebRTCSim = new WebRTCSimulator();
+
+            // The CAD viewer is the only part that needs WebGL; if it cannot start, the
+            // blueprint canvas and the collaboration panel must still work.
+            try {
+                window.CADEngine = new CADViewer();
+            } catch (err) {
+                console.warn("CAD viewer unavailable:", err);
+                document.getElementById('cad-webgl').innerHTML =
+                    '<div style="display:flex;height:100%;align-items:center;justify-content:center;text-align:center;padding:20px;color:var(--text-muted);font-family:\'Share Tech Mono\', monospace;font-size:11px;line-height:1.8;">3D CAD VIEWER UNAVAILABLE<br>(WebGL not supported)</div>';
+                document.getElementById('cad-verts').innerText = 'n/a';
+                // No-op stand-in so the toolbar buttons stay harmless.
+                window.CADEngine = { toggleWireframe(){}, toggleAnimation(){}, resize(){} };
+            }
         };
 
     </script>

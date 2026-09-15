@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WebGL Engine | Particle Simulator</title>
+    <title>ENG.MOHAMMAD | WebGL Particle Engine</title>
+    <meta name="description" content="GPU-accelerated particle simulator: 50,000 points morphing between Fibonacci sphere, DNA helix, torus and chaos distributions using Three.js BufferGeometry.">
+    <meta name="theme-color" content="#020406">
 
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=Syncopate:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -11,7 +13,7 @@
     <!-- Three.js & Plugins -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/Motion.min.js"></script>
 
     <style>
         /* =========================================
@@ -123,7 +125,7 @@
                 <div class="telemetry-row"><span class="tel-label">RENDER_FPS:</span> <span class="tel-value" id="fps-val">60.0</span></div>
                 <div class="telemetry-row"><span class="tel-label">VERTICES:</span> <span class="tel-value" id="vert-val">50,000</span></div>
                 <div class="telemetry-row"><span class="tel-label">GEOMETRY:</span> <span class="tel-value" id="geo-val">SPHERE_CORE</span></div>
-                <div class="telemetry-row"><span class="tel-label">CAMERA_Z:</span> <span class="tel-value" id="cam-val">150.00</span></div>
+                <div class="telemetry-row"><span class="tel-label">ORBIT_DIST:</span> <span class="tel-value" id="cam-val">153.00</span></div>
             </div>
 
             <div class="instructions">
@@ -192,6 +194,24 @@
          * =======================================================
          */
 
+        /**
+         * Animation is progressive enhancement. If the GSAP bundle fails to load (offline,
+         * blocked, CDN outage) this stand-in applies each tween's end state immediately, so
+         * the controls still work instead of throwing on every interaction.
+         */
+        const Motion = (typeof gsap !== 'undefined') ? gsap : {
+            to(target, vars) {
+                if (vars.endArray && target) {
+                    for (let i = 0; i < vars.endArray.length; i++) target[i] = vars.endArray[i];
+                }
+                ['x', 'y', 'z', 'v'].forEach(k => { if (typeof vars[k] === 'number' && target) target[k] = vars[k]; });
+                if (vars.onUpdate) vars.onUpdate();
+                if (vars.onComplete) vars.onComplete();
+                return { kill() {} };
+            },
+            from() { return { kill() {} }; }
+        };
+
         class ParticleEngine {
             constructor() {
                 // System Constants
@@ -200,6 +220,10 @@
                 this.currentShape = 'sphere';
                 this.rotationSpeed = 1.0;
                 this.dispersion = 1.0;
+                this.isMorphing = false;
+                this.breathCursor = 0;
+                this.morphTween = null;
+                this.themeTween = null;
                 
                 // Arrays to hold coordinate targets for morphing
                 this.shapes = {
@@ -228,7 +252,7 @@
                 this.camera.position.set(0, 30, 150);
 
                 this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
-                this.renderer.setPixelRatio(window.devicePixelRatio);
+                this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
                 this.renderer.setSize(window.innerWidth, window.innerHeight);
                 this.container.appendChild(this.renderer.domElement);
 
@@ -334,13 +358,16 @@
                 const positions = this.geometry.attributes.position.array;
                 const targets = this.shapes[targetShape];
                 
-                gsap.to(positions, {
+                if(this.morphTween) this.morphTween.kill();
+                this.isMorphing = true;
+                this.morphTween = Motion.to(positions, {
                     endArray: targets,
                     duration: 2.0,
                     ease: "power3.inOut",
                     onUpdate: () => {
                         this.geometry.attributes.position.needsUpdate = true;
-                    }
+                    },
+                    onComplete: () => { this.isMorphing = false; }
                 });
             }
 
@@ -352,20 +379,25 @@
                 const colors = this.geometry.attributes.color.array;
                 const color1 = new THREE.Color(c1Hex);
                 const color2 = new THREE.Color(c2Hex);
-                
-                // Animate Colors
-                const dummy = { v: 0 };
-                gsap.to(dummy, {
+
+                // Precompute the gradient once, and snapshot where we are starting from.
+                const from = colors.slice();
+                const to = new Float32Array(colors.length);
+                const mixed = new THREE.Color();
+                for(let i=0; i<this.particleCount; i++) {
+                    mixed.copy(color1).lerp(color2, i / this.particleCount);
+                    to[i*3] = mixed.r; to[i*3+1] = mixed.g; to[i*3+2] = mixed.b;
+                }
+
+                if(this.themeTween) this.themeTween.kill();
+                const progress = { v: 0 };
+                this.themeTween = Motion.to(progress, {
                     v: 1,
                     duration: 1.5,
+                    ease: "power2.out",
                     onUpdate: () => {
-                        for(let i=0; i<this.particleCount; i++) {
-                            const mixRatio = i / this.particleCount;
-                            const finalColor = color1.clone().lerp(color2, mixRatio);
-                            colors[i*3] = finalColor.r;
-                            colors[i*3+1] = finalColor.g;
-                            colors[i*3+2] = finalColor.b;
-                        }
+                        const v = progress.v;
+                        for(let i=0; i<colors.length; i++) colors[i] = from[i] + (to[i] - from[i]) * v;
                         this.geometry.attributes.color.needsUpdate = true;
                     }
                 });
@@ -382,18 +414,23 @@
                 document.getElementById('dispersion-val').innerText = Math.round(this.dispersion * 100) + '%';
                 
                 // Update scale of the entire particle system
-                gsap.to(this.particles.scale, {
+                Motion.to(this.particles.scale, {
                     x: this.dispersion, y: this.dispersion, z: this.dispersion,
                     duration: 1.0, ease: "back.out(1.5)"
                 });
             }
 
             resetCamera() {
-                gsap.to(this.camera.position, {
-                    x: 0, y: 30, z: 150,
-                    duration: 1.5, ease: "power2.inOut"
-                });
+                // Auto-rotate rewrites the camera position every frame, so it has to stand
+                // down until the reset tween has landed.
+                const wasAutoRotating = this.controls.autoRotate;
+                this.controls.autoRotate = false;
                 this.controls.target.set(0, 0, 0);
+                Motion.to(this.camera.position, {
+                    x: 0, y: 30, z: 150,
+                    duration: 1.5, ease: "power2.inOut",
+                    onComplete: () => { this.controls.autoRotate = wasAutoRotating; }
+                });
             }
 
             // 5. Telemetry & Core Loop
@@ -420,9 +457,9 @@
                         setTimeout(() => loader.style.display = 'none', 500);
                         
                         // Entrance Animation
-                        gsap.from('.info-panel', { x: -50, opacity: 0, duration: 1, ease: "power3.out", delay: 0.5 });
-                        gsap.from('.controls-panel', { x: 50, opacity: 0, duration: 1, ease: "power3.out", delay: 0.5 });
-                        gsap.from('.btn-return', { y: -20, opacity: 0, duration: 1, delay: 0.8 });
+                        Motion.from('.info-panel', { x: -50, opacity: 0, duration: 1, ease: "power3.out", delay: 0.5 });
+                        Motion.from('.controls-panel', { x: 50, opacity: 0, duration: 1, ease: "power3.out", delay: 0.5 });
+                        Motion.from('.btn-return', { y: -20, opacity: 0, duration: 1, delay: 0.8 });
                     }, 800);
                 }, 1500);
             }
@@ -430,15 +467,23 @@
             animate() {
                 requestAnimationFrame(() => this.animate());
 
-                // Subtle organic floating effect for vertices
-                if(this.currentShape === 'sphere' || this.currentShape === 'torus') {
+                // Subtle organic floating effect. The offset is recomputed from each
+                // particle's target coordinate every frame rather than added to its current
+                // position, so it oscillates instead of drifting away from the shape.
+                if(!this.isMorphing && (this.currentShape === 'sphere' || this.currentShape === 'torus')) {
                     const time = Date.now() * 0.001;
                     const positions = this.geometry.attributes.position.array;
-                    // Only animate a subset to save CPU, this gives a twinkling/breathing effect
-                    for(let i=0; i<1000; i++) {
-                        const idx = Math.floor(Math.random() * this.particleCount) * 3;
-                        positions[idx+1] += Math.sin(time + positions[idx]) * 0.1;
+                    const base = this.shapes[this.currentShape];
+                    // Walk a moving window of particles so the whole cloud breathes over time.
+                    const windowSize = 2000;
+                    for(let k=0; k<windowSize; k++) {
+                        const i = (this.breathCursor + k) % this.particleCount;
+                        const idx = i * 3;
+                        positions[idx]     = base[idx];
+                        positions[idx + 1] = base[idx + 1] + Math.sin(time * 1.5 + base[idx] * 0.15) * 1.2;
+                        positions[idx + 2] = base[idx + 2];
                     }
+                    this.breathCursor = (this.breathCursor + windowSize) % this.particleCount;
                     this.geometry.attributes.position.needsUpdate = true;
                 }
 
@@ -451,13 +496,29 @@
                 if (now - this.lastTime >= 1000) {
                     this.fpsEl.innerText = Math.round((this.frames * 1000) / (now - this.lastTime)).toFixed(1);
                     this.frames = 0; this.lastTime = now;
-                    if(this.camEl) this.camEl.innerText = Math.round(this.camera.position.z).toFixed(2);
+                    if(this.camEl) this.camEl.innerText = this.camera.position.distanceTo(this.controls.target).toFixed(2);
                 }
             }
         }
 
         // Boot the Engine
-        const Engine = new ParticleEngine();
+        let Engine;
+        try {
+            Engine = new ParticleEngine();
+        } catch (err) {
+            console.error("Particle engine failed to start:", err);
+            // Without this the preloader would sit at "COMPILING SHADERS" indefinitely.
+            const loader = document.getElementById('loader');
+            document.getElementById('loader-text').innerHTML =
+                'WEBGL UNAVAILABLE<br><span style="font-size:12px;color:#64748b;">This engine needs hardware-accelerated WebGL.<br>Try a desktop browser with GPU acceleration enabled.</span>';
+            const ring = loader.querySelector('.loader-ring');
+            if(ring) ring.style.display = 'none';
+            // Keep a usable exit even though the scene never rendered.
+            const exit = document.querySelector('.btn-return');
+            if(exit) { exit.style.zIndex = '999999'; }
+            // Neutralise the control panel so its buttons cannot throw.
+            Engine = new Proxy({}, { get: () => () => {} });
+        }
 
     </script>
 </body>

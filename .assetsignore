@@ -1,0 +1,11 @@
+# Files in the assets directory that must NOT be published to the web.
+# The site is served from the repository root, so anything here would otherwise
+# be uploaded alongside the pages. Syntax follows .gitignore rules.
+
+.git
+.gitignore
+.assetsignore
+wrangler.jsonc
+wrangler.toml
+node_modules
+README.md

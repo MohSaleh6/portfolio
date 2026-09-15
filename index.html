@@ -2,8 +2,13 @@
 <html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ENG.MOHAMMAD | Systems Architect</title>
+    <meta name="description" content="Portfolio of Eng. Mohammad Saleh - full-stack systems architect. Interactive engineering projects: WebGL particle physics, SCADA digital twins, OBD-II telemetry, and operations-research route optimization.">
+    <meta name="theme-color" content="#010103">
+    <meta property="og:title" content="ENG.MOHAMMAD | Systems Architect">
+    <meta property="og:description" content="Interactive engineering portfolio: WebGL physics, industrial digital twins, IoT telemetry and algorithmic route optimization.">
+    <meta property="og:type" content="website">
     
     <!-- Core Typography -->
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=Syncopate:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -165,6 +170,7 @@
         /* --- PROJECTS MATRIX --- */
         .project-matrix { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
         .matrix-card { height: 450px; border: 1px solid var(--glass-border); background: #050508; position: relative; overflow: hidden; cursor: none; }
+        .matrix-card:focus-visible, .btn-system:focus-visible, .nav-item:focus-visible, .node-link:focus-visible { outline: 2px solid var(--secondary-core); outline-offset: 4px; }
         .matrix-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; filter: grayscale(100%) opacity(0.3); transition: all 0.6s; transform: translateZ(-30px); }
         .matrix-card:hover .matrix-image { filter: grayscale(0%) opacity(0.8); transform: scale(1.05) translateZ(-10px); }
         .matrix-data { position: absolute; bottom: 0; left: 0; width: 100%; padding: 30px; background: linear-gradient(to top, rgba(1,1,2,0.98) 20%, transparent); transform: translateY(30px) translateZ(40px); transition: 0.5s; display: flex; flex-direction: column; justify-content: flex-end; }
@@ -262,7 +268,7 @@
     <!-- 03. BACKGROUNDS & HUD -->
     <div class="blueprint-grid"></div>
     <div id="webgl-core"></div>
-    <div class="cursor-assembly"><div class="cursor-core"></div><div class="cursor-reticle"></div></div>
+    <div class="cursor-assembly" aria-hidden="true"><div class="cursor-dot"></div><div class="cursor-reticle"></div></div>
 
     <div class="system-hud">
         <div class="hud-panel">MEM_ALLOC: <span class="hud-value">OPTIMAL</span></div>
@@ -293,7 +299,7 @@
             <p class="hero-desc">Architecting robust full-stack systems and engineering mathematically precise, high-performance digital interfaces using advanced WebGL physics and algorithmic logic.</p>
             
             <div class="btn-container">
-                <!-- ينزل برفق لقسم المشاريع بدلاً من التوجيه لصفحة وهمية -->
+                <!-- Scrolls smoothly to the projects section instead of a placeholder page -->
                 <a href="#projects" class="btn-system hover-trigger">
                     EXPLORE ARCHITECTURE <i class="fas fa-layer-group"></i>
                 </a>
@@ -304,7 +310,48 @@
         </section>
 
         <!-- ENGINEERING PROCESS -->
-            <!-- PROJECTS MATRIX SECTION (تم إصلاح الـ ID هنا لتعمل الكبسة) -->
+        <section class="section-module" id="process">
+            <div class="module-header">
+                <span class="module-index">01 //</span>
+                <h2 class="cipher-text" data-original="Engineering Process">Engineering Process</h2>
+            </div>
+
+            <div class="process-grid">
+                <div class="process-step tilt-chassis hover-trigger">
+                    <div class="process-icon"><i class="fas fa-drafting-compass"></i></div>
+                    <div class="process-content">
+                        <h3>01. Requirements &amp; Analysis</h3>
+                        <p>Every build starts by turning an ambiguous brief into measurable constraints: throughput targets, latency budgets, data volumes and failure modes. Nothing is written until the success criteria are numeric.</p>
+                    </div>
+                </div>
+
+                <div class="process-step tilt-chassis hover-trigger">
+                    <div class="process-icon"><i class="fas fa-project-diagram"></i></div>
+                    <div class="process-content">
+                        <h3>02. System Architecture</h3>
+                        <p>Modelling the domain before the interface — schemas, state machines and module boundaries. Choosing the algorithm that fits the complexity class of the problem rather than the one that is quickest to type.</p>
+                    </div>
+                </div>
+
+                <div class="process-step tilt-chassis hover-trigger">
+                    <div class="process-icon"><i class="fas fa-code"></i></div>
+                    <div class="process-content">
+                        <h3>03. Implementation</h3>
+                        <p>Building in vertical slices so each layer is provably working before the next is stacked on it. Rendering paths are profiled as they are written, because a frame budget is a requirement, not an afterthought.</p>
+                    </div>
+                </div>
+
+                <div class="process-step tilt-chassis hover-trigger">
+                    <div class="process-icon"><i class="fas fa-vial"></i></div>
+                    <div class="process-content">
+                        <h3>04. Verification &amp; Deployment</h3>
+                        <p>Testing the edges first: empty states, disconnected sockets, unsupported hardware. A feature is only finished when it degrades gracefully on the day the network, the GPU or the API is not there.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PROJECTS MATRIX -->
         <section class="section-module" id="projects">
             <div class="module-header">
                 <span class="module-index">02 //</span>
@@ -314,7 +361,7 @@
             <div class="project-matrix">
                 
                 <!-- 01. EduTech Platform -->
-                <div class="matrix-card tilt-chassis hover-trigger" onclick="SystemArchitect.initiateTransfer('https://tuition-platform.mohalisal1.workers.dev/')">
+                <div class="matrix-card tilt-chassis hover-trigger" role="link" tabindex="0" data-href="https://tuition-platform.mohalisal1.workers.dev/">
                     <div class="matrix-image" style="background-image: url('https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=2070&auto=format&fit=crop');"></div>
                     <div class="matrix-data">
                         <h3>EduTech Platform</h3>
@@ -325,7 +372,7 @@
                 </div>
 
                 <!-- 02. FinTech Core -->
-                <div class="matrix-card tilt-chassis hover-trigger" onclick="SystemArchitect.initiateTransfer('fintech.html')">
+                <div class="matrix-card tilt-chassis hover-trigger" role="link" tabindex="0" data-href="fintech.html">
                     <div class="matrix-image" style="background-image: url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop');"></div>
                     <div class="matrix-data">
                         <h3>FinTech Core</h3>
@@ -334,8 +381,8 @@
                     </div>
                 </div>
 
-                <!-- 03. WebGL Engine (تمت إعادته!) -->
-                <div class="matrix-card tilt-chassis hover-trigger" onclick="SystemArchitect.initiateTransfer('webgl.html')">
+                <!-- 03. WebGL Engine -->
+                <div class="matrix-card tilt-chassis hover-trigger" role="link" tabindex="0" data-href="webgl.html">
                     <div class="matrix-image" style="background-image: url('https://images.unsplash.com/photo-1618761714954-0b8cd0026356?q=80&w=2070&auto=format&fit=crop');"></div>
                     <div class="matrix-data">
                         <h3>WebGL Particle Engine</h3>
@@ -345,7 +392,7 @@
                 </div>
 
                 <!-- 04. IoT Automotive Twin -->
-                <div class="matrix-card tilt-chassis hover-trigger" onclick="SystemArchitect.initiateTransfer('iot.html')">
+                <div class="matrix-card tilt-chassis hover-trigger" role="link" tabindex="0" data-href="iot.html">
                     <div class="matrix-image" style="background-image: url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=2070&auto=format&fit=crop');"></div>
                     <div class="matrix-data">
                         <h3>IoT Automotive Twin</h3>
@@ -355,7 +402,7 @@
                 </div>
 
                 <!-- 05. Smart Factory SCADA -->
-                <div class="matrix-card tilt-chassis hover-trigger" onclick="SystemArchitect.initiateTransfer('factory.html')">
+                <div class="matrix-card tilt-chassis hover-trigger" role="link" tabindex="0" data-href="factory.html">
                     <div class="matrix-image" style="background-image: url('https://images.unsplash.com/photo-1565514020179-026b92b84bb6?q=80&w=2070&auto=format&fit=crop');"></div>
                     <div class="matrix-data">
                         <h3>Smart Factory SCADA</h3>
@@ -365,7 +412,7 @@
                 </div>
 
                 <!-- 06. AI Supply Chain -->
-                <div class="matrix-card tilt-chassis hover-trigger" onclick="SystemArchitect.initiateTransfer('supply-chain.html')">
+                <div class="matrix-card tilt-chassis hover-trigger" role="link" tabindex="0" data-href="supply-chain.html">
                     <div class="matrix-image" style="background-image: url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=2070&auto=format&fit=crop');"></div>
                     <div class="matrix-data">
                         <h3>AI Supply Chain</h3>
@@ -375,7 +422,7 @@
                 </div>
 
                 <!-- 07. WebRTC Sync Room -->
-                <div class="matrix-card tilt-chassis hover-trigger" onclick="SystemArchitect.initiateTransfer('webrtc.html')">
+                <div class="matrix-card tilt-chassis hover-trigger" role="link" tabindex="0" data-href="webrtc.html">
                     <div class="matrix-image" style="background-image: url('https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=2070&auto=format&fit=crop');"></div>
                     <div class="matrix-data">
                         <h3>WebRTC Sync Room</h3>
@@ -509,7 +556,11 @@
     <script>
         const Config = {
             isTouch: window.matchMedia("(max-width: 900px) or (pointer: coarse)").matches,
-            lerp: (s, e, f) => s + (e - s) * f
+            lerp: (s, e, f) => s + (e - s) * f,
+            // Animation is progressive enhancement: the site must work without the CDN.
+            hasGSAP: typeof gsap !== 'undefined',
+            hasScrollTrigger: typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined',
+            hasTHREE: typeof THREE !== 'undefined'
         };
 
         class BootSequence {
@@ -527,6 +578,14 @@
             }
             async init() {
                 document.body.style.overflow = 'hidden';
+                try {
+                    await this.runBootLines();
+                } finally {
+                    // Always release the scroll lock, even if a boot line failed.
+                    this.finish();
+                }
+            }
+            async runBootLines() {
                 for(let i=0; i<this.logs.length; i++) {
                     await new Promise(r => setTimeout(r, Math.random() * 250 + 100));
                     const line = document.createElement('div');
@@ -534,6 +593,8 @@
                     this.console.appendChild(line);
                     this.bar.style.width = `${((i+1)/this.logs.length)*100}%`;
                 }
+            }
+            finish() {
                 setTimeout(() => {
                     this.container.style.transform = 'translateY(-100%)';
                     setTimeout(() => {
@@ -622,6 +683,11 @@
                 });
             }
             initCounters() {
+                if(!Config.hasScrollTrigger) {
+                    // No animation library: show the final figures immediately.
+                    document.querySelectorAll('.counter').forEach(c => { c.innerText = c.getAttribute('data-target'); });
+                    return;
+                }
                 gsap.registerPlugin(ScrollTrigger);
                 document.querySelectorAll('.counter').forEach(counter => {
                     const target = parseFloat(counter.getAttribute('data-target'));
@@ -638,6 +704,7 @@
                 });
             }
             initGSAP() {
+                if(!Config.hasScrollTrigger) return; // content is already in its final state
                 gsap.from('.hero-sys-status', { y: 20, opacity: 0, duration: 1 });
                 gsap.from('.hero-title span', { y: 40, opacity: 0, duration: 1, stagger: 0.1, delay: 0.2 });
                 gsap.from('.hero-desc', { opacity: 0, duration: 1, delay: 0.4 });
@@ -707,8 +774,12 @@
                 for(let i=0; i<this.nodes.length; i++) {
                     let n = this.nodes[i];
                     n.x += n.vx; n.y += n.vy;
-                    if(n.x < 0 || n.x > this.canvas.width) n.vx *= -1;
-                    if(n.y < 0 || n.y > this.canvas.height) n.vy *= -1;
+                    // Clamp as well as reflect: a node left outside the canvas (e.g. after a
+                    // resize) would otherwise flip its velocity every frame and stick there.
+                    if(n.x < 0) { n.x = 0; n.vx = Math.abs(n.vx); }
+                    else if(n.x > this.canvas.width) { n.x = this.canvas.width; n.vx = -Math.abs(n.vx); }
+                    if(n.y < 0) { n.y = 0; n.vy = Math.abs(n.vy); }
+                    else if(n.y > this.canvas.height) { n.y = this.canvas.height; n.vy = -Math.abs(n.vy); }
                     this.ctx.beginPath(); this.ctx.arc(n.x, n.y, 2, 0, Math.PI*2); this.ctx.fillStyle = '#4A90E2'; this.ctx.fill();
                     for(let j=i+1; j<this.nodes.length; j++) {
                         let n2 = this.nodes[j];
@@ -764,13 +835,28 @@
         }
 
         const SystemArchitect = new SystemCore();
+        window.SystemArchitect = SystemArchitect;
+
+        // Project cards behave as links: clickable, focusable, and activated by Enter/Space.
+        document.querySelectorAll('.matrix-card[data-href]').forEach(card => {
+            const go = () => SystemArchitect.initiateTransfer(card.dataset.href);
+            card.addEventListener('click', go);
+            card.addEventListener('keydown', (e) => {
+                if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); }
+            });
+        });
+
         new BootSequence();
-        setTimeout(() => new NeuralMesh(), 1500);
-        try { new WebGLEngine(); } catch(e) { console.warn("WebGL unsupported."); }
+        setTimeout(() => {
+            try { new NeuralMesh(); } catch(e) { console.warn("Neural mesh canvas unavailable:", e); }
+        }, 1500);
+        if(Config.hasTHREE) {
+            try { new WebGLEngine(); } catch(e) { console.warn("WebGL unsupported:", e); }
+        }
 
 
-    // --- SAFARI BAFCACHE FIX ---
-// هذا الكود يضمن إخفاء شاشة التشفير إذا استخدم الزائر زر "الرجوع" في المتصفح
+    // --- SAFARI BFCACHE FIX ---
+// Hides the transition overlay when the visitor returns via the browser back button.
 window.addEventListener("pageshow", function (event) {
     if (event.persisted) {
         const overlay = document.getElementById('transition-protocol');

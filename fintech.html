@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FinTech Core | Advanced Market Telemetry</title>
+    <title>ENG.MOHAMMAD | FinTech Core</title>
+    <meta name="description" content="Real-time market telemetry dashboard: live exchange websocket feed, Chart.js visualisation, simulated blockchain ledger and an interactive security-posture scorer.">
+    <meta name="theme-color" content="#020406">
     
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -23,8 +25,9 @@
         .sidebar { width: 260px; background: rgba(8, 11, 16, 0.95); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 30px 20px; z-index: 100; backdrop-filter: blur(20px); }
         .brand { font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 50px; display: flex; align-items: center; gap: 10px; }
         .brand i { color: var(--primary); text-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
-        .nav-item { display: flex; align-items: center; gap: 15px; padding: 15px; color: var(--text-muted); text-decoration: none; border-radius: 10px; transition: 0.3s; margin-bottom: 5px; font-weight: 600; cursor: pointer; }
-        .nav-item:hover, .nav-item.active { background: rgba(59, 130, 246, 0.1); color: var(--primary); border-left: 3px solid var(--primary); }
+        .nav-item { display: flex; align-items: center; gap: 15px; padding: 15px; color: var(--text-muted); text-decoration: none; border-radius: 10px; transition: 0.3s; margin-bottom: 5px; font-weight: 600; cursor: pointer; border-left: 3px solid transparent; }
+        .nav-item:hover, .nav-item.active { background: rgba(59, 130, 246, 0.1); color: var(--primary); border-left-color: var(--primary); }
+        .nav-item:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
         .return-btn { margin-top: auto; padding: 15px; text-align: center; border: 1px solid var(--border-color); color: var(--text-muted); border-radius: 10px; text-decoration: none; transition: 0.3s; font-family: 'Share Tech Mono', monospace; font-size: 13px; }
         .return-btn:hover { background: rgba(239, 68, 68, 0.1); color: var(--danger); border-color: var(--danger); }
 
@@ -87,7 +90,7 @@
         /* Score Bar */
         .score-container { margin-bottom: 30px; background: rgba(0,0,0,0.5); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); }
         .score-bar-bg { width: 100%; height: 10px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-top: 10px; overflow: hidden; }
-        .score-bar-fill { height: 100%; width: 25%; background: var(--danger); transition: width 0.5s, background 0.5s; }
+        .score-bar-fill { height: 100%; width: 0%; background: var(--danger); transition: width 0.5s, background 0.5s; }
 
         /* Live Markets Grid */
         .markets-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
@@ -104,8 +107,17 @@
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
         @media (max-width: 900px) {
-            .sidebar { display: none; }
+            /* The sidebar used to be display:none here, which left phone users with no
+               navigation and no way back to the portfolio. Reflow it into a top bar. */
+            body { flex-direction: column; height: auto; overflow: auto; }
+            .sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 8px; padding: 15px; border-right: none; border-bottom: 1px solid var(--border-color); }
+            .brand { margin-bottom: 0; width: 100%; font-size: 18px; }
+            .nav-item { margin-bottom: 0; padding: 10px 12px; font-size: 13px; border-left: none; border-bottom: 3px solid transparent; border-radius: 8px; }
+            .nav-item:hover, .nav-item.active { border-left-color: transparent; border-bottom-color: var(--primary); }
+            .return-btn { margin-top: 0; margin-left: auto; padding: 10px 12px; }
+            .main-content { height: auto; overflow: visible; padding: 20px 15px; }
             .charts-container, .security-grid { grid-template-columns: 1fr; }
+            .chart-wrapper { height: 240px; }
             .top-header { flex-direction: column; align-items: flex-start; gap: 15px; }
         }
     </style>
@@ -121,11 +133,11 @@
     <!-- Sidebar -->
     <aside class="sidebar">
         <div class="brand"><i class="fas fa-layer-group"></i> FinTech Core</div>
-        <a class="nav-item active" data-target="view-dashboard"><i class="fas fa-chart-line"></i> Main Board</a>
-        <a class="nav-item" data-target="view-markets"><i class="fas fa-globe"></i> Live Markets</a>
-        <a class="nav-item" data-target="view-transactions"><i class="fas fa-cubes"></i> Blockchain Tx</a>
-        <a class="nav-item" data-target="view-security"><i class="fas fa-shield-alt"></i> Security Center</a>
-        <a class="nav-item" data-target="view-api"><i class="fas fa-terminal"></i> API Console</a>
+        <a class="nav-item active" role="button" tabindex="0" aria-current="page" data-target="view-dashboard"><i class="fas fa-chart-line"></i> Main Board</a>
+        <a class="nav-item" role="button" tabindex="0" data-target="view-markets"><i class="fas fa-globe"></i> Live Markets</a>
+        <a class="nav-item" role="button" tabindex="0" data-target="view-transactions"><i class="fas fa-cubes"></i> Blockchain Tx</a>
+        <a class="nav-item" role="button" tabindex="0" data-target="view-security"><i class="fas fa-shield-alt"></i> Security Center</a>
+        <a class="nav-item" role="button" tabindex="0" data-target="view-api"><i class="fas fa-terminal"></i> API Console</a>
         
         <a href="index.html" class="return-btn"><i class="fas fa-sign-out-alt"></i> DISCONNECT</a>
     </aside>
@@ -203,7 +215,7 @@
                 <div class="score-container">
                     <div style="display: flex; justify-content: space-between; font-weight: bold;">
                         <span>Overall Security Score</span>
-                        <span id="score-text" style="color: var(--danger);">25% (Vulnerable)</span>
+                        <span id="score-text" style="color: var(--danger);">0% (Vulnerable)</span>
                     </div>
                     <div class="score-bar-bg">
                         <div class="score-bar-fill" id="score-bar"></div>
@@ -247,9 +259,9 @@
         <section id="view-api" class="view-section">
             <div class="table-panel" style="background: #000; height: 100%;">
                 <h2 style="color: var(--matrix-green); font-family: 'Share Tech Mono'; font-size: 16px; margin-bottom: 20px;">> LIVE TERMINAL OUTPUT</h2>
-                <div id="terminal-output" style="font-family: 'Share Tech Mono', monospace; font-size: 12px; color: #a3a3a3; line-height: 1.8;">
-                    > System Boot... OK<br>
-                    > Establishing WSS connection...<br>
+                <div id="terminal-output" style="font-family: 'Share Tech Mono', monospace; font-size: 12px; color: #a3a3a3; line-height: 1.8; max-height: 60vh; overflow-y: auto;">
+                    <div>&gt; System Boot... OK</div>
+                    <div>&gt; Establishing WSS connection...</div>
                 </div>
             </div>
         </section>
@@ -260,7 +272,10 @@
         class FinTechArchitecture {
             constructor() {
                 this.initSPA();
-                this.initCharts();
+                // Charts are a CDN dependency; a failure there must not take the rest of
+                // the dashboard (and the preloader) down with it.
+                try { this.initCharts(); } catch(err) { this.handleChartFailure(err); }
+                this.initSimulatorLoop();
                 this.initWebSockets();
                 this.initLiveMarketsAPI();
                 this.initSecurityLogic();
@@ -273,50 +288,148 @@
                 const navItems = document.querySelectorAll('.nav-item');
                 const views = document.querySelectorAll('.view-section');
 
+                const activate = (item) => {
+                    const target = item.getAttribute('data-target');
+                    navItems.forEach(n => { n.classList.remove('active'); n.removeAttribute('aria-current'); });
+                    item.classList.add('active');
+                    item.setAttribute('aria-current', 'page');
+                    views.forEach(v => {
+                        v.classList.remove('active');
+                        if(v.id === target) v.classList.add('active');
+                    });
+
+                    // Fetch markets fresh when tab is selected
+                    if(target === 'view-markets') this.initLiveMarketsAPI();
+                    // Chart.js cannot measure a hidden canvas, so re-fit once it is shown.
+                    if(target === 'view-dashboard' && this.chart) this.chart.resize();
+                };
+
                 navItems.forEach(item => {
-                    item.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        const target = item.getAttribute('data-target');
-                        navItems.forEach(n => n.classList.remove('active'));
-                        item.classList.add('active');
-                        views.forEach(v => {
-                            v.classList.remove('active');
-                            if(v.id === target) v.classList.add('active');
-                        });
-                        
-                        // Fetch markets fresh when tab is clicked
-                        if(target === 'view-markets') this.initLiveMarketsAPI();
+                    item.addEventListener('click', (e) => { e.preventDefault(); activate(item); });
+                    // These tabs are anchors without an href, so Enter/Space need wiring up.
+                    item.addEventListener('keydown', (e) => {
+                        if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(item); }
                     });
                 });
             }
 
             // 2. Real-Time WebSockets (Binance API for Dashboard)
             initWebSockets() {
-                const ws = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@trade/ethusdt@trade');
-                const btcEl = document.getElementById('dash-btc');
-                const ethEl = document.getElementById('dash-eth');
-                const terminal = document.getElementById('terminal-output');
-                let pb = 0, pe = 0;
+                this.prevPrice = { BTCUSDT: 0, ETHUSDT: 0 };
+                this.wsRetries = 0;
+                this.connectSocket();
+            }
+
+            connectSocket() {
+                const statusEl = document.querySelector('.sys-status');
+
+                let ws;
+                try {
+                    // Documented combined-stream endpoint. Payloads arrive wrapped as
+                    // { stream, data }, which the handler below unwraps.
+                    ws = new WebSocket('wss://stream.binance.com:9443/stream?streams=btcusdt@trade/ethusdt@trade');
+                } catch (err) {
+                    this.startFallbackFeed('socket blocked');
+                    return;
+                }
+                this.ws = ws;
+
+                // If nothing arrives the tiles used to sit on "SYNCING..." forever.
+                const openTimeout = setTimeout(() => {
+                    if(ws.readyState !== WebSocket.OPEN) { try { ws.close(); } catch(e) {} }
+                }, 5000);
+
+                ws.onopen = () => {
+                    clearTimeout(openTimeout);
+                    this.wsRetries = 0;
+                    this.stopFallbackFeed();
+                    if(statusEl) {
+                        statusEl.innerHTML = '<span class="socket-indicator"></span> SOCKET ACTIVE';
+                        statusEl.style.color = ''; statusEl.style.borderColor = ''; statusEl.style.background = ''; statusEl.style.opacity = '1';
+                    }
+                    this.logTerminal('[WSS] Stream connected: btcusdt@trade, ethusdt@trade');
+                };
 
                 ws.onmessage = (event) => {
-                    const data = JSON.parse(event.data);
+                    let payload;
+                    try { payload = JSON.parse(event.data); } catch(e) { return; }
+
+                    // Combined streams wrap the trade in `data`; raw streams do not.
+                    const data = payload.data || payload;
                     const price = parseFloat(data.p);
                     const sym = data.s;
-                    const format = (v) => '$' + v.toLocaleString('en-US', {minimumFractionDigits: 2});
+                    if(!sym || !Number.isFinite(price)) return;
 
-                    if(sym === 'BTCUSDT') {
-                        btcEl.innerText = format(price);
-                        this.flash(btcEl, price, pb); pb = price;
-                        this.logTerminal(`[WSS] BTC Traded @ ${price}`);
-                    } else if (sym === 'ETHUSDT') {
-                        ethEl.innerText = format(price);
-                        this.flash(ethEl, price, pe); pe = price;
+                    this.renderPrice(sym, price);
+                    if(sym === 'BTCUSDT') this.logTerminal(`[WSS] BTC Traded @ ${price}`);
+                };
+
+                ws.onerror = () => { this.logTerminal('[WSS] Socket error'); };
+
+                ws.onclose = () => {
+                    clearTimeout(openTimeout);
+                    if(statusEl) statusEl.innerHTML = '<span class="socket-indicator" style="background:#f59e0b;box-shadow:0 0 10px #f59e0b;"></span> SOCKET RECONNECTING';
+
+                    // Exponential backoff, capped, then fall back to the local simulator so
+                    // the dashboard still demonstrates the pipeline behind a firewall.
+                    // Start the local feed straight away so the price tiles never sit on
+                    // "SYNCING..." while the backoff runs; a successful reconnect stops it.
+                    this.startFallbackFeed('exchange stream unreachable');
+
+                    this.wsRetries++;
+                    if(this.wsRetries <= 4) {
+                        const wait = Math.min(1000 * Math.pow(2, this.wsRetries - 1), 8000);
+                        this.logTerminal(`[WSS] Disconnected. Retry ${this.wsRetries}/4 in ${wait/1000}s`);
+                        setTimeout(() => this.connectSocket(), wait);
+                    } else {
+                        this.logTerminal('[SYS] Reconnect attempts exhausted - staying on local simulation');
                     }
                 };
             }
 
+            renderPrice(sym, price) {
+                const el = sym === 'BTCUSDT' ? document.getElementById('dash-btc') : document.getElementById('dash-eth');
+                if(!el) return;
+                el.innerText = '$' + price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                this.flash(el, price, this.prevPrice[sym]);
+                this.prevPrice[sym] = price;
+            }
+
+            /** Local random-walk feed used when the exchange socket cannot be reached. */
+            startFallbackFeed(reason) {
+                if(this.fallbackTimer) return; // already simulating
+                const statusEl = document.querySelector('.sys-status');
+                if(statusEl) {
+                    statusEl.innerHTML = '<span class="socket-indicator" style="background:#f59e0b;box-shadow:0 0 10px #f59e0b;"></span> SIMULATED FEED';
+                    statusEl.style.color = '#f59e0b';
+                    statusEl.style.borderColor = 'rgba(245, 158, 11, 0.3)';
+                    statusEl.style.background = 'rgba(245, 158, 11, 0.1)';
+                }
+                this.logTerminal(`[SYS] ${reason} - switching to local simulation`);
+
+                let btc = 64000 + Math.random() * 2000;
+                let eth = 3100 + Math.random() * 200;
+
+                // Paint once immediately: waiting for the first interval would leave the
+                // tiles reading "SYNCING..." for another 1.2s after the switchover.
+                const tick = () => {
+                    this.renderPrice('BTCUSDT', btc);
+                    this.renderPrice('ETHUSDT', eth);
+                };
+                tick();
+                this.fallbackTimer = setInterval(() => {
+                    btc = Math.max(1000, btc * (1 + (Math.random() - 0.5) * 0.002));
+                    eth = Math.max(100, eth * (1 + (Math.random() - 0.5) * 0.003));
+                    tick();
+                }, 1200);
+            }
+
+            stopFallbackFeed() {
+                if(this.fallbackTimer) { clearInterval(this.fallbackTimer); this.fallbackTimer = null; }
+            }
+
             flash(el, curr, prev) {
-                if(prev === 0) return;
+                if(!prev) return;
                 el.classList.remove('price-up', 'price-down');
                 void el.offsetWidth;
                 if(curr > prev) el.classList.add('price-up');
@@ -324,25 +437,41 @@
                 setTimeout(() => el.classList.remove('price-up', 'price-down'), 400);
             }
 
+            /** Renders text as text: exchange payloads must not be parsed as markup. */
+            static escape(value) {
+                return String(value).replace(/[&<>"']/g, c => ({
+                    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+                })[c]);
+            }
+
             logTerminal(msg) {
                 const term = document.getElementById('terminal-output');
-                term.insertAdjacentHTML('beforeend', `> ${msg}<br>`);
-                if(term.children.length > 25) term.removeChild(term.firstChild);
+                // One element per line, so trimming removes a whole line rather than a
+                // stray text node and leaving its <br> behind.
+                term.insertAdjacentHTML('beforeend', `<div>&gt; ${FinTechArchitecture.escape(msg)}</div>`);
+                while(term.children.length > 25) term.removeChild(term.firstElementChild);
+                term.scrollTop = term.scrollHeight;
             }
 
             // 3. REST API - Fetch Live Markets (Portfolios Tab)
             async initLiveMarketsAPI() {
                 const container = document.getElementById('market-grid-container');
+                if(this.marketsLoading) return; // avoid duplicate in-flight requests
+                this.marketsLoading = true;
                 try {
                     // Binance 24hr ticker REST API
                     const res = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbols=["BTCUSDT","ETHUSDT","SOLUSDT","BNBUSDT","XRPUSDT","ADAUSDT","DOGEUSDT","DOTUSDT"]');
+                    if(!res.ok) throw new Error(`HTTP ${res.status}`);
                     const data = await res.json();
-                    
+                    if(!Array.isArray(data)) throw new Error('Unexpected payload shape');
+
                     container.innerHTML = ''; // clear loading
                     
                     data.forEach(coin => {
-                        const price = parseFloat(coin.lastPrice).toLocaleString('en-US', {maximumFractionDigits: 4});
+                        const lastPrice = parseFloat(coin.lastPrice);
                         const change = parseFloat(coin.priceChangePercent);
+                        if(!Number.isFinite(lastPrice) || !Number.isFinite(change)) return;
+                        const price = lastPrice.toLocaleString('en-US', {maximumFractionDigits: 4});
                         const colorClass = change >= 0 ? 'color: var(--success)' : 'color: var(--danger)';
                         const sign = change >= 0 ? '+' : '';
                         
@@ -351,13 +480,24 @@
                                 <div class="market-pair">${coin.symbol.replace('USDT', ' / USDT')}</div>
                                 <div class="market-price">$${price}</div>
                                 <div class="market-change" style="${colorClass}">${sign}${change.toFixed(2)}%</div>
-                                <div style="font-size: 10px; color: var(--text-muted); margin-top: 5px;">Vol: ${Math.round(coin.volume).toLocaleString()}</div>
+                                <div style="font-size: 10px; color: var(--text-muted); margin-top: 5px;">Vol: ${Math.round(parseFloat(coin.volume) || 0).toLocaleString()}</div>
                             </div>
                         `;
                         container.insertAdjacentHTML('beforeend', card);
                     });
                 } catch (err) {
-                    container.innerHTML = `<div style="color: var(--danger)">API Connection Failed. Please try again.</div>`;
+                    console.warn('Market data request failed:', err);
+                    container.innerHTML = `<div style="color: var(--danger); grid-column: 1 / -1;">
+                        API connection failed (${FinTechArchitecture.escape(err.message)}).
+                        <button id="market-retry" style="margin-left:12px; background:transparent; border:1px solid var(--danger); color:var(--danger); padding:6px 14px; border-radius:6px; cursor:pointer; font-family:'Share Tech Mono',monospace;">RETRY</button>
+                    </div>`;
+                    const retry = document.getElementById('market-retry');
+                    if(retry) retry.addEventListener('click', () => {
+                        container.innerHTML = 'Loading API Data...';
+                        this.initLiveMarketsAPI();
+                    });
+                } finally {
+                    this.marketsLoading = false;
                 }
             }
 
@@ -369,16 +509,16 @@
 
                 toggles.forEach(toggle => {
                     toggle.addEventListener('change', () => {
-                        let activeCount = document.querySelectorAll('.sec-toggle:checked').length;
-                        let score = (activeCount / 4) * 100;
+                        const activeCount = document.querySelectorAll('.sec-toggle:checked').length;
+                        const score = (activeCount / toggles.length) * 100;
                         
                         bar.style.width = `${score}%`;
                         
-                        if(score <= 25) { bar.style.background = 'var(--danger)'; text.style.color = 'var(--danger)'; text.innerText = `${score}% (Vulnerable)`; }
-                        else if(score <= 75) { bar.style.background = '#f59e0b'; text.style.color = '#f59e0b'; text.innerText = `${score}% (Moderate)`; }
-                        else { bar.style.background = 'var(--success)'; text.style.color = 'var(--success)'; text.innerText = `${score}% (Secured)`; }
+                        if(score <= 25) { bar.style.background = 'var(--danger)'; text.style.color = 'var(--danger)'; text.innerText = `${Math.round(score)}% (Vulnerable)`; }
+                        else if(score <= 75) { bar.style.background = '#f59e0b'; text.style.color = '#f59e0b'; text.innerText = `${Math.round(score)}% (Moderate)`; }
+                        else { bar.style.background = 'var(--success)'; text.style.color = 'var(--success)'; text.innerText = `${Math.round(score)}% (Secured)`; }
                         
-                        this.logTerminal(`[SEC] Rule updated. Score: ${score}%`);
+                        this.logTerminal(`[SEC] Rule updated. Score: ${Math.round(score)}%`);
                     });
                 });
             }
@@ -390,7 +530,7 @@
                 let blockNum = 18492000;
 
                 setInterval(() => {
-                    const hash = '0x' + Math.random().toString(16).substr(2, 12) + '...' + Math.random().toString(16).substr(2, 4);
+                    const hash = '0x' + Math.random().toString(16).slice(2, 14) + '...' + Math.random().toString(16).slice(2, 6);
                     const type = types[Math.floor(Math.random() * types.length)];
                     const val = (Math.random() * 50).toFixed(2);
                     blockNum++;
@@ -408,8 +548,29 @@
                 }, 3000);
             }
 
+            /** Falls back to a readable message when the Chart.js bundle is unavailable. */
+            handleChartFailure(err) {
+                console.warn('Charts unavailable:', err);
+                document.querySelectorAll('.chart-wrapper').forEach(w => {
+                    w.innerHTML = '<div style="display:flex;height:100%;min-height:160px;align-items:center;justify-content:center;text-align:center;color:var(--text-muted);font-family:\'Share Tech Mono\', monospace;font-size:12px;">CHART LIBRARY UNAVAILABLE<br>(offline or blocked)</div>';
+                });
+            }
+
+            /** Header telemetry + the liquidity feed; runs with or without Chart.js. */
+            initSimulatorLoop() {
+                setInterval(() => {
+                    document.getElementById('ping').innerText = Math.floor(Math.random() * (35 - 12 + 1) + 12);
+                    document.getElementById('tps-val').innerText = Math.floor(Math.random() * 1000 + 3000).toLocaleString();
+                    if(!this.chart) return;
+                    const d = this.chart.data.datasets[0].data;
+                    d.push(d[d.length - 1] + (Math.random() * 20 - 10)); d.shift();
+                    this.chart.update('none');
+                }, 2000);
+            }
+
             // 6. Chart.js Setup
             initCharts() {
+                if(typeof Chart === 'undefined') throw new Error('Chart.js failed to load');
                 Chart.defaults.color = '#64748b'; Chart.defaults.font.family = "'Share Tech Mono', monospace";
                 const ctxMain = document.getElementById('mainChart').getContext('2d');
                 let grad = ctxMain.createLinearGradient(0, 0, 0, 400);
@@ -427,18 +588,10 @@
                     options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'bottom', labels: { color: '#f8fafc', font: { family: 'Space Grotesk' } } } } }
                 });
 
-                // Simulator loop
-                setInterval(() => {
-                    document.getElementById('ping').innerText = Math.floor(Math.random() * (35 - 12 + 1) + 12);
-                    document.getElementById('tps-val').innerText = Math.floor(Math.random() * 1000 + 3000).toLocaleString();
-                    const d = this.chart.data.datasets[0].data;
-                    d.push(d[d.length - 1] + (Math.random() * 20 - 10)); d.shift();
-                    this.chart.update('none');
-                }, 2000);
             }
 
             removeLoader() {
-                window.addEventListener('load', () => {
+                const run = () => {
                     setTimeout(() => {
                         const loader = document.getElementById('loader');
                         document.getElementById('loader-text').innerText = "SYSTEMS ONLINE.";
@@ -447,7 +600,11 @@
                             setTimeout(() => loader.style.display = 'none', 500);
                         }, 800);
                     }, 1000);
-                });
+                };
+                // If `load` already fired (cache / bfcache restore) the listener would
+                // never run and the preloader would cover the page forever.
+                if(document.readyState === 'complete') run();
+                else window.addEventListener('load', run, { once: true });
             }
         }
 
