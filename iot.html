@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ENG.MOHAMMAD SALEH | Automotive Enterprise Systems</title>
+    <title>ENG.MOHAMMAD | IoT Automotive Twin</title>
+    <meta name="description" content="Web Bluetooth OBD-II diagnostic tool: CAN-BUS telemetry, canvas gauges, signal oscilloscope, DTC fault scanner and a procedural 3D ECU model.">
+    <meta name="theme-color" content="#020406">
     
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=Syncopate:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -11,7 +13,6 @@
     <!-- Core Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
     <style>
         /* ==========================================================================
@@ -78,6 +79,8 @@
         .sys-controls { margin-top: auto; display: flex; flex-direction: column; gap: 10px; }
         .btn-ignite { background: rgba(255, 51, 51, 0.05); border: 1px solid var(--danger); color: var(--danger); padding: 12px; border-radius: 6px; font-family: var(--font-mono); font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; text-transform: uppercase; letter-spacing: 1px; }
         .btn-ignite i { font-size: 16px; }
+        .btn-exit { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px; border: 1px solid var(--border-core); border-radius: 6px; color: var(--text-muted); text-decoration: none; font-family: var(--font-mono); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; }
+        .btn-exit:hover { color: var(--primary); border-color: var(--primary); background: rgba(74, 144, 226, 0.08); }
         .btn-ignite:hover { background: var(--danger); color: #fff; box-shadow: 0 0 15px rgba(255, 51, 51, 0.3); }
         .btn-ignite.on { background: rgba(0, 255, 65, 0.05); border-color: var(--success); color: var(--success); }
         .btn-ignite.on:hover { background: var(--success); color: #000; box-shadow: 0 0 15px rgba(0, 255, 65, 0.4); }
@@ -240,6 +243,7 @@
                     <div class="audio-text">Engine Synth</div>
                     <i class="fas fa-volume-mute audio-icon" id="audio-icon"></i>
                 </div>
+                <a href="index.html" class="btn-exit"><i class="fas fa-arrow-left"></i> Return to Portfolio</a>
             </div>
         </aside>
 
@@ -332,7 +336,7 @@
                 </div>
                 <div class="scanner-layout">
                     <div class="dtc-board" id="dtc-board">
-                        <div class="dtc-empty"><i class="fas fa-shield-check"></i><h2>SYSTEM OPTIMAL</h2></div>
+                        <div class="dtc-empty"><i class="fas fa-check-circle"></i><h2>SYSTEM OPTIMAL</h2></div>
                     </div>
                     <div class="actions-col">
                         <button class="btn-obd btn-scan" onclick="window.App.diag.scan()"><i class="fas fa-search"></i> REQUEST CODES</button>
@@ -353,7 +357,10 @@
         /**
          * MATH & DB
          */
-        const MathUtils = { lerp: (s, e, f) => s + (e - s) * f };
+        const MathUtils = {
+            lerp: (s, e, f) => s + (e - s) * f,
+            clamp: (v, min, max) => Math.min(Math.max(v, min), max)
+        };
         const DTC_DB = {
             "P0171": { title: "System Too Lean (Bank 1)", desc: "Excessive oxygen in the exhaust. The Air-to-Fuel ratio is deviating from 14.7:1.", fix: "Check vacuum leaks. Inspect MAF sensor." },
             "P0420": { title: "Catalyst System Efficiency", desc: "Downstream O2 sensor indicates the catalytic converter is failing to filter emissions.", fix: "Verify O2 sensors via oscilloscope. Replace Catalytic Converter." },
@@ -579,13 +586,16 @@
                 this.osc.connect(f); f.connect(this.gain); this.gain.connect(this.ctx.destination);
                 this.osc.start();
             }
+            resume() {
+                if(this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+            }
             toggle() {
                 this.isMuted = !this.isMuted;
                 const i = document.getElementById('audio-icon');
                 if(this.isMuted) { i.className='fas fa-volume-mute'; i.style.color='var(--danger)'; if(this.gain) this.gain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.1); }
-                else { i.className='fas fa-volume-up'; i.style.color='var(--success)'; this.init(); if(this.isRunning) this.gain.gain.setTargetAtTime(0.3, this.ctx.currentTime, 0.1); }
+                else { i.className='fas fa-volume-up'; i.style.color='var(--success)'; this.init(); this.resume(); if(this.isRunning) this.gain.gain.setTargetAtTime(0.3, this.ctx.currentTime, 0.1); }
             }
-            play() { this.isRunning = true; this.init(); if(!this.isMuted) this.gain.gain.setTargetAtTime(0.3, this.ctx.currentTime, 0.5); }
+            play() { this.isRunning = true; this.init(); this.resume(); if(!this.isMuted) this.gain.gain.setTargetAtTime(0.3, this.ctx.currentTime, 0.5); }
             stop() { this.isRunning = false; if(this.gain) this.gain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.5); }
             update(rpm) { if(this.osc && this.gain.gain.value > 0) this.osc.frequency.setTargetAtTime(Math.max(30, (rpm/60)*2), this.ctx.currentTime, 0.1); }
         }
@@ -614,7 +624,8 @@
             }
             inject() {
                 if(!window.App.isRunning) return;
-                const c = Object.keys(DTC_DB)[Math.floor(Math.random()*3)];
+                const codes = Object.keys(DTC_DB);
+                const c = codes[Math.floor(Math.random()*codes.length)];
                 if(!this.faults.includes(c)) { this.faults.push(c); this.log(`SIM: INJECTED ${c}`, "err"); }
             }
             clear() {
@@ -659,7 +670,14 @@
                     this.gSpd = new CustomGauge('cvs-speed', 260, '#4A90E2');
                     this.oscO2 = new Oscilloscope('osc-o2', '#4A90E2', 'sine');
                     this.oscTps = new Oscilloscope('osc-tps', '#FF9F1C', 'line');
-                    this.ecu3d = new ECU3D();
+                    try {
+                        this.ecu3d = new ECU3D();
+                    } catch(err) {
+                        this.ecu3d = null;
+                        const ecuBox = document.getElementById('webgl-ecu');
+                        if(ecuBox) ecuBox.innerHTML = '<div style="display:flex;height:100%;align-items:center;justify-content:center;text-align:center;padding:20px;color:var(--text-muted);font-family:var(--font-mono);font-size:12px;">3D ECU VIEW UNAVAILABLE<br>(WebGL not supported by this browser)</div>';
+                        console.warn('ECU 3D disabled:', err);
+                    }
                     this.audio = new AudioSynth();
                     this.diag = new Diagnostics();
 
@@ -684,7 +702,7 @@
                             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
                             document.getElementById(t).classList.add('active');
                             if(t === 'v-dash') { this.gRpm.resize(); this.gSpd.resize(); }
-                            if(t === 'v-osc') { this.oscO2.resize(); this.oscTps.resize(); this.ecu3d.resize(); }
+                            if(t === 'v-osc') { this.oscO2.resize(); this.oscTps.resize(); if(this.ecu3d) this.ecu3d.resize(); }
                         });
                     });
 
@@ -717,9 +735,11 @@
                 this.audio.update(this.rpm);
                 if(this.ecu3d) this.ecu3d.update(this.rpm);
                 
-                this.oscO2.pushData(0.5 + (this.rpm/8000)*0.5);
+                const o2 = 0.5 + (this.rpm/8000)*0.5;
+                this.oscO2.pushData(o2);
                 this.oscTps.pushData(this.throttle/100);
                 document.getElementById('tps-val').innerText = Math.round(this.throttle) + '%';
+                document.getElementById('o2-val').innerText = o2.toFixed(2) + 'V';
             }
 
             updateUI() {
@@ -727,7 +747,14 @@
                 document.getElementById('val-rpm').innerText = Math.round(this.rpm);
                 document.getElementById('val-speed').innerText = Math.round(this.speed);
                 document.getElementById('val-temp').innerText = Math.round(this.temp) + ' °C';
-                document.getElementById('val-load').innerText = Math.round((this.rpm/8000)*100) + ' %';
+                const load = (this.rpm/8000)*100;
+                document.getElementById('val-load').innerText = Math.round(load) + ' %';
+                // MAF: airflow scales with engine speed and load (approx. g/s for a 2.0L engine)
+                const maf = this.isRunning ? (this.rpm/1000) * (1 + load/100) * 3.2 : 0;
+                document.getElementById('val-maf').innerText = maf.toFixed(1) + ' g/s';
+                // Battery rail: 12.1V at rest, alternator charges to ~14.2V while running
+                const volts = this.isRunning ? 13.8 + (this.rpm/8000)*0.4 : 12.1;
+                document.getElementById('val-volt').innerText = volts.toFixed(1) + ' V';
             }
         }
 

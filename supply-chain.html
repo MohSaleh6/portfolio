@@ -3,18 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ENG.MOHAMMAD | Smart Factory Digital Twin</title>
-    
+    <title>ENG.MOHAMMAD | AI Supply Chain Optimizer</title>
+    <meta name="description" content="Operations research route optimizer: Dijkstra's shortest-path algorithm applied to a logistics network, with live cost modelling and link-disruption rerouting.">
+
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=Syncopate:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
     <style>
         /* ==========================================================================
-           01. INDUSTRIAL UI VARIABLES
+           01. DESIGN TOKENS
            ========================================================================== */
         :root {
             --bg-base: #020406; --bg-panel: rgba(8, 12, 18, 0.9);
@@ -31,606 +28,972 @@
         .scada-grid { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; background-image: linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px); background-size: 40px 40px; }
 
         /* ==========================================================================
-           02. SCADA SIDEBAR CONTROLS
+           02. SIDEBAR CONTROLS
            ========================================================================== */
-        .sidebar { width: 320px; background: rgba(4, 6, 10, 0.95); border-right: 1px solid var(--border-core); display: flex; flex-direction: column; padding: 25px; box-shadow: 10px 0 40px rgba(0,0,0,0.8); z-index: 100; backdrop-filter: blur(10px); }
+        .sidebar { width: 340px; flex-shrink: 0; background: rgba(4, 6, 10, 0.95); border-right: 1px solid var(--border-core); display: flex; flex-direction: column; padding: 25px; box-shadow: 10px 0 40px rgba(0,0,0,0.8); z-index: 100; backdrop-filter: blur(10px); overflow-y: auto; }
         .brand { font-family: var(--font-head); font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 5px; display: flex; align-items: center; gap: 10px; }
         .brand span { color: var(--primary); text-shadow: 0 0 10px var(--primary); }
-        .brand-sub { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); letter-spacing: 2px; margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px; }
+        .brand-sub { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); letter-spacing: 2px; margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px; }
 
-        .control-group { margin-bottom: 25px; background: rgba(0,0,0,0.4); padding: 15px; border-radius: 8px; border: 1px solid rgba(0,255,255,0.05); }
-        .cg-title { font-family: var(--font-mono); font-size: 11px; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
-        
-        /* Sliders */
-        .slider-wrap { margin-bottom: 15px; }
-        .slider-wrap:last-child { margin-bottom: 0; }
-        .slider-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); font-family: var(--font-mono); margin-bottom: 8px; }
-        .slider-val { color: #fff; font-weight: bold; }
-        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 8px; background: var(--primary); cursor: pointer; box-shadow: 0 0 10px var(--primary); border-radius: 2px; margin-top: -6px; }
-        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; }
-        input[type=range].danger-slider::-webkit-slider-thumb { background: var(--danger); box-shadow: 0 0 10px var(--danger); }
+        .control-group { margin-bottom: 25px; }
+        .cg-title { font-family: var(--font-mono); font-size: 11px; color: var(--primary); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
 
-        /* Buttons */
-        .sys-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: auto; }
-        .btn { padding: 12px; font-family: var(--font-mono); font-size: 11px; font-weight: bold; text-transform: uppercase; border-radius: 6px; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; gap: 5px; border: 1px solid transparent; letter-spacing: 1px; }
-        .btn i { font-size: 16px; }
-        .btn-maint { background: rgba(255, 183, 0, 0.1); border-color: var(--warning); color: var(--warning); }
-        .btn-maint:hover { background: var(--warning); color: #000; box-shadow: 0 0 20px rgba(255, 183, 0, 0.4); }
-        .btn-reset { background: rgba(0, 255, 255, 0.1); border-color: var(--primary); color: var(--primary); }
-        .btn-reset:hover { background: var(--primary); color: #000; box-shadow: 0 0 20px rgba(0, 255, 255, 0.4); }
+        .field { margin-bottom: 14px; }
+        .field label { display: block; font-size: 11px; font-family: var(--font-mono); color: var(--text-muted); margin-bottom: 6px; letter-spacing: 1px; }
+        select { width: 100%; background: rgba(0,0,0,0.5); border: 1px solid var(--border-core); color: var(--text-main); padding: 10px; border-radius: 4px; font-family: var(--font-mono); font-size: 12px; cursor: pointer; }
+        select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 10px rgba(0,255,255,0.2); }
 
-        .btn-estop { grid-column: span 2; background: rgba(255, 0, 60, 0.1); border-color: var(--danger); color: var(--danger); padding: 20px; font-size: 14px; margin-top: 10px; }
-        .btn-estop:hover, .btn-estop.active { background: var(--danger); color: #fff; box-shadow: 0 0 30px rgba(255, 0, 60, 0.6); animation: pulse-red 1s infinite; }
+        .slider-labels { display: flex; justify-content: space-between; font-size: 11px; font-family: var(--font-mono); color: var(--text-muted); margin-bottom: 8px; letter-spacing: 1px; }
+        .slider-val { color: var(--warning); font-weight: bold; }
+        input[type=range] { width: 100%; -webkit-appearance: none; appearance: none; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; outline: none; cursor: pointer; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--primary); box-shadow: 0 0 10px var(--primary); cursor: pointer; }
+        input[type=range]::-moz-range-thumb { width: 14px; height: 14px; border: none; border-radius: 50%; background: var(--primary); box-shadow: 0 0 10px var(--primary); cursor: pointer; }
+        .slider-wrap { margin-bottom: 16px; }
 
-        .btn-exit { margin-top: 20px; color: var(--text-muted); text-decoration: none; font-size: 11px; text-align: center; border: 1px solid #222; padding: 10px; border-radius: 6px; transition: 0.3s; font-family: var(--font-mono); }
-        .btn-exit:hover { background: var(--primary); color: #000; border-color: var(--primary); }
+        .btn { width: 100%; padding: 12px; border-radius: 4px; font-family: var(--font-mono); font-size: 12px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; border: 1px solid; background: transparent; margin-bottom: 10px; }
+        .btn-run { border-color: var(--success); color: var(--success); background: rgba(0,255,65,0.06); }
+        .btn-run:hover:not(:disabled) { background: var(--success); color: #000; box-shadow: 0 0 20px rgba(0,255,65,0.4); }
+        .btn-alt { border-color: var(--border-core); color: var(--text-muted); }
+        .btn-alt:hover:not(:disabled) { color: var(--primary); border-color: var(--primary); background: rgba(0,255,255,0.06); }
+        .btn-danger { border-color: var(--danger); color: var(--danger); }
+        .btn-danger:hover:not(:disabled) { background: var(--danger); color: #fff; }
+        .btn-danger.active { background: var(--danger); color: #fff; box-shadow: 0 0 20px rgba(255,0,60,0.5); }
+        .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+        .btn-exit { margin-top: auto; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px; border: 1px solid var(--border-core); border-radius: 4px; color: var(--text-muted); text-decoration: none; font-family: var(--font-mono); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; }
+        .btn-exit:hover { color: var(--primary); border-color: var(--primary); background: rgba(0,255,255,0.06); }
+
+        .legend { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); line-height: 2; letter-spacing: 1px; }
+        .legend i { width: 14px; text-align: center; margin-right: 8px; }
 
         /* ==========================================================================
-           03. MAIN DASHBOARD (OEE & 3D)
+           03. MAIN STAGE
            ========================================================================== */
-        .main-stage { flex: 1; display: flex; flex-direction: column; padding: 20px; gap: 20px; position: relative; }
-        
-        /* TOP: 3D DIGITAL TWIN */
-        .twin-container { flex: 2; border-radius: 12px; border: 1px solid var(--border-core); position: relative; overflow: hidden; background: radial-gradient(circle at center, #060b14, #010203); box-shadow: inset 0 0 50px #000; }
-        #webgl-factory { width: 100%; height: 100%; position: absolute; top: 0; left: 0; outline: none; }
-        
-        .hud-overlay { position: absolute; top: 20px; left: 20px; pointer-events: none; }
-        .hud-title { font-family: var(--font-head); font-size: 20px; color: #fff; text-shadow: 0 0 10px var(--primary); }
-        .hud-desc { font-family: var(--font-mono); font-size: 11px; color: var(--success); margin-top: 5px; }
-        .hud-desc.error { color: var(--danger); animation: blink 1s infinite; }
+        .main-stage { flex: 1; display: flex; flex-direction: column; padding: 20px; gap: 20px; min-width: 0; overflow-y: auto; }
 
-        .cam-controls { position: absolute; bottom: 20px; right: 20px; display: flex; gap: 10px; z-index: 10; }
-        .btn-cam { background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 12px; font-family: var(--font-mono); font-size: 10px; cursor: pointer; border-radius: 4px; transition: 0.3s; }
-        .btn-cam:hover, .btn-cam.active { background: var(--primary); border-color: var(--primary); color: #000; }
+        .network-container { flex: 1; min-height: 340px; position: relative; border: 1px solid var(--border-core); border-radius: 6px; background: rgba(2, 6, 12, 0.6); overflow: hidden; }
+        #network-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 
-        /* BOTTOM: OEE CALCULATIONS (Industrial Engineering) */
-        .oee-panel { flex: 1; background: var(--bg-panel); border: 1px solid var(--border-core); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; backdrop-filter: blur(10px); }
-        .oee-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px; margin-bottom: 15px; }
-        .oee-title { font-family: var(--font-mono); font-size: 14px; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; }
-        .oee-formula { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 4px; }
+        .hud-overlay { position: absolute; top: 15px; left: 20px; pointer-events: none; }
+        .hud-title { font-family: var(--font-head); font-size: 13px; letter-spacing: 2px; color: #fff; }
+        .hud-desc { font-family: var(--font-mono); font-size: 11px; color: var(--success); margin-top: 5px; letter-spacing: 1px; }
+        .hud-desc.busy { color: var(--warning); }
+        .hud-desc.error { color: var(--danger); }
 
-        .oee-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; height: 100%; }
-        
-        .kpi-card { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
-        .kpi-card::before { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 3px; background: var(--primary); }
-        .kpi-label { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
-        .kpi-val { font-family: var(--font-mono); font-size: 32px; font-weight: bold; color: #fff; margin-top: 5px; }
-        .kpi-sub { font-size: 9px; color: var(--text-muted); font-family: var(--font-main); margin-top: 5px; }
-        
-        .kpi-card.total-oee { background: rgba(0, 255, 255, 0.05); border-color: var(--primary); }
-        .kpi-card.total-oee::before { width: 100%; height: 3px; background: var(--primary); }
-        .kpi-card.total-oee .kpi-val { color: var(--primary); text-shadow: 0 0 15px var(--primary); font-size: 40px; }
+        .queue-panel { position: absolute; top: 15px; right: 20px; width: 210px; background: rgba(2, 6, 12, 0.85); border: 1px solid var(--border-core); border-radius: 4px; padding: 12px; font-family: var(--font-mono); font-size: 10px; backdrop-filter: blur(6px); }
+        .queue-head { color: var(--primary); letter-spacing: 1px; margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px; }
+        .queue-row { display: flex; justify-content: space-between; padding: 3px 0; color: var(--text-muted); }
+        .queue-row.settled { color: var(--success); }
+        .queue-row span:last-child { color: var(--warning); }
 
-        .chart-container { position: relative; height: 40px; width: 100%; margin-top: 10px; }
-        .kpi-canvas { width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
+        /* KPI DASHBOARD */
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; }
+        .kpi-card { background: var(--bg-panel); border: 1px solid var(--border-core); border-left: 3px solid var(--primary); border-radius: 4px; padding: 15px; }
+        .kpi-label { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; }
+        .kpi-val { font-family: var(--font-head); font-size: 22px; color: #fff; margin: 8px 0 4px; }
+        .kpi-sub { font-family: var(--font-mono); font-size: 9px; color: var(--text-muted); }
 
-        /* Global Overlays */
-        #alarm-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(255,0,0,0.15); z-index: 999; pointer-events: none; opacity: 0; transition: 0.3s; }
-        #alarm-overlay.active { opacity: 1; animation: flash-alarm 1s infinite; }
+        /* ROUTE MANIFEST */
+        .manifest { background: var(--bg-panel); border: 1px solid var(--border-core); border-radius: 6px; padding: 18px; max-height: 230px; overflow-y: auto; }
+        .manifest-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px; }
+        .manifest-title { font-family: var(--font-head); font-size: 12px; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; }
+        .manifest-formula { font-family: var(--font-mono); font-size: 10px; color: var(--warning); letter-spacing: 1px; }
+        table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 11px; }
+        th { text-align: left; color: var(--primary); font-weight: normal; letter-spacing: 1px; padding: 8px 10px; border-bottom: 1px solid var(--border-core); text-transform: uppercase; font-size: 10px; }
+        td { padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--text-main); }
+        tr:last-child td { border-bottom: none; }
+        .leg-mode { color: var(--text-muted); }
+        .empty-row td { color: var(--text-muted); text-align: center; padding: 20px; }
 
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(255,0,60,0.7); } 70% { box-shadow: 0 0 0 15px rgba(255,0,60,0); } 100% { box-shadow: 0 0 0 0 rgba(255,0,60,0); } }
-        @keyframes flash-alarm { 0%, 100% { background: rgba(255,0,0,0.05); } 50% { background: rgba(255,0,0,0.25); } }
-
+        /* ==========================================================================
+           04. RESPONSIVE
+           ========================================================================== */
         @media (max-width: 1024px) {
-            body { flex-direction: column; overflow-y: auto; }
+            body { flex-direction: column; height: auto; overflow-y: auto; }
             .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border-core); }
-            .oee-grid { grid-template-columns: 1fr 1fr; }
-            .twin-container { min-height: 400px; }
+            .btn-exit { margin-top: 20px; }
+            .main-stage { padding: 15px; }
+            .network-container { height: 60vh; min-height: 300px; }
+            .queue-panel { display: none; }
         }
     </style>
 </head>
 <body>
 
     <div class="scada-grid"></div>
-    <div id="alarm-overlay"></div>
 
     <!-- ==========================================================================
-         SCADA SIDEBAR (CONTROLS)
+         CONTROL SIDEBAR
          ========================================================================== -->
     <aside class="sidebar">
-        <div class="brand"><i class="fas fa-industry"></i> SMART<span>.</span>FACTORY</div>
-        <div class="brand-sub">DIGITAL TWIN & OEE SCADA</div>
+        <div class="brand"><i class="fas fa-route"></i> SUPPLY<span>.</span>CHAIN</div>
+        <div class="brand-sub">DIJKSTRA ROUTE OPTIMIZER</div>
 
         <div class="control-group">
-            <div class="cg-title"><span>Production Speed</span> <i class="fas fa-tachometer-alt"></i></div>
-            <div class="slider-wrap">
-                <div class="slider-labels"><span>Conveyor Velocity</span> <span class="slider-val" id="val-speed">1.0x</span></div>
-                <input type="range" id="sim-speed" min="0.5" max="3" step="0.1" value="1.0" oninput="FactorySCADA.updateParams()">
+            <div class="cg-title"><span>Shipment Request</span> <i class="fas fa-box"></i></div>
+            <div class="field">
+                <label for="sel-source">Origin Node</label>
+                <select id="sel-source"></select>
             </div>
-            <div class="slider-wrap">
-                <div class="slider-labels"><span>Robot Kinematics</span> <span class="slider-val" id="val-robot">1.0x</span></div>
-                <input type="range" id="sim-robot" min="0.5" max="3" step="0.1" value="1.0" oninput="FactorySCADA.updateParams()">
+            <div class="field">
+                <label for="sel-target">Destination Node</label>
+                <select id="sel-target"></select>
+            </div>
+            <div class="field">
+                <label for="sel-objective">Optimization Objective</label>
+                <select id="sel-objective">
+                    <option value="cost">Minimum Cost ($)</option>
+                    <option value="time">Minimum Transit Time (h)</option>
+                    <option value="distance">Minimum Distance (km)</option>
+                </select>
             </div>
         </div>
 
         <div class="control-group">
-            <div class="cg-title" style="color: var(--danger);"><span>Quality Control</span> <i class="fas fa-bug"></i></div>
+            <div class="cg-title"><span>Cost Model</span> <i class="fas fa-sliders-h"></i></div>
             <div class="slider-wrap">
-                <div class="slider-labels"><span>Defect Probability</span> <span class="slider-val" id="val-defect">5%</span></div>
-                <input type="range" class="danger-slider" id="sim-defect" min="0" max="30" step="1" value="5" oninput="FactorySCADA.updateParams()">
+                <div class="slider-labels"><span>Fuel Index</span> <span class="slider-val" id="val-fuel">1.00x</span></div>
+                <input type="range" id="sim-fuel" min="0.5" max="2.5" step="0.05" value="1">
             </div>
-            <div class="slider-labels" style="margin-top: 10px;"><span>Defective Items</span> <span class="slider-val" style="color:var(--danger);" id="val-bad-count">0</span></div>
+            <div class="slider-wrap">
+                <div class="slider-labels"><span>Network Congestion</span> <span class="slider-val" id="val-congestion">15%</span></div>
+                <input type="range" id="sim-congestion" min="0" max="80" step="1" value="15">
+            </div>
+            <div class="slider-wrap">
+                <div class="slider-labels"><span>Animation Speed</span> <span class="slider-val" id="val-anim">1.0x</span></div>
+                <input type="range" id="sim-anim" min="0.25" max="4" step="0.25" value="1">
+            </div>
         </div>
 
-        <div class="sys-btns">
-            <button class="btn btn-maint" id="btn-maint" onclick="FactorySCADA.toggleMaintenance()">
-                <i class="fas fa-wrench"></i> <span>Maintenance</span>
-            </button>
-            <button class="btn btn-reset" onclick="FactorySCADA.resetData()">
-                <i class="fas fa-redo"></i> <span>Reset Data</span>
-            </button>
-            <button class="btn btn-estop" id="btn-estop" onclick="FactorySCADA.triggerEStop()">
-                <i class="fas fa-hand-paper"></i> <span>EMERGENCY STOP</span>
-            </button>
+        <div class="control-group">
+            <div class="cg-title"><span>Solver</span> <i class="fas fa-microchip"></i></div>
+            <button class="btn btn-run" id="btn-solve"><i class="fas fa-play"></i> Run Dijkstra</button>
+            <button class="btn btn-danger" id="btn-disrupt"><i class="fas fa-unlink"></i> Disrupt Link Mode</button>
+            <button class="btn btn-alt" id="btn-regen"><i class="fas fa-random"></i> Regenerate Network</button>
+            <button class="btn btn-alt" id="btn-reset"><i class="fas fa-undo"></i> Restore All Links</button>
         </div>
-        
+
+        <div class="control-group">
+            <div class="cg-title"><span>Legend</span> <i class="fas fa-map"></i></div>
+            <div class="legend">
+                <div><i class="fas fa-industry" style="color:var(--warning)"></i> Plant / Factory</div>
+                <div><i class="fas fa-warehouse" style="color:var(--primary)"></i> Distribution Hub</div>
+                <div><i class="fas fa-store" style="color:var(--accent)"></i> Retail Node</div>
+                <div><i class="fas fa-circle" style="color:var(--success)"></i> Settled (visited)</div>
+                <div><i class="fas fa-circle" style="color:var(--warning)"></i> In priority queue</div>
+                <div><i class="fas fa-times" style="color:var(--danger)"></i> Disrupted lane</div>
+            </div>
+        </div>
+
         <a href="index.html" class="btn-exit"><i class="fas fa-arrow-left"></i> Return to Portfolio</a>
     </aside>
 
     <!-- ==========================================================================
-         MAIN STAGE (3D TWIN & OEE DASHBOARD)
+         MAIN STAGE
          ========================================================================== -->
     <main class="main-stage">
-        
-        <!-- 3D WEBGL FACTORY -->
-        <div class="twin-container">
-            <div id="webgl-factory"></div>
-            
+
+        <div class="network-container">
+            <canvas id="network-canvas"></canvas>
+
             <div class="hud-overlay">
-                <div class="hud-title">ASSEMBLY LINE ALPHA</div>
-                <div class="hud-desc" id="hud-status">SYSTEM RUNNING OPTIMALLY</div>
+                <div class="hud-title">LOGISTICS NETWORK — GRAPH G(V, E)</div>
+                <div class="hud-desc" id="hud-status">NETWORK IDLE — AWAITING SOLVE REQUEST</div>
             </div>
 
-            <div class="cam-controls">
-                <button class="btn-cam active" onclick="Factory3D.setCamera('iso', this)">ISO</button>
-                <button class="btn-cam" onclick="Factory3D.setCamera('top', this)">TOP</button>
-                <button class="btn-cam" onclick="Factory3D.setCamera('side', this)">SIDE</button>
+            <div class="queue-panel">
+                <div class="queue-head">PRIORITY QUEUE // MIN-HEAP</div>
+                <div id="queue-list"><div class="queue-row"><span>empty</span><span>—</span></div></div>
             </div>
         </div>
 
-        <!-- OEE INDUSTRIAL ENGINEERING MATH DASHBOARD -->
-        <div class="oee-panel">
-            <div class="oee-header">
-                <div class="oee-title"><i class="fas fa-chart-line"></i> Overall Equipment Effectiveness (OEE)</div>
-                <div class="oee-formula">OEE = Availability × Performance × Quality</div>
+        <div class="kpi-grid">
+            <div class="kpi-card" style="border-left-color: var(--success);">
+                <div class="kpi-label">Optimal Cost</div>
+                <div class="kpi-val" id="kpi-cost">—</div>
+                <div class="kpi-sub">Σ w(u,v) along path</div>
             </div>
-            
-            <div class="oee-grid">
-                <!-- Availability -->
-                <div class="kpi-card" style="border-left-color: var(--warning);">
-                    <div class="kpi-label">Availability (A)</div>
-                    <div class="kpi-val" id="kpi-a">100%</div>
-                    <div class="kpi-sub">Operating Time / Planned Time</div>
-                    <div class="chart-container"><canvas class="kpi-canvas" id="chart-a"></canvas></div>
-                </div>
-                
-                <!-- Performance -->
-                <div class="kpi-card" style="border-left-color: #4A90E2;">
-                    <div class="kpi-label">Performance (P)</div>
-                    <div class="kpi-val" id="kpi-p">100%</div>
-                    <div class="kpi-sub">Actual Rate / Ideal Rate</div>
-                    <div class="chart-container"><canvas class="kpi-canvas" id="chart-p"></canvas></div>
-                </div>
-
-                <!-- Quality -->
-                <div class="kpi-card" style="border-left-color: var(--success);">
-                    <div class="kpi-label">Quality (Q)</div>
-                    <div class="kpi-val" id="kpi-q">100%</div>
-                    <div class="kpi-sub">Good Parts / Total Parts (<span id="total-parts">0</span>)</div>
-                    <div class="chart-container"><canvas class="kpi-canvas" id="chart-q"></canvas></div>
-                </div>
-
-                <!-- Total OEE -->
-                <div class="kpi-card total-oee">
-                    <div class="kpi-label">SYSTEM OEE</div>
-                    <div class="kpi-val" id="kpi-oee">100%</div>
-                    <div class="kpi-sub">World Class Target: > 85%</div>
-                    <div class="chart-container"><canvas class="kpi-canvas" id="chart-oee"></canvas></div>
-                </div>
+            <div class="kpi-card" style="border-left-color: var(--primary);">
+                <div class="kpi-label">Distance</div>
+                <div class="kpi-val" id="kpi-dist">—</div>
+                <div class="kpi-sub">Total lane kilometres</div>
             </div>
+            <div class="kpi-card" style="border-left-color: var(--warning);">
+                <div class="kpi-label">Transit Time</div>
+                <div class="kpi-val" id="kpi-time">—</div>
+                <div class="kpi-sub">Incl. congestion + handling</div>
+            </div>
+            <div class="kpi-card" style="border-left-color: var(--accent);">
+                <div class="kpi-label">Saving vs Greedy</div>
+                <div class="kpi-val" id="kpi-saving">—</div>
+                <div class="kpi-sub">Optimal vs nearest-neighbour</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Nodes Settled</div>
+                <div class="kpi-val" id="kpi-visited">—</div>
+                <div class="kpi-sub">of <span id="kpi-total-nodes">0</span> in graph</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Solve Time</div>
+                <div class="kpi-val" id="kpi-ms">—</div>
+                <div class="kpi-sub">O((V + E) log V)</div>
+            </div>
+        </div>
+
+        <div class="manifest">
+            <div class="manifest-head">
+                <div class="manifest-title"><i class="fas fa-file-invoice" style="color: var(--primary);"></i> ROUTE MANIFEST</div>
+                <div class="manifest-formula">w(u,v) = km × fuel × mode × (1 + congestion)</div>
+            </div>
+            <table>
+                <thead>
+                    <tr><th>Leg</th><th>From</th><th>To</th><th>Mode</th><th>Km</th><th>Hours</th><th>Cost</th></tr>
+                </thead>
+                <tbody id="manifest-body">
+                    <tr class="empty-row"><td colspan="7">No route computed yet — configure a shipment and run the solver.</td></tr>
+                </tbody>
+            </table>
         </div>
 
     </main>
 
     <!-- ==========================================================================
-         ENTERPRISE JAVASCRIPT KERNEL
+         OPERATIONS RESEARCH KERNEL
          ========================================================================== -->
     <script>
         /**
-         * 1. MINI CHARTS FOR DASHBOARD (Zero Dependency)
+         * =======================================================================
+         * AI SUPPLY CHAIN — DIJKSTRA ROUTE OPTIMIZER
+         * Architected by ENG. MOHAMMAD SALEH
+         *
+         * Pure Canvas 2D + vanilla JS. No rendering libraries.
+         *  - Graph generation over a weighted, undirected logistics network
+         *  - Dijkstra's shortest path with a binary min-heap: O((V + E) log V)
+         *  - Animated relaxation so the search order is visible
+         *  - Greedy nearest-neighbour baseline for a cost-saving comparison
+         * =======================================================================
          */
-        class MiniTrendChart {
-            constructor(canvasId, color) {
-                this.canvas = document.getElementById(canvasId);
-                this.ctx = this.canvas ? this.canvas.getContext('2d') : null;
-                this.color = color;
-                this.data = new Array(30).fill(100); // Initialize with 100%
-                this.resize(); window.addEventListener('resize', () => this.resize());
-            }
-            resize() {
-                if(!this.canvas || this.canvas.parentElement.clientWidth === 0) return;
-                this.canvas.width = this.canvas.parentElement.clientWidth;
-                this.canvas.height = this.canvas.parentElement.clientHeight;
-            }
-            update(val) {
-                if(!this.ctx || this.canvas.width === 0) return;
-                this.data.push(val); this.data.shift();
-                
-                const w = this.canvas.width, h = this.canvas.height;
-                this.ctx.clearRect(0,0,w,h);
-                this.ctx.beginPath(); this.ctx.moveTo(0, h);
-                
-                const step = w / 29;
-                this.data.forEach((v, i) => {
-                    // Map 0-100 to canvas height. Base is 0, Top is 100.
-                    const y = h - (Math.max(0, Math.min(100, v)) / 100) * h;
-                    this.ctx.lineTo(i * step, y);
-                });
-                
-                this.ctx.strokeStyle = this.color; this.ctx.lineWidth = 2; this.ctx.stroke();
-                this.ctx.lineTo(w, h);
-                this.ctx.fillStyle = this.color.replace(')', ', 0.15)').replace('rgb', 'rgba').replace('#', '');
-                // Basic hex to rgba for fill
-                if(this.color.startsWith('#')) {
-                    const r = parseInt(this.color.slice(1,3), 16), g = parseInt(this.color.slice(3,5), 16), b = parseInt(this.color.slice(5,7), 16);
-                    this.ctx.fillStyle = `rgba(${r},${g},${b},0.15)`;
+
+        /* -----------------------------------------------------------------------
+         * 1. BINARY MIN-HEAP (priority queue backing Dijkstra)
+         * --------------------------------------------------------------------- */
+        class MinHeap {
+            constructor() { this.items = []; }
+            get size() { return this.items.length; }
+            push(node, priority) {
+                this.items.push({ node, priority });
+                let i = this.items.length - 1;
+                while (i > 0) {
+                    const parent = (i - 1) >> 1;
+                    if (this.items[parent].priority <= this.items[i].priority) break;
+                    [this.items[parent], this.items[i]] = [this.items[i], this.items[parent]];
+                    i = parent;
                 }
-                this.ctx.fill();
+            }
+            pop() {
+                if (this.items.length === 0) return null;
+                const top = this.items[0];
+                const last = this.items.pop();
+                if (this.items.length > 0) {
+                    this.items[0] = last;
+                    let i = 0;
+                    const n = this.items.length;
+                    for (;;) {
+                        const l = 2 * i + 1, r = 2 * i + 2;
+                        let smallest = i;
+                        if (l < n && this.items[l].priority < this.items[smallest].priority) smallest = l;
+                        if (r < n && this.items[r].priority < this.items[smallest].priority) smallest = r;
+                        if (smallest === i) break;
+                        [this.items[smallest], this.items[i]] = [this.items[i], this.items[smallest]];
+                        i = smallest;
+                    }
+                }
+                return top;
+            }
+            /** Snapshot of the smallest entries, for the on-screen queue panel. */
+            peekSorted(limit) {
+                return this.items.slice().sort((a, b) => a.priority - b.priority).slice(0, limit);
             }
         }
 
-        /**
-         * 2. 3D PROCEDURAL FACTORY (THREE.JS)
-         * Simulates Conveyor Belt and SCARA Robotic Arms
-         */
-        class SmartFactory3D {
-            constructor() {
-                this.container = document.getElementById('webgl-factory');
-                this.scene = new THREE.Scene();
-                this.camera = new THREE.PerspectiveCamera(45, this.container.clientWidth / this.container.clientHeight, 0.1, 1000);
-                this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-                this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
-                this.container.appendChild(this.renderer.domElement);
-
-                this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
-                this.controls.enableDamping = true; this.controls.maxPolarAngle = Math.PI / 2;
-                
-                // Factory State
-                this.boxes = [];
-                this.robots = [];
-                this.conveyorSpeed = 1.0;
-                this.robotSpeed = 1.0;
-                this.isPaused = false;
-                this.time = 0;
-
-                // Materials
-                this.mats = {
-                    metal: new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.8, roughness: 0.2 }),
-                    robotBase: new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.9 }),
-                    robotArm: new THREE.MeshStandardMaterial({ color: 0x00ffff, wireframe: true, transparent: true, opacity: 0.6 }),
-                    boxGood: new THREE.MeshStandardMaterial({ color: 0x4A90E2 }),
-                    boxBad: new THREE.MeshStandardMaterial({ color: 0xff003c, emissive: 0xff0000, emissiveIntensity: 0.5 }),
-                    belt: new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.9 })
-                };
-
-                this.buildEnvironment();
-                this.setCamera('iso');
-                
-                window.addEventListener('resize', () => this.resize());
-                this.animate();
-            }
-
-            buildEnvironment() {
-                this.scene.add(new THREE.AmbientLight(0xffffff, 0.4));
-                const dirLight = new THREE.DirectionalLight(0xffffff, 1.2); dirLight.position.set(10, 20, 10); this.scene.add(dirLight);
-                const grid = new THREE.GridHelper(100, 50, 0x00ffff, 0x111122); grid.position.y = -2; this.scene.add(grid);
-
-                // 1. Conveyor Belt
-                this.belt = new THREE.Mesh(new THREE.BoxGeometry(40, 1, 4), this.mats.belt);
-                this.scene.add(this.belt);
-                
-                // Rollers
-                for(let i=-19; i<=19; i+=2) {
-                    let roller = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 4.2, 16), this.mats.metal);
-                    roller.rotation.x = Math.PI/2; roller.position.set(i, 0.5, 0);
-                    this.scene.add(roller);
-                }
-
-                // 2. Robotic Arms (SCARA Type)
-                this.createRobot(-10, 2); // Assembly Robot
-                this.createRobot(0, -2);  // Welding Robot
-                this.createRobot(10, 2);  // Inspection Robot
-            }
-
-            createRobot(x, z) {
-                const group = new THREE.Group(); group.position.set(x, 0, z);
-                
-                // Base
-                const base = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 2, 2), this.mats.robotBase);
-                base.position.y = 1; group.add(base);
-
-                // Shoulder Joint (Rotates Y)
-                const shoulder = new THREE.Group(); shoulder.position.y = 2;
-                const sMesh = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 1.5), this.mats.robotArm); sMesh.rotation.x = Math.PI/2;
-                shoulder.add(sMesh);
-
-                // Upper Arm
-                const upArm = new THREE.Mesh(new THREE.BoxGeometry(1, 4, 1), this.mats.robotArm);
-                upArm.position.y = 2; shoulder.add(upArm);
-
-                // Elbow Joint (Rotates Z)
-                const elbow = new THREE.Group(); elbow.position.y = 4;
-                const eMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.8, 1.2), this.mats.metal); eMesh.rotation.x = Math.PI/2;
-                elbow.add(eMesh);
-
-                // Forearm
-                const foreArm = new THREE.Mesh(new THREE.BoxGeometry(0.8, 4, 0.8), this.mats.robotArm);
-                foreArm.position.y = 2; elbow.add(foreArm);
-
-                // Effector (Tool)
-                const tool = new THREE.Mesh(new THREE.ConeGeometry(0.5, 1.5), this.mats.metal);
-                tool.position.y = 4.5; tool.rotation.x = Math.PI; elbow.add(tool);
-
-                shoulder.add(elbow); base.add(shoulder); this.scene.add(group);
-                
-                this.robots.push({ group, shoulder, elbow, baseOffset: x });
-            }
-
-            spawnBox(isDefective) {
-                if(this.isPaused) return;
-                const geo = new THREE.BoxGeometry(1.5, 1.5, 1.5);
-                const mesh = new THREE.Mesh(geo, isDefective ? this.mats.boxBad : this.mats.boxGood);
-                mesh.position.set(-20, 1.5, 0); // Start at beginning of conveyor
-                this.scene.add(mesh);
-                this.boxes.push({ mesh, isDefective, processedBy: [] });
-            }
-
-            updatePhysics() {
-                if(this.isPaused) return;
-                this.time += 0.05 * this.robotSpeed;
-
-                // Move Boxes
-                for(let i=this.boxes.length-1; i>=0; i--) {
-                    let b = this.boxes[i];
-                    b.mesh.position.x += 0.1 * this.conveyorSpeed;
-
-                    // Defective boxes get pushed off the line at x = 12
-                    if(b.isDefective && b.mesh.position.x > 12 && b.mesh.position.z < 5) {
-                        b.mesh.position.z += 0.2; // Push off
-                        b.mesh.position.y -= 0.1; // Fall
-                    }
-
-                    // Remove if out of bounds
-                    if(b.mesh.position.x > 22 || b.mesh.position.y < -5) {
-                        this.scene.remove(b.mesh);
-                        this.boxes.splice(i, 1);
-                    }
-                }
-
-                // Animate Robots (Procedural Kinematics simulating work)
-                this.robots.forEach((r, idx) => {
-                    // Find nearest box
-                    let nearest = this.boxes.find(b => Math.abs(b.mesh.position.x - r.baseOffset) < 2);
-                    
-                    if(nearest) {
-                        // Work Animation (Bend down to box)
-                        r.shoulder.rotation.z = MathUtils.lerp(r.shoulder.rotation.z, -Math.PI/4, 0.1 * this.robotSpeed);
-                        r.elbow.rotation.z = MathUtils.lerp(r.elbow.rotation.z, Math.PI/2, 0.1 * this.robotSpeed);
-                        // Follow box slightly on Y axis
-                        r.shoulder.rotation.y = MathUtils.lerp(r.shoulder.rotation.y, (nearest.mesh.position.x - r.baseOffset) * 0.5, 0.1);
-                    } else {
-                        // Idle Animation (Scan around)
-                        r.shoulder.rotation.y = Math.sin(this.time + idx) * 0.5;
-                        r.shoulder.rotation.z = MathUtils.lerp(r.shoulder.rotation.z, 0, 0.05 * this.robotSpeed);
-                        r.elbow.rotation.z = MathUtils.lerp(r.elbow.rotation.z, Math.PI/4, 0.05 * this.robotSpeed);
-                    }
-                });
-            }
-
-            setCamera(view, btnElement) {
-                if(btnElement) { document.querySelectorAll('.btn-cam').forEach(b => b.classList.remove('active')); btnElement.classList.add('active'); }
-                if(view === 'iso') gsap.to(this.camera.position, {x: 0, y: 20, z: 30, duration: 1});
-                if(view === 'top') gsap.to(this.camera.position, {x: 0, y: 35, z: 0, duration: 1});
-                if(view === 'side') gsap.to(this.camera.position, {x: -30, y: 10, z: 15, duration: 1});
-                gsap.to(this.controls.target, {x: 0, y: 0, z: 0, duration: 1});
-            }
-
-            triggerEStop(isActive) {
-                this.isPaused = isActive;
-                if(isActive) {
-                    this.scene.background = new THREE.Color(0x220000);
-                    // Drop robots
-                    this.robots.forEach(r => {
-                        gsap.to(r.shoulder.rotation, { z: Math.PI/3, duration: 0.5 });
-                        gsap.to(r.elbow.rotation, { z: Math.PI/1.5, duration: 0.5 });
-                    });
-                } else {
-                    this.scene.background = null;
-                }
-            }
-
-            resize() {
-                if(this.container.clientWidth === 0) return;
-                this.camera.aspect = this.container.clientWidth / this.container.clientHeight;
-                this.camera.updateProjectionMatrix();
-                this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
-            }
-            animate() {
-                requestAnimationFrame(() => this.animate());
-                this.controls.update();
-                this.updatePhysics();
-                this.renderer.render(this.scene, this.camera);
-            }
-        }
-
-        /**
-         * 3. INDUSTRIAL ENGINEERING OEE MATH LOGIC
-         * Handles SCADA calculations and state
-         */
-        class FactoryController {
-            constructor() {
-                this.state = {
-                    speed: 1.0, robotSpd: 1.0, defectRate: 5,
-                    isRunning: true, isEStop: false, isMaint: false,
-                    totalParts: 0, badParts: 0,
-                    plannedTime: 0, runTime: 0,
-                    idealCycleTime: 2000 // ms per part ideally
-                };
-
-                // Init Charts
-                this.charts = {
-                    a: new MiniTrendChart('chart-a', '#ffb700'),
-                    p: new MiniTrendChart('chart-p', '#4A90E2'),
-                    q: new MiniTrendChart('chart-q', '#00ff41'),
-                    oee: new MiniTrendChart('chart-oee', '#00ffff')
-                };
-
-                this.timer = setInterval(() => this.tick(), 1000); // 1 sec tick
-                this.spawner = null;
-                this.setSpawner();
-            }
-
-            setSpawner() {
-                if(this.spawner) clearInterval(this.spawner);
-                const delay = 2000 / this.state.speed;
-                this.spawner = setInterval(() => {
-                    if(!this.state.isRunning) return;
-                    this.state.totalParts++;
-                    document.getElementById('total-parts').innerText = this.state.totalParts;
-                    
-                    const isDefect = (Math.random() * 100) < this.state.defectRate;
-                    if(isDefect) {
-                        this.state.badParts++;
-                        document.getElementById('val-bad-count').innerText = this.state.badParts;
-                    }
-                    
-                    if(window.Factory3D) window.Factory3D.spawnBox(isDefect);
-                }, delay);
-            }
-
-            updateParams() {
-                if(this.state.isEStop) return;
-                this.state.speed = parseFloat(document.getElementById('sim-speed').value);
-                this.state.robotSpd = parseFloat(document.getElementById('sim-robot').value);
-                this.state.defectRate = parseInt(document.getElementById('sim-defect').value);
-                
-                document.getElementById('val-speed').innerText = this.state.speed.toFixed(1) + 'x';
-                document.getElementById('val-robot').innerText = this.state.robotSpd.toFixed(1) + 'x';
-                document.getElementById('val-defect').innerText = this.state.defectRate + '%';
-                
-                if(window.Factory3D) {
-                    window.Factory3D.conveyorSpeed = this.state.speed;
-                    window.Factory3D.robotSpeed = this.state.robotSpd;
-                }
-                this.setSpawner();
-            }
-
-            toggleMaintenance() {
-                if(this.state.isEStop) return;
-                this.state.isMaint = !this.state.isMaint;
-                const btn = document.getElementById('btn-maint');
-                const hud = document.getElementById('hud-status');
-                
-                if(this.state.isMaint) {
-                    this.state.isRunning = false;
-                    btn.style.background = 'var(--warning)'; btn.style.color = '#000';
-                    hud.innerText = "MAINTENANCE DOWNTIME ACTIVE"; hud.className = "hud-desc error";
-                    if(window.Factory3D) window.Factory3D.isPaused = true;
-                } else {
-                    this.state.isRunning = true;
-                    btn.style.background = ''; btn.style.color = '';
-                    hud.innerText = "SYSTEM RUNNING OPTIMALLY"; hud.className = "hud-desc";
-                    if(window.Factory3D) window.Factory3D.isPaused = false;
-                }
-            }
-
-            triggerEStop() {
-                this.state.isEStop = !this.state.isEStop;
-                const btn = document.getElementById('btn-estop');
-                const overlay = document.getElementById('alarm-overlay');
-                const hud = document.getElementById('hud-status');
-
-                if(this.state.isEStop) {
-                    this.state.isRunning = false;
-                    btn.classList.add('active'); overlay.classList.add('active');
-                    hud.innerText = "CRITICAL: EMERGENCY STOP ENGAGED"; hud.className = "hud-desc error";
-                    // Disable inputs
-                    document.getElementById('sim-speed').disabled = true;
-                    document.getElementById('sim-defect').disabled = true;
-                    if(window.Factory3D) window.Factory3D.triggerEStop(true);
-                } else {
-                    this.state.isRunning = true;
-                    btn.classList.remove('active'); overlay.classList.remove('active');
-                    hud.innerText = "SYSTEM RUNNING OPTIMALLY"; hud.className = "hud-desc";
-                    document.getElementById('sim-speed').disabled = false;
-                    document.getElementById('sim-defect').disabled = false;
-                    if(window.Factory3D) window.Factory3D.triggerEStop(false);
-                }
-            }
-
-            resetData() {
-                this.state.totalParts = 0; this.state.badParts = 0;
-                this.state.plannedTime = 0; this.state.runTime = 0;
-                document.getElementById('total-parts').innerText = '0';
-                document.getElementById('val-bad-count').innerText = '0';
-                this.updateUI(100, 100, 100, 100); // Reset visual to 100%
-            }
-
-            tick() {
-                // Time Math
-                this.state.plannedTime++;
-                if(this.state.isRunning) this.state.runTime++;
-
-                // OEE MATH (Industrial Engineering Core)
-                let A = 100, P = 100, Q = 100;
-
-                // 1. Availability (A) = Operating Time / Planned Production Time
-                if(this.state.plannedTime > 0) A = (this.state.runTime / this.state.plannedTime) * 100;
-
-                // 2. Performance (P) = (Total Parts / Operating Time) / Ideal Run Rate
-                // Ideal rate = 1 part every 2 secs (0.5 parts/sec)
-                if(this.state.runTime > 0) {
-                    const actualRate = this.state.totalParts / this.state.runTime;
-                    P = (actualRate / 0.5) * 100;
-                }
-
-                // 3. Quality (Q) = Good Parts / Total Parts
-                if(this.state.totalParts > 0) {
-                    const goodParts = this.state.totalParts - this.state.badParts;
-                    Q = (goodParts / this.state.totalParts) * 100;
-                }
-
-                // Protect against infinity/NaN and clamp to 100% max for visuals
-                A = MathUtils.clamp(A, 0, 100);
-                P = MathUtils.clamp(P, 0, 100);
-                Q = MathUtils.clamp(Q, 0, 100);
-                
-                const OEE = (A/100) * (P/100) * (Q/100) * 100;
-
-                this.updateUI(A, P, Q, OEE);
-            }
-
-            updateUI(a, p, q, oee) {
-                document.getElementById('kpi-a').innerText = a.toFixed(1) + '%';
-                document.getElementById('kpi-p').innerText = p.toFixed(1) + '%';
-                document.getElementById('kpi-q').innerText = q.toFixed(1) + '%';
-                document.getElementById('kpi-oee').innerText = oee.toFixed(1) + '%';
-
-                this.charts.a.update(a); this.charts.p.update(p);
-                this.charts.q.update(q); this.charts.oee.update(oee);
-            }
-        }
-
-        // ==========================================================================
-        // SYSTEM BOOTSTRAP
-        // ==========================================================================
-        window.onload = () => {
-            window.Factory3D = new SmartFactory3D();
-            window.FactorySCADA = new FactoryController();
+        /* -----------------------------------------------------------------------
+         * 2. LOGISTICS NETWORK MODEL
+         * --------------------------------------------------------------------- */
+        const MODES = {
+            road: { label: 'ROAD', costPerKm: 1.00, kmPerHour: 75,  color: '#00ffff' },
+            rail: { label: 'RAIL', costPerKm: 0.55, kmPerHour: 55,  color: '#00ff41' },
+            air:  { label: 'AIR',  costPerKm: 3.40, kmPerHour: 720, color: '#ff00ff' }
         };
 
+        const NODE_KINDS = {
+            plant:  { label: 'PLANT', color: '#ffb700', radius: 13, handlingHours: 1.5 },
+            hub:    { label: 'HUB',   color: '#00ffff', radius: 11, handlingHours: 0.8 },
+            retail: { label: 'STORE', color: '#ff00ff', radius: 9,  handlingHours: 0.4 }
+        };
+
+        class SupplyNetwork {
+            constructor() { this.generate(); }
+
+            /** Builds a connected random network: plants -> hubs -> retail nodes. */
+            generate() {
+                this.nodes = [];
+                this.edges = [];
+
+                const plants = 2, hubs = 5, retail = 7;
+                const names = {
+                    plant: ['ALPHA WORKS', 'BETA WORKS'],
+                    hub: ['NORTH HUB', 'EAST HUB', 'CENTRAL HUB', 'WEST HUB', 'SOUTH HUB'],
+                    retail: ['R-01 KIRKUK', 'R-02 BASRA', 'R-03 ERBIL', 'R-04 MOSUL', 'R-05 NAJAF', 'R-06 ANBAR', 'R-07 DUHOK']
+                };
+
+                // Nodes are laid out in normalised 0..1 space and scaled at draw time,
+                // so the network survives any canvas resize without regenerating.
+                const place = (kind, count, xMin, xMax) => {
+                    for (let i = 0; i < count; i++) {
+                        const band = (i + 0.5) / count;
+                        this.nodes.push({
+                            id: this.nodes.length,
+                            kind,
+                            name: names[kind][i],
+                            nx: xMin + Math.random() * (xMax - xMin),
+                            ny: Math.min(0.92, Math.max(0.08, band + (Math.random() - 0.5) * 0.14))
+                        });
+                    }
+                };
+                place('plant', plants, 0.06, 0.14);
+                place('hub', hubs, 0.34, 0.62);
+                place('retail', retail, 0.80, 0.94);
+
+                const idsOf = kind => this.nodes.filter(n => n.kind === kind).map(n => n.id);
+                const plantIds = idsOf('plant'), hubIds = idsOf('hub'), retailIds = idsOf('retail');
+
+                // Every plant reaches every hub; guarantees the graph is connected.
+                plantIds.forEach(p => hubIds.forEach(h => this.addEdge(p, h)));
+                // Hub-to-hub lateral lanes (ring) allow multi-hop transfers.
+                hubIds.forEach((h, i) => this.addEdge(h, hubIds[(i + 1) % hubIds.length]));
+                // Each retail node is served by two hubs, so there is always an alternative.
+                retailIds.forEach((r, i) => {
+                    this.addEdge(r, hubIds[i % hubIds.length]);
+                    this.addEdge(r, hubIds[(i + 2) % hubIds.length]);
+                });
+                // A few retail-to-retail milk-run lanes for routing variety.
+                for (let i = 0; i + 1 < retailIds.length; i += 2) this.addEdge(retailIds[i], retailIds[i + 1]);
+
+                this.rebuildAdjacency();
+            }
+
+            addEdge(a, b) {
+                if (a === b) return;
+                if (this.edges.some(e => (e.a === a && e.b === b) || (e.a === b && e.b === a))) return;
+
+                const na = this.nodes[a], nb = this.nodes[b];
+                // Euclidean distance in normalised space, scaled to a plausible km figure.
+                const dx = na.nx - nb.nx, dy = na.ny - nb.ny;
+                const km = Math.round(Math.sqrt(dx * dx + dy * dy) * 1600) + 40;
+
+                // Long plant->hub trunk lanes favour rail; a few premium lanes use air.
+                let mode = 'road';
+                const roll = Math.random();
+                if (na.kind === 'plant' || nb.kind === 'plant') mode = roll < 0.55 ? 'rail' : 'road';
+                else if (roll < 0.12) mode = 'air';
+
+                this.edges.push({ a, b, km, mode, disrupted: false });
+            }
+
+            rebuildAdjacency() {
+                this.adjacency = this.nodes.map(() => []);
+                this.edges.forEach((e, index) => {
+                    this.adjacency[e.a].push({ to: e.b, index });
+                    this.adjacency[e.b].push({ to: e.a, index });
+                });
+            }
+
+            /**
+             * Edge weight under the active cost model.
+             * cost     = km x fuelIndex x modeCostPerKm x (1 + congestion)
+             * hours    = km / modeSpeed x (1 + congestion) + destination handling
+             */
+            weight(edge, toNodeId, params) {
+                const mode = MODES[edge.mode];
+                const congestion = params.congestion / 100;
+                const cost = edge.km * params.fuel * mode.costPerKm * (1 + congestion);
+                const hours = (edge.km / mode.kmPerHour) * (1 + congestion) + NODE_KINDS[this.nodes[toNodeId].kind].handlingHours;
+
+                if (params.objective === 'distance') return { metric: edge.km, cost, hours, km: edge.km };
+                if (params.objective === 'time') return { metric: hours, cost, hours, km: edge.km };
+                return { metric: cost, cost, hours, km: edge.km };
+            }
+        }
+
+        /* -----------------------------------------------------------------------
+         * 3. DIJKSTRA SOLVER
+         * --------------------------------------------------------------------- */
+        class DijkstraSolver {
+            /**
+             * Runs Dijkstra from `source`, recording each settle step so the UI can
+             * replay the search. Returns null-safe results even when the target is
+             * unreachable (e.g. after enough lanes have been disrupted).
+             */
+            static solve(network, source, target, params) {
+                const t0 = performance.now();
+                const n = network.nodes.length;
+                const dist = new Array(n).fill(Infinity);
+                const prev = new Array(n).fill(null);
+                const prevEdge = new Array(n).fill(null);
+                const settled = new Array(n).fill(false);
+                const steps = [];
+
+                dist[source] = 0;
+                const heap = new MinHeap();
+                heap.push(source, 0);
+
+                while (heap.size > 0) {
+                    const top = heap.pop();
+                    const u = top.node;
+
+                    // Stale heap entry (a shorter distance was queued later) — skip it.
+                    if (settled[u]) continue;
+                    settled[u] = true;
+
+                    steps.push({
+                        settled: u,
+                        frontier: heap.peekSorted(6).map(e => ({ node: e.node, priority: e.priority })),
+                        settledSet: settled.slice()
+                    });
+
+                    if (u === target) break;
+
+                    for (const link of network.adjacency[u]) {
+                        const edge = network.edges[link.index];
+                        if (edge.disrupted || settled[link.to]) continue;
+
+                        const w = network.weight(edge, link.to, params);
+                        const candidate = dist[u] + w.metric;
+                        if (candidate < dist[link.to]) {
+                            dist[link.to] = candidate;
+                            prev[link.to] = u;
+                            prevEdge[link.to] = link.index;
+                            heap.push(link.to, candidate);
+                        }
+                    }
+                }
+
+                // Reconstruct the path by walking predecessors back from the target.
+                const path = [];
+                const pathEdges = [];
+                if (dist[target] < Infinity) {
+                    let cur = target;
+                    while (cur !== null) {
+                        path.unshift(cur);
+                        if (prevEdge[cur] !== null) pathEdges.unshift(prevEdge[cur]);
+                        cur = prev[cur];
+                    }
+                }
+
+                return {
+                    reachable: dist[target] < Infinity,
+                    dist, path, pathEdges, steps,
+                    settledCount: settled.filter(Boolean).length,
+                    ms: performance.now() - t0
+                };
+            }
+
+            /**
+             * Nearest-neighbour baseline: always hop to the cheapest unvisited
+             * neighbour. Used to quantify how much the optimal route saves.
+             */
+            static greedy(network, source, target, params) {
+                const visited = new Set([source]);
+                let current = source;
+                let total = 0;
+                let guard = 0;
+
+                while (current !== target && guard++ < network.nodes.length * 2) {
+                    let best = null;
+                    for (const link of network.adjacency[current]) {
+                        const edge = network.edges[link.index];
+                        if (edge.disrupted || visited.has(link.to)) continue;
+                        const w = network.weight(edge, link.to, params);
+                        // Bias toward the target so the walk makes progress instead of wandering.
+                        const score = w.metric - (link.to === target ? 1e9 : 0);
+                        if (!best || score < best.score) best = { score, metric: w.metric, to: link.to };
+                    }
+                    if (!best) return null; // dead end
+                    total += best.metric;
+                    current = best.to;
+                    visited.add(current);
+                }
+                return current === target ? total : null;
+            }
+        }
+
+        /* -----------------------------------------------------------------------
+         * 4. CANVAS RENDERER
+         * --------------------------------------------------------------------- */
+        class NetworkRenderer {
+            constructor(canvas, network) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                this.network = network;
+                this.padding = 60;
+                this.rightInset = 60;
+
+                this.settledSet = [];
+                this.frontier = [];
+                this.path = [];
+                this.pathEdges = [];
+                this.pathProgress = 0;
+                this.source = null;
+                this.target = null;
+                this.hoverEdge = null;
+
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+                this.loop();
+            }
+
+            resize() {
+                const rect = this.canvas.getBoundingClientRect();
+                if (rect.width === 0 || rect.height === 0) return;
+                // Cap the device pixel ratio: 3x on a phone triples the fill cost for no visible gain.
+                const dpr = Math.min(window.devicePixelRatio || 1, 2);
+                this.canvas.width = Math.round(rect.width * dpr);
+                this.canvas.height = Math.round(rect.height * dpr);
+                this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                this.w = rect.width;
+                this.h = rect.height;
+
+                // Reserve the queue panel's column when it is on screen (it is hidden on
+                // narrow layouts), so node labels are never drawn underneath it.
+                const panel = document.querySelector('.queue-panel');
+                const panelShown = panel && getComputedStyle(panel).display !== 'none';
+                this.rightInset = panelShown ? panel.offsetWidth + 40 : 60;
+            }
+
+            /**
+             * Normalised node coordinates -> canvas pixels. The right inset keeps nodes and
+             * their labels clear of the priority-queue panel that floats over that corner.
+             */
+            pos(node) {
+                const usableWidth = this.w - this.padding - this.rightInset;
+                return {
+                    x: this.padding + node.nx * usableWidth,
+                    y: this.padding * 0.6 + node.ny * (this.h - this.padding * 1.2)
+                };
+            }
+
+            /** Nearest edge to a canvas point, used for the disruption tool. */
+            edgeAt(px, py, tolerance = 12) {
+                let best = null;
+                this.network.edges.forEach((e, index) => {
+                    const p1 = this.pos(this.network.nodes[e.a]);
+                    const p2 = this.pos(this.network.nodes[e.b]);
+                    const dx = p2.x - p1.x, dy = p2.y - p1.y;
+                    const lenSq = dx * dx + dy * dy;
+                    if (lenSq === 0) return;
+                    let t = ((px - p1.x) * dx + (py - p1.y) * dy) / lenSq;
+                    t = Math.max(0, Math.min(1, t));
+                    const cx = p1.x + t * dx, cy = p1.y + t * dy;
+                    const d = Math.hypot(px - cx, py - cy);
+                    if (d < tolerance && (!best || d < best.d)) best = { index, d };
+                });
+                return best ? best.index : null;
+            }
+
+            nodeAt(px, py) {
+                for (const node of this.network.nodes) {
+                    const p = this.pos(node);
+                    if (Math.hypot(px - p.x, py - p.y) <= NODE_KINDS[node.kind].radius + 6) return node.id;
+                }
+                return null;
+            }
+
+            loop() {
+                this.draw();
+                requestAnimationFrame(() => this.loop());
+            }
+
+            draw() {
+                if (!this.w) { this.resize(); return; }
+                const ctx = this.ctx;
+                const t = performance.now() * 0.001;
+                ctx.clearRect(0, 0, this.w, this.h);
+
+                const onPath = new Set(this.pathEdges);
+
+                // --- Lanes ---
+                this.network.edges.forEach((e, index) => {
+                    const p1 = this.pos(this.network.nodes[e.a]);
+                    const p2 = this.pos(this.network.nodes[e.b]);
+                    const isPath = onPath.has(index);
+
+                    ctx.beginPath();
+                    ctx.moveTo(p1.x, p1.y);
+                    ctx.lineTo(p2.x, p2.y);
+
+                    if (e.disrupted) {
+                        ctx.strokeStyle = 'rgba(255, 0, 60, 0.35)';
+                        ctx.setLineDash([4, 6]);
+                        ctx.lineWidth = 1.5;
+                    } else if (isPath) {
+                        ctx.strokeStyle = MODES[e.mode].color;
+                        ctx.setLineDash([]);
+                        ctx.lineWidth = 3;
+                        ctx.shadowColor = MODES[e.mode].color;
+                        ctx.shadowBlur = 14;
+                    } else if (index === this.hoverEdge) {
+                        ctx.strokeStyle = 'rgba(255, 183, 0, 0.9)';
+                        ctx.setLineDash([]);
+                        ctx.lineWidth = 2.5;
+                    } else {
+                        ctx.strokeStyle = 'rgba(120, 170, 200, 0.18)';
+                        ctx.setLineDash([]);
+                        ctx.lineWidth = 1;
+                    }
+                    ctx.stroke();
+                    ctx.shadowBlur = 0;
+                    ctx.setLineDash([]);
+
+                    if (e.disrupted) {
+                        const mx = (p1.x + p2.x) / 2, my = (p1.y + p2.y) / 2;
+                        ctx.strokeStyle = '#ff003c';
+                        ctx.lineWidth = 2;
+                        ctx.beginPath();
+                        ctx.moveTo(mx - 5, my - 5); ctx.lineTo(mx + 5, my + 5);
+                        ctx.moveTo(mx + 5, my - 5); ctx.lineTo(mx - 5, my + 5);
+                        ctx.stroke();
+                    }
+                });
+
+                // --- Freight pulse travelling the solved route ---
+                if (this.pathEdges.length > 0) {
+                    this.pathProgress = (this.pathProgress + 0.004) % 1;
+                    const legFloat = this.pathProgress * this.pathEdges.length;
+                    const legIndex = Math.floor(legFloat);
+                    const legT = legFloat - legIndex;
+                    const edge = this.network.edges[this.pathEdges[legIndex]];
+                    if (edge) {
+                        // Travel in path order: leg i runs from path[i] to path[i+1].
+                        const from = this.pos(this.network.nodes[this.path[legIndex]]);
+                        const to = this.pos(this.network.nodes[this.path[legIndex + 1]]);
+                        if (from && to) {
+                            const x = from.x + (to.x - from.x) * legT;
+                            const y = from.y + (to.y - from.y) * legT;
+                            ctx.beginPath();
+                            ctx.arc(x, y, 5, 0, Math.PI * 2);
+                            ctx.fillStyle = '#ffffff';
+                            ctx.shadowColor = MODES[edge.mode].color;
+                            ctx.shadowBlur = 18;
+                            ctx.fill();
+                            ctx.shadowBlur = 0;
+                        }
+                    }
+                }
+
+                // --- Nodes ---
+                const frontierIds = new Set(this.frontier.map(f => f.node));
+                this.network.nodes.forEach(node => {
+                    const p = this.pos(node);
+                    const kind = NODE_KINDS[node.kind];
+                    const isSettled = this.settledSet[node.id];
+                    const isFrontier = frontierIds.has(node.id);
+                    const isEndpoint = node.id === this.source || node.id === this.target;
+
+                    if (isEndpoint) {
+                        const pulse = 1 + Math.sin(t * 3) * 0.12;
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, (kind.radius + 9) * pulse, 0, Math.PI * 2);
+                        ctx.strokeStyle = node.id === this.source ? 'rgba(0,255,65,0.8)' : 'rgba(255,0,255,0.8)';
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                    }
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, kind.radius, 0, Math.PI * 2);
+                    if (isSettled) { ctx.fillStyle = 'rgba(0,255,65,0.85)'; ctx.shadowColor = '#00ff41'; }
+                    else if (isFrontier) { ctx.fillStyle = 'rgba(255,183,0,0.85)'; ctx.shadowColor = '#ffb700'; }
+                    else { ctx.fillStyle = 'rgba(8,14,22,0.95)'; ctx.shadowColor = 'transparent'; }
+                    ctx.shadowBlur = isSettled || isFrontier ? 14 : 0;
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+
+                    ctx.strokeStyle = kind.color;
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+
+                    ctx.fillStyle = isSettled || isFrontier ? '#02060c' : kind.color;
+                    ctx.font = 'bold 9px "Share Tech Mono", monospace';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(String(node.id), p.x, p.y);
+
+                    ctx.fillStyle = 'rgba(224, 242, 254, 0.75)';
+                    ctx.font = '9px "Share Tech Mono", monospace';
+                    ctx.textBaseline = 'top';
+                    ctx.fillText(node.name, p.x, p.y + kind.radius + 5);
+                });
+            }
+        }
+
+        /* -----------------------------------------------------------------------
+         * 5. APPLICATION CONTROLLER
+         * --------------------------------------------------------------------- */
+        class SupplyChainApp {
+            constructor() {
+                this.network = new SupplyNetwork();
+                this.renderer = new NetworkRenderer(document.getElementById('network-canvas'), this.network);
+
+                this.params = { fuel: 1, congestion: 15, objective: 'cost' };
+                this.animSpeed = 1;
+                this.disruptMode = false;
+                this.isSolving = false;
+                this.stepTimers = [];
+
+                this.bindControls();
+                this.populateSelects();
+                this.bindCanvas();
+                document.getElementById('kpi-total-nodes').innerText = this.network.nodes.length;
+                this.solve();
+            }
+
+            bindControls() {
+                const fuel = document.getElementById('sim-fuel');
+                const congestion = document.getElementById('sim-congestion');
+                const anim = document.getElementById('sim-anim');
+
+                fuel.addEventListener('input', () => {
+                    this.params.fuel = parseFloat(fuel.value);
+                    document.getElementById('val-fuel').innerText = this.params.fuel.toFixed(2) + 'x';
+                });
+                congestion.addEventListener('input', () => {
+                    this.params.congestion = parseInt(congestion.value, 10);
+                    document.getElementById('val-congestion').innerText = this.params.congestion + '%';
+                });
+                anim.addEventListener('input', () => {
+                    this.animSpeed = parseFloat(anim.value);
+                    document.getElementById('val-anim').innerText = this.animSpeed.toFixed(1) + 'x';
+                });
+
+                document.getElementById('sel-objective').addEventListener('change', (e) => {
+                    this.params.objective = e.target.value;
+                });
+
+                document.getElementById('btn-solve').addEventListener('click', () => this.solve());
+                document.getElementById('btn-regen').addEventListener('click', () => this.regenerate());
+                document.getElementById('btn-reset').addEventListener('click', () => {
+                    this.network.edges.forEach(e => { e.disrupted = false; });
+                    this.solve();
+                });
+                document.getElementById('btn-disrupt').addEventListener('click', (e) => {
+                    this.disruptMode = !this.disruptMode;
+                    e.currentTarget.classList.toggle('active', this.disruptMode);
+                    this.renderer.canvas.style.cursor = this.disruptMode ? 'crosshair' : 'default';
+                    this.setStatus(this.disruptMode
+                        ? 'DISRUPTION MODE — CLICK A LANE TO CLOSE OR REOPEN IT'
+                        : 'NETWORK READY', this.disruptMode ? 'busy' : '');
+                });
+
+                [document.getElementById('sel-source'), document.getElementById('sel-target')].forEach(sel => {
+                    sel.addEventListener('change', () => this.solve());
+                });
+            }
+
+            bindCanvas() {
+                const canvas = this.renderer.canvas;
+                const toLocal = (evt) => {
+                    const rect = canvas.getBoundingClientRect();
+                    return { x: evt.clientX - rect.left, y: evt.clientY - rect.top };
+                };
+
+                canvas.addEventListener('pointermove', (evt) => {
+                    const p = toLocal(evt);
+                    this.renderer.hoverEdge = this.disruptMode ? this.renderer.edgeAt(p.x, p.y) : null;
+                });
+                canvas.addEventListener('pointerleave', () => { this.renderer.hoverEdge = null; });
+
+                canvas.addEventListener('pointerdown', (evt) => {
+                    const p = toLocal(evt);
+
+                    if (this.disruptMode) {
+                        const index = this.renderer.edgeAt(p.x, p.y);
+                        if (index !== null) {
+                            const edge = this.network.edges[index];
+                            edge.disrupted = !edge.disrupted;
+                            this.solve();
+                        }
+                        return;
+                    }
+
+                    // Outside disruption mode, clicking a node re-targets the shipment.
+                    const nodeId = this.renderer.nodeAt(p.x, p.y);
+                    if (nodeId !== null) {
+                        const sourceSel = document.getElementById('sel-source');
+                        if (nodeId === parseInt(sourceSel.value, 10)) return;
+                        document.getElementById('sel-target').value = String(nodeId);
+                        this.solve();
+                    }
+                });
+            }
+
+            populateSelects() {
+                const sourceSel = document.getElementById('sel-source');
+                const targetSel = document.getElementById('sel-target');
+                const options = this.network.nodes
+                    .map(n => `<option value="${n.id}">${n.id} — ${n.name} (${NODE_KINDS[n.kind].label})</option>`)
+                    .join('');
+                sourceSel.innerHTML = options;
+                targetSel.innerHTML = options;
+                sourceSel.value = '0';
+                targetSel.value = String(this.network.nodes.length - 1);
+            }
+
+            regenerate() {
+                this.network.generate();
+                this.renderer.network = this.network;
+                this.populateSelects();
+                document.getElementById('kpi-total-nodes').innerText = this.network.nodes.length;
+                this.solve();
+            }
+
+            setStatus(text, cls = '') {
+                const hud = document.getElementById('hud-status');
+                hud.innerText = text;
+                hud.className = 'hud-desc' + (cls ? ' ' + cls : '');
+            }
+
+            clearTimers() {
+                this.stepTimers.forEach(id => clearTimeout(id));
+                this.stepTimers = [];
+            }
+
+            solve() {
+                this.clearTimers();
+
+                const source = parseInt(document.getElementById('sel-source').value, 10);
+                const target = parseInt(document.getElementById('sel-target').value, 10);
+
+                if (Number.isNaN(source) || Number.isNaN(target)) return;
+                if (source === target) {
+                    this.setStatus('ORIGIN AND DESTINATION ARE THE SAME NODE', 'error');
+                    this.renderResult(null, source, target);
+                    return;
+                }
+
+                const result = DijkstraSolver.solve(this.network, source, target, this.params);
+                this.renderer.source = source;
+                this.renderer.target = target;
+                this.renderer.path = [];
+                this.renderer.pathEdges = [];
+                this.renderer.settledSet = [];
+                this.renderer.frontier = [];
+
+                this.setStatus('SOLVING — RELAXING EDGES...', 'busy');
+
+                // Replay the recorded settle order so the search is visible.
+                const stepDelay = Math.max(20, 90 / this.animSpeed);
+                result.steps.forEach((step, i) => {
+                    this.stepTimers.push(setTimeout(() => {
+                        this.renderer.settledSet = step.settledSet;
+                        this.renderer.frontier = step.frontier;
+                        this.renderQueue(step.frontier, step.settled);
+                    }, i * stepDelay));
+                });
+
+                this.stepTimers.push(setTimeout(() => {
+                    this.renderResult(result, source, target);
+                }, result.steps.length * stepDelay + 120));
+            }
+
+            renderQueue(frontier, settledNode) {
+                const list = document.getElementById('queue-list');
+                const unit = this.params.objective === 'cost' ? '$' : (this.params.objective === 'time' ? 'h' : 'km');
+                const rows = [`<div class="queue-row settled"><span>settled: ${settledNode}</span><span>&#10003;</span></div>`];
+                frontier.forEach(f => {
+                    rows.push(`<div class="queue-row"><span>node ${f.node}</span><span>${f.priority.toFixed(1)}${unit}</span></div>`);
+                });
+                if (frontier.length === 0) rows.push('<div class="queue-row"><span>queue drained</span><span>&#8212;</span></div>');
+                list.innerHTML = rows.join('');
+            }
+
+            renderResult(result, source, target) {
+                const body = document.getElementById('manifest-body');
+                const setKpi = (id, value) => { document.getElementById(id).innerText = value; };
+
+                if (!result || !result.reachable) {
+                    this.renderer.path = [];
+                    this.renderer.pathEdges = [];
+                    ['kpi-cost', 'kpi-dist', 'kpi-time', 'kpi-saving', 'kpi-ms'].forEach(id => setKpi(id, '—'));
+                    setKpi('kpi-visited', result ? result.settledCount : '—');
+                    if (result) {
+                        this.setStatus('NO FEASIBLE ROUTE — DESTINATION UNREACHABLE (LANES DISRUPTED)', 'error');
+                        body.innerHTML = '<tr class="empty-row"><td colspan="7">Dijkstra explored every reachable node and found no path. Restore a lane to reconnect the network.</td></tr>';
+                    }
+                    return;
+                }
+
+                this.renderer.path = result.path;
+                this.renderer.pathEdges = result.pathEdges;
+                this.renderer.pathProgress = 0;
+
+                // Sum the real-world figures leg by leg (the solver optimises one metric,
+                // but the manifest reports all three).
+                let totalCost = 0, totalKm = 0, totalHours = 0;
+                const rows = [];
+
+                result.pathEdges.forEach((edgeIndex, i) => {
+                    const edge = this.network.edges[edgeIndex];
+                    const fromId = result.path[i];
+                    const toId = result.path[i + 1];
+                    const w = this.network.weight(edge, toId, this.params);
+
+                    totalCost += w.cost;
+                    totalKm += w.km;
+                    totalHours += w.hours;
+
+                    rows.push(`<tr>
+                        <td>${i + 1}</td>
+                        <td>${this.network.nodes[fromId].name}</td>
+                        <td>${this.network.nodes[toId].name}</td>
+                        <td class="leg-mode" style="color:${MODES[edge.mode].color}">${MODES[edge.mode].label}</td>
+                        <td>${w.km.toLocaleString()}</td>
+                        <td>${w.hours.toFixed(1)}</td>
+                        <td>$${Math.round(w.cost).toLocaleString()}</td>
+                    </tr>`);
+                });
+
+                body.innerHTML = rows.join('');
+
+                setKpi('kpi-cost', '$' + Math.round(totalCost).toLocaleString());
+                setKpi('kpi-dist', Math.round(totalKm).toLocaleString() + ' km');
+                setKpi('kpi-time', totalHours.toFixed(1) + ' h');
+                setKpi('kpi-visited', result.settledCount);
+                setKpi('kpi-ms', result.ms.toFixed(2) + ' ms');
+
+                const greedyMetric = DijkstraSolver.greedy(this.network, source, target, this.params);
+                const optimalMetric = result.dist[target];
+                if (greedyMetric !== null && greedyMetric > 0 && optimalMetric > 0) {
+                    const saving = ((greedyMetric - optimalMetric) / greedyMetric) * 100;
+                    setKpi('kpi-saving', (saving > 0 ? '-' : '') + Math.abs(saving).toFixed(1) + '%');
+                } else {
+                    setKpi('kpi-saving', 'n/a');
+                }
+
+                this.setStatus(`OPTIMAL ROUTE FOUND — ${result.path.length} NODES / ${result.pathEdges.length} LANES`, '');
+            }
+        }
+
+        // ==========================================================================
+        // BOOTSTRAP
+        // ==========================================================================
+        window.addEventListener('DOMContentLoaded', () => {
+            try {
+                window.SupplyApp = new SupplyChainApp();
+            } catch (err) {
+                console.error('Supply chain optimizer failed to start:', err);
+                const hud = document.getElementById('hud-status');
+                if (hud) { hud.innerText = 'ENGINE ERROR — SEE CONSOLE'; hud.className = 'hud-desc error'; }
+            }
+        });
     </script>
 </body>
 </html>
