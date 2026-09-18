@@ -1,873 +1,738 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ENG.MOHAMMAD | Systems Architect</title>
-    <meta name="description" content="Portfolio of Eng. Mohammad Saleh - full-stack systems architect. Interactive engineering projects: WebGL particle physics, SCADA digital twins, OBD-II telemetry, and operations-research route optimization.">
-    <meta name="theme-color" content="#010103">
-    <meta property="og:title" content="ENG.MOHAMMAD | Systems Architect">
-    <meta property="og:description" content="Interactive engineering portfolio: WebGL physics, industrial digital twins, IoT telemetry and algorithmic route optimization.">
-    <meta property="og:type" content="website">
-    
-    <!-- Core Typography -->
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=Syncopate:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <style>
-        /* =========================================
-           01. CORE SYSTEM VARIABLES
-           ========================================= */
-        :root {
-            --bg-base: #010103;
-            --primary-core: #4A90E2;
-            --primary-glow: rgba(74, 144, 226, 0.6);
-            --secondary-core: #FF9F1C;
-            --matrix-green: #00ff41;
-            --text-main: #f8fafc;
-            --text-muted: #64748b;
-            --grid-line: rgba(74, 144, 226, 0.05);
-            --glass-bg: rgba(5, 7, 12, 0.6);
-            --glass-border: rgba(74, 144, 226, 0.15);
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mohammad Saleh — Systems Engineer &amp; Full-Stack Developer</title>
+<meta name="description" content="Portfolio of Mohammad Saleh: interactive engineering systems built for the browser — GPU particle physics, an industrial OEE digital twin, OBD-II vehicle telemetry, Dijkstra route optimisation and production e-commerce.">
+<meta name="theme-color" content="#04070d">
+<meta name="color-scheme" content="dark">
 
-        /* =========================================
-           02. BASE & RESET
-           ========================================= */
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
-        body {
-            font-family: 'Space Grotesk', sans-serif; background-color: var(--bg-base);
-            color: var(--text-main); overflow-x: hidden; cursor: none;
-            -webkit-font-smoothing: antialiased;
-        }
+<meta property="og:type" content="website">
+<meta property="og:title" content="Mohammad Saleh — Systems Engineer">
+<meta property="og:description" content="Interactive engineering systems built for the browser: GPU physics, industrial digital twins, vehicle telemetry and operations research.">
 
-        ::selection { background: var(--primary-core); color: #fff; }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: var(--bg-base); }
-        ::-webkit-scrollbar-thumb { background: var(--primary-core); border-radius: 4px; }
+<link rel="stylesheet" href="assets/core.css">
+<link rel="stylesheet" href="assets/vendor/fontawesome/css/all.min.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2304070d'/><text y='.9em' x='.5em' font-size='62' text-anchor='middle' fill='%234d9fff' font-family='monospace' font-weight='bold'>M</text></svg>">
 
-        /* =========================================
-           03. SYSTEM BOOTLOADER (PRELOADER)
-           ========================================= */
-        #system-bootloader {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: #000; z-index: 999999; display: flex; flex-direction: column;
-            justify-content: flex-end; padding: 5vw; font-family: 'Share Tech Mono', monospace;
-            color: var(--matrix-green); text-shadow: 0 0 5px rgba(0,255,65,0.5);
-            transition: transform 1.2s cubic-bezier(0.77, 0, 0.175, 1);
-        }
-        .boot-console { display: flex; flex-direction: column; gap: 8px; font-size: 14px; margin-bottom: 20px;}
-        .boot-line { opacity: 0; animation: typeIn 0.1s forwards; }
-        .boot-progress { width: 100%; height: 2px; background: #222; position: relative; }
-        .boot-bar { height: 100%; width: 0%; background: var(--matrix-green); box-shadow: 0 0 15px var(--matrix-green); transition: width 0.2s; }
-        @keyframes typeIn { to { opacity: 1; } }
+<style>
+    /* ======================================================================
+       PAGE SHELL
+       ====================================================================== */
+    body { background: var(--surface-base); }
 
-        /* =========================================
-           04. REDIRECTION PROTOCOL (TRANSITION)
-           ========================================= */
-        #transition-protocol {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(1,1,3,0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            z-index: 999998; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            opacity: 0; pointer-events: none; transition: opacity 0.5s;
-        }
-        #transition-protocol.active { opacity: 1; pointer-events: all; }
-        .cipher-ring {
-            width: 120px; height: 120px; border: 2px dashed var(--primary-core);
-            border-radius: 50%; animation: spin 4s linear infinite; position: relative;
-        }
-        .cipher-ring::before {
-            content: ''; position: absolute; top: -15px; left: -15px; right: -15px; bottom: -15px;
-            border: 1px solid rgba(74, 144, 226, 0.2); border-radius: 50%; border-top-color: var(--secondary-core);
-            animation: spin 2s linear infinite reverse;
-        }
-        .protocol-text { margin-top: 40px; font-family: 'Share Tech Mono', monospace; color: var(--primary-core); font-size: 16px; letter-spacing: 4px; text-align: center; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
+    /* Ambient blueprint grid + a soft glow behind the hero. */
+    .backdrop { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+    .backdrop::before {
+        content: ''; position: absolute; inset: 0;
+        background-image:
+            linear-gradient(rgba(77,159,255,0.045) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(77,159,255,0.045) 1px, transparent 1px);
+        background-size: 54px 54px;
+        mask-image: radial-gradient(ellipse 85% 60% at 50% 0%, #000 20%, transparent 78%);
+        -webkit-mask-image: radial-gradient(ellipse 85% 60% at 50% 0%, #000 20%, transparent 78%);
+    }
+    .backdrop::after {
+        content: ''; position: absolute; top: -30vh; left: 50%; transform: translateX(-50%);
+        width: min(1100px, 120vw); height: 80vh; border-radius: 50%;
+        background: radial-gradient(circle, rgba(77,159,255,0.13), transparent 62%);
+        filter: blur(30px);
+    }
 
-        /* =========================================
-           05. GLOBAL BACKGROUND & HUD
-           ========================================= */
-        .blueprint-grid {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; pointer-events: none;
-            background-image: linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
-            background-size: 40px 40px; mask-image: radial-gradient(circle at center, black 50%, transparent 100%);
-            -webkit-mask-image: radial-gradient(circle at center, black 50%, transparent 100%);
-        }
-        #webgl-core { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; }
+    .wrap { position: relative; z-index: 1; }
+    .shell { width: min(1240px, 100% - 2 * var(--space-5)); margin-inline: auto; }
 
-        .system-hud {
-            position: fixed; bottom: 30px; right: 40px; z-index: 100; pointer-events: none;
-            font-family: 'Share Tech Mono', monospace; font-size: 11px;
-            display: flex; flex-direction: column; gap: 6px; align-items: flex-end;
-        }
-        .hud-panel { background: rgba(0,0,0,0.8); border: 1px solid var(--glass-border); padding: 5px 12px; }
-        .hud-value { color: var(--secondary-core); margin-left: 10px; font-weight: bold;}
+    /* ======================================================================
+       NAV
+       ====================================================================== */
+    .nav {
+        position: sticky; top: 0; z-index: 60;
+        display: flex; align-items: center; justify-content: space-between; gap: var(--space-5);
+        padding: var(--space-4) 0;
+        background: color-mix(in srgb, var(--surface-base) 82%, transparent);
+        backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+        border-bottom: 1px solid transparent;
+        transition: border-color var(--speed) var(--ease-out);
+    }
+    .nav.is-stuck { border-bottom-color: var(--accent-line); }
+    .logo {
+        display: inline-flex; align-items: center; gap: var(--space-3);
+        font-family: var(--font-display); font-size: 14px; font-weight: 700;
+        letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-strong); text-decoration: none;
+    }
+    .logo-mark {
+        display: grid; place-items: center; width: 30px; height: 30px;
+        border: 1px solid var(--accent); border-radius: var(--radius-sm);
+        background: var(--accent-dim); color: var(--accent); font-size: 13px;
+    }
+    .nav-links { display: flex; gap: var(--space-6); }
+    .nav-links a {
+        font-family: var(--font-mono); font-size: var(--step--1);
+        letter-spacing: 0.14em; text-transform: uppercase;
+        color: var(--text-muted); text-decoration: none;
+        transition: color var(--speed) var(--ease-out);
+    }
+    .nav-links a:hover { color: var(--accent-bright); }
+    @media (max-width: 760px) { .nav-links { display: none; } }
 
-        /* Custom Crosshair */
-        .cursor-assembly { position: fixed; top: 0; left: 0; z-index: 9999; pointer-events: none; mix-blend-mode: difference; }
-        .cursor-reticle { width: 40px; height: 40px; border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; position: absolute; top: -20px; left: -20px; transition: 0.2s; }
-        .cursor-reticle::before, .cursor-reticle::after { content: ''; position: absolute; background: var(--primary-core); }
-        .cursor-reticle::before { top: 50%; left: -8px; width: calc(100% + 16px); height: 1px; }
-        .cursor-reticle::after { left: 50%; top: -8px; height: calc(100% + 16px); width: 1px; }
-        .cursor-dot { width: 4px; height: 4px; background: var(--secondary-core); position: absolute; top: -2px; left: -2px; border-radius: 50%; }
+    /* ======================================================================
+       HERO
+       ====================================================================== */
+    .hero { padding: clamp(var(--space-8), 11vw, 150px) 0 var(--space-9); }
+    .hero-status {
+        display: inline-flex; align-items: center; gap: var(--space-3);
+        padding: 7px 15px; margin-bottom: var(--space-5);
+        border: 1px solid rgba(61,220,151,0.28); border-radius: 99px;
+        background: rgba(61,220,151,0.07);
+        font-family: var(--font-mono); font-size: 11px;
+        letter-spacing: 0.16em; text-transform: uppercase; color: var(--signal);
+    }
+    .pulse-dot {
+        width: 7px; height: 7px; border-radius: 50%; background: var(--signal);
+        box-shadow: 0 0 0 0 rgba(61,220,151,0.7); animation: pulse 2.4s ease-out infinite;
+    }
+    @keyframes pulse {
+        70% { box-shadow: 0 0 0 9px rgba(61,220,151,0); }
+        100% { box-shadow: 0 0 0 0 rgba(61,220,151,0); }
+    }
 
-        /* =========================================
-           06. NAVIGATION
-           ========================================= */
-        .layout-wrapper { position: relative; z-index: 10; }
-        nav {
-            position: fixed; top: 0; width: 100%; padding: 30px 6vw; display: flex; justify-content: space-between; align-items: center;
-            z-index: 500; transition: all 0.4s;
-        }
-        nav.nav-active { padding: 15px 6vw; background: rgba(1, 1, 2, 0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid var(--glass-border); }
-        .brand-logo { font-family: 'Syncopate', sans-serif; font-size: 22px; font-weight: 700; letter-spacing: 2px; color: #fff; text-decoration: none; }
-        .brand-logo span { color: var(--primary-core); }
-        .nav-menu { display: flex; gap: 40px; }
-        .nav-item { font-family: 'Share Tech Mono', monospace; color: var(--text-main); text-decoration: none; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; }
-        .nav-item:hover { color: var(--primary-core); }
+    .hero h1 {
+        font-family: var(--font-display); font-size: var(--step-4);
+        font-weight: 700; letter-spacing: -0.02em; text-transform: uppercase;
+        line-height: 0.98; margin-bottom: var(--space-5);
+    }
+    .hero h1 .outline {
+        color: transparent;
+        -webkit-text-stroke: 1.5px rgba(243,247,252,0.72);
+        text-stroke: 1.5px rgba(243,247,252,0.72);
+    }
+    .hero-lede { max-width: 62ch; font-size: var(--step-1); line-height: 1.6; color: var(--text-body); }
+    .hero-lede strong { color: var(--text-strong); font-weight: 600; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: var(--space-4); margin-top: var(--space-7); }
 
-        /* =========================================
-           07. HERO MODULE
-           ========================================= */
-        .module-hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 100px 10vw 0; position: relative; }
-        .hero-sys-status { font-family: 'Share Tech Mono', monospace; color: var(--secondary-core); font-size: 12px; letter-spacing: 4px; margin-bottom: 25px; display: inline-flex; align-items: center; gap: 10px; }
-        .hero-sys-status::before { content: ''; width: 8px; height: 8px; background: var(--secondary-core); border-radius: 50%; box-shadow: 0 0 10px var(--secondary-core); animation: pulse 2s infinite; }
-        
-        .hero-title { font-family: 'Syncopate', sans-serif; font-size: clamp(35px, 7vw, 100px); font-weight: 700; line-height: 1.1; text-transform: uppercase; margin-bottom: 30px; letter-spacing: -1px; word-wrap: break-word; }
-        .text-stroke { color: transparent; -webkit-text-stroke: 1.5px rgba(255,255,255,0.8); }
-        .hero-desc { max-width: 600px; color: var(--text-muted); font-size: 1.1rem; line-height: 1.8; margin-bottom: 50px; }
-        
-        .btn-container { display: flex; gap: 20px; flex-wrap: wrap; z-index: 50; position: relative; }
-        .btn-system {
-            padding: 16px 40px; background: rgba(74, 144, 226, 0.1); border: 1px solid var(--primary-core);
-            color: #fff; font-family: 'Share Tech Mono', monospace; font-size: 14px; font-weight: bold;
-            text-transform: uppercase; letter-spacing: 2px; cursor: none; text-decoration: none;
-            display: inline-flex; align-items: center; gap: 12px; transition: all 0.3s ease;
-            box-shadow: inset 0 0 10px rgba(74, 144, 226, 0.2), 0 0 20px rgba(74, 144, 226, 0.2);
-            backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
-        }
-        .btn-system:hover { background: var(--primary-core); color: #fff; box-shadow: 0 0 30px var(--primary-glow); transform: translateY(-3px); }
+    .hero-stats {
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: var(--space-5); margin-top: var(--space-8);
+        padding-top: var(--space-6); border-top: 1px solid var(--accent-line);
+    }
+    .stat dt { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted); }
+    .stat dd {
+        margin: 6px 0 0; font-family: var(--font-display); font-size: var(--step-2);
+        color: var(--text-strong); font-variant-numeric: tabular-nums;
+    }
 
-        /* =========================================
-           08. GLOBAL SECTION ARCHITECTURE
-           ========================================= */
-        .section-module { padding: 120px 10vw; position: relative; border-top: 1px solid rgba(255,255,255,0.03); }
-        .module-header { font-family: 'Syncopate', sans-serif; font-size: clamp(28px, 5vw, 45px); margin-bottom: 70px; display: flex; flex-direction: column; gap: 10px; }
-        .module-index { font-family: 'Share Tech Mono', monospace; font-size: 12px; color: var(--primary-core); letter-spacing: 3px; }
+    /* ======================================================================
+       SECTIONS
+       ====================================================================== */
+    section { padding-block: var(--space-9); scroll-margin-top: 80px; }
+    .section-head { margin-bottom: var(--space-7); }
+    .section-head h2 {
+        font-family: var(--font-display); font-size: var(--step-3);
+        text-transform: uppercase; letter-spacing: -0.01em; margin-top: var(--space-3);
+    }
+    .section-head p { max-width: 66ch; margin-top: var(--space-4); color: var(--text-body); }
 
-        .tilt-chassis { transform-style: preserve-3d; will-change: transform; perspective: 1500px; }
+    /* ======================================================================
+       PROJECT CARDS
+       ====================================================================== */
+    .projects { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: var(--space-5); }
 
-        /* --- METHODOLOGY (PROCESS) --- */
-        .process-grid { display: flex; flex-direction: column; gap: 30px; position: relative; }
-        .process-grid::before { content: ''; position: absolute; left: 25px; top: 0; bottom: 0; width: 2px; background: var(--glass-border); }
-        .process-step { display: flex; gap: 30px; position: relative; padding: 40px; background: var(--glass-bg); border: 1px solid var(--glass-border); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
-        .process-icon { width: 50px; height: 50px; border-radius: 50%; background: var(--bg-base); border: 2px solid var(--primary-core); display: flex; justify-content: center; align-items: center; font-size: 18px; color: var(--primary-core); position: absolute; left: 0; top: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 15px rgba(74, 144, 226, 0.3); z-index: 2; }
-        .process-content { margin-left: 40px; }
-        .process-content h3 { font-family: 'Syncopate', sans-serif; font-size: 20px; margin-bottom: 15px; }
-        .process-content p { color: var(--text-muted); line-height: 1.7; font-size: 15px; }
+    .card {
+        position: relative; display: flex; flex-direction: column;
+        padding: var(--space-6); border-radius: var(--radius-lg);
+        background: linear-gradient(170deg, var(--surface-panel), var(--surface-sunken));
+        border: 1px solid var(--accent-line);
+        text-decoration: none; color: inherit; overflow: hidden;
+        transition: transform var(--speed) var(--ease-out),
+                    border-color var(--speed) var(--ease-out),
+                    box-shadow var(--speed) var(--ease-out);
+    }
+    /* Pointer-tracked sheen. The custom properties are written by JS. */
+    .card::before {
+        content: ''; position: absolute; inset: 0; opacity: 0;
+        background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 0%), rgba(77,159,255,0.12), transparent 62%);
+        transition: opacity var(--speed) var(--ease-out);
+    }
+    .card:hover, .card:focus-visible {
+        transform: translateY(-5px);
+        border-color: rgba(77,159,255,0.5);
+        box-shadow: var(--shadow-lift);
+    }
+    .card:hover::before, .card:focus-visible::before { opacity: 1; }
+    .card > * { position: relative; }
 
-        /* --- PROJECTS MATRIX --- */
-        .project-matrix { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
-        .matrix-card { height: 450px; border: 1px solid var(--glass-border); background: #050508; position: relative; overflow: hidden; cursor: none; }
-        .matrix-card:focus-visible, .btn-system:focus-visible, .nav-item:focus-visible, .node-link:focus-visible { outline: 2px solid var(--secondary-core); outline-offset: 4px; }
-        .matrix-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; filter: grayscale(100%) opacity(0.3); transition: all 0.6s; transform: translateZ(-30px); }
-        .matrix-card:hover .matrix-image { filter: grayscale(0%) opacity(0.8); transform: scale(1.05) translateZ(-10px); }
-        .matrix-data { position: absolute; bottom: 0; left: 0; width: 100%; padding: 30px; background: linear-gradient(to top, rgba(1,1,2,0.98) 20%, transparent); transform: translateY(30px) translateZ(40px); transition: 0.5s; display: flex; flex-direction: column; justify-content: flex-end; }
-        .matrix-card:hover .matrix-data { transform: translateY(0) translateZ(50px); }
-        .matrix-data h3 { font-family: 'Syncopate', sans-serif; font-size: 22px; margin-bottom: 12px; }
-        .matrix-data p { color: #cbd5e1; font-size: 13px; line-height: 1.6; margin-bottom: 20px; }
-        .tech-array { display: flex; flex-wrap: wrap; gap: 8px; }
-        .tech-array span { padding: 4px 10px; background: rgba(74, 144, 226, 0.1); border: 1px solid rgba(74, 144, 226, 0.2); font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--primary-core); }
-        
-        .rtl-badge { display: inline-block; margin-top: 8px; font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--secondary-core); border: 1px dashed var(--secondary-core); padding: 3px 8px; }
+    .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-4); margin-bottom: var(--space-5); }
+    .card-icon {
+        display: grid; place-items: center; width: 46px; height: 46px; flex-shrink: 0;
+        border-radius: var(--radius-md); font-size: 19px;
+        background: var(--tint, var(--accent-dim)); color: var(--tint-fg, var(--accent));
+        border: 1px solid color-mix(in srgb, var(--tint-fg, var(--accent)) 30%, transparent);
+    }
+    .card-flag {
+        font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.16em;
+        text-transform: uppercase; color: var(--signal);
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 4px 10px; border-radius: 99px;
+        border: 1px solid rgba(61,220,151,0.3); background: rgba(61,220,151,0.07);
+    }
+    .card h3 { font-size: var(--step-1); margin-bottom: var(--space-3); }
+    .card-role {
+        font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em;
+        text-transform: uppercase; color: var(--tint-fg, var(--accent)); margin-bottom: var(--space-3);
+    }
+    .card p { font-size: var(--step--1); line-height: 1.75; color: var(--text-body); }
+    .card-highlight {
+        margin-top: var(--space-4); padding: var(--space-3) var(--space-4);
+        border-left: 2px solid var(--tint-fg, var(--accent)); border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+        background: rgba(255,255,255,0.025);
+        font-family: var(--font-mono); font-size: 10.5px; line-height: 1.7; color: var(--text-muted);
+    }
+    .card-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; padding-top: var(--space-5); }
+    .card-cta {
+        display: inline-flex; align-items: center; gap: var(--space-2); margin-top: var(--space-5);
+        font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em;
+        text-transform: uppercase; color: var(--text-strong);
+    }
+    .card-cta i { transition: transform var(--speed) var(--ease-out); }
+    .card:hover .card-cta i { transform: translateX(4px); }
 
-        /* --- LIVE TELEMETRY COUNTERS --- */
-        .telemetry-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; }
-        .telemetry-node { padding: 40px 20px; text-align: center; border: 1px solid var(--glass-border); background: var(--glass-bg); position: relative; overflow: hidden; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
-        .telemetry-node::after { content: ''; position: absolute; bottom: 0; left: 0; height: 3px; width: 100%; background: var(--primary-core); transform: scaleX(0); transform-origin: left; transition: 0.5s; }
-        .telemetry-node:hover::after { transform: scaleX(1); }
-        .tel-number { font-family: 'Syncopate', sans-serif; font-size: 40px; color: #fff; margin-bottom: 10px; }
-        .tel-label { font-family: 'Share Tech Mono', monospace; color: var(--secondary-core); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; }
+    /* ======================================================================
+       CAPABILITIES
+       ====================================================================== */
+    .capabilities { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--space-5); }
+    .cap { padding: var(--space-6); border-radius: var(--radius-md); background: var(--surface-panel); border: 1px solid var(--accent-line); }
+    .cap i { font-size: 21px; color: var(--highlight); }
+    .cap h3 { font-size: var(--step-0); margin: var(--space-4) 0 var(--space-3); }
+    .cap p { font-size: var(--step--1); color: var(--text-body); }
+    .cap ul { margin: var(--space-4) 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 6px; }
 
-        /* --- ALGORITHMIC CANVAS (NEW NEURAL MESH) --- */
-        .algo-section { display: flex; flex-wrap: wrap; gap: 50px; align-items: center; }
-        .algo-text { flex: 1 1 300px; }
-        .algo-text h3 { font-family: 'Syncopate', sans-serif; font-size: 22px; margin-bottom: 20px; }
-        .algo-text p { color: var(--text-muted); line-height: 1.8; margin-bottom: 20px; }
-        .algo-canvas-container { flex: 1 1 300px; height: 400px; border: 1px solid var(--glass-border); position: relative; background: #030406; overflow: hidden; }
-        #neural-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-        .canvas-overlay { position: absolute; top: 20px; left: 20px; font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--matrix-green); pointer-events: none; }
+    /* ======================================================================
+       PROCESS
+       ====================================================================== */
+    .process { display: grid; gap: var(--space-4); counter-reset: step; }
+    .step {
+        display: grid; grid-template-columns: 54px 1fr; gap: var(--space-5); align-items: start;
+        padding: var(--space-5) var(--space-6); border-radius: var(--radius-md);
+        background: var(--surface-panel); border: 1px solid var(--accent-line);
+    }
+    .step-num {
+        display: grid; place-items: center; width: 42px; height: 42px;
+        border-radius: 50%; border: 1px solid var(--accent-line); background: var(--accent-dim);
+        font-family: var(--font-mono); font-size: 13px; color: var(--accent);
+    }
+    .step h3 { font-size: var(--step-0); margin-bottom: 6px; }
+    .step p { font-size: var(--step--1); color: var(--text-body); }
+    @media (max-width: 560px) { .step { grid-template-columns: 1fr; } }
 
-        /* --- TECHNICAL SPECS --- */
-        .specs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 40px; }
-        .spec-node { padding: 45px 35px; background: var(--glass-bg); border: 1px solid var(--glass-border); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
-        .spec-icon { font-size: 35px; color: var(--secondary-core); margin-bottom: 25px; transform: translateZ(40px); }
-        .spec-node h3 { font-family: 'Syncopate', sans-serif; font-size: 18px; margin-bottom: 15px; transform: translateZ(30px); }
-        .spec-node p { color: var(--text-muted); font-size: 14px; line-height: 1.7; transform: translateZ(20px); }
+    /* ======================================================================
+       CONTACT
+       ====================================================================== */
+    .contact {
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-8);
+        padding: var(--space-8); border-radius: var(--radius-lg);
+        background: linear-gradient(150deg, var(--surface-panel), var(--surface-sunken));
+        border: 1px solid var(--accent-line);
+    }
+    .contact h2 { font-family: var(--font-display); font-size: var(--step-2); text-transform: uppercase; margin-bottom: var(--space-4); }
+    .contact p { color: var(--text-body); }
+    .contact-links { display: flex; flex-direction: column; gap: var(--space-3); margin-top: var(--space-6); }
+    .contact-link {
+        display: inline-flex; align-items: center; gap: var(--space-3);
+        font-family: var(--font-mono); font-size: var(--step--1); color: var(--text-body);
+        text-decoration: none; transition: color var(--speed) var(--ease-out);
+    }
+    .contact-link:hover { color: var(--accent-bright); }
+    .contact-link i { width: 18px; color: var(--accent); }
 
-        /* --- COMMS INTERFACE --- */
-        .comms-interface {
-            display: flex; flex-wrap: wrap; gap: 50px; background: var(--glass-bg);
-            border: 1px solid var(--glass-border); padding: 60px; position: relative;
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-        }
-        .comms-interface::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--primary-core); }
-        .comms-header { flex: 1 1 300px; }
-        .comms-header h3 { font-family: 'Syncopate', sans-serif; font-size: clamp(28px, 4vw, 40px); line-height: 1.2; margin-bottom: 20px; word-wrap: break-word; overflow-wrap: break-word; }
-        .comms-header p { color: var(--text-muted); line-height: 1.6; }
-        .social-nodes { display: flex; gap: 15px; margin-top: 30px; }
-        .node-link { width: 50px; height: 50px; border: 1px solid var(--glass-border); display: flex; justify-content: center; align-items: center; font-size: 18px; color: #fff; text-decoration: none; transition: 0.3s; cursor: none; }
-        .node-link:hover { background: var(--primary-core); border-color: var(--primary-core); transform: translateY(-5px); }
+    form { display: flex; flex-direction: column; gap: var(--space-5); }
+    .field label {
+        display: block; margin-bottom: 7px;
+        font-family: var(--font-mono); font-size: 10px;
+        letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-muted);
+    }
+    .field input, .field textarea {
+        width: 100%; padding: 12px 14px; border-radius: var(--radius-sm);
+        background: rgba(0,0,0,0.32); border: 1px solid var(--accent-line);
+        color: var(--text-strong); font-family: var(--font-body); font-size: var(--step-0);
+        transition: border-color var(--speed) var(--ease-out), background var(--speed) var(--ease-out);
+    }
+    .field textarea { resize: vertical; min-height: 110px; }
+    .field input:focus, .field textarea:focus { outline: none; border-color: var(--accent); background: rgba(0,0,0,0.5); }
 
-        .comms-form { flex: 1 1 300px; display: flex; flex-direction: column; gap: 35px; }
-        .form-field { position: relative; }
-        .form-field input, .form-field textarea { width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 15px 0; font-family: 'Share Tech Mono', monospace; font-size: 15px; outline: none; transition: 0.3s; resize: none; }
-        .form-field label { position: absolute; top: 15px; left: 0; color: var(--text-muted); pointer-events: none; transition: 0.3s; font-family: 'Share Tech Mono', monospace; }
-        .form-field input:focus ~ label, .form-field input:valid ~ label, .form-field textarea:focus ~ label, .form-field textarea:valid ~ label { top: -15px; font-size: 11px; color: var(--primary-core); }
-        .form-field input:focus, .form-field textarea:focus { border-bottom-color: var(--primary-core); }
+    footer {
+        padding: var(--space-7) 0; margin-top: var(--space-8);
+        border-top: 1px solid var(--accent-line);
+        display: flex; flex-wrap: wrap; gap: var(--space-4); justify-content: space-between;
+        font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);
+    }
 
-        footer { padding: 40px; text-align: center; border-top: 1px dashed rgba(255,255,255,0.1); font-family: 'Share Tech Mono', monospace; font-size: 12px; color: var(--text-muted); }
-
-        /* =========================================
-           09. RESPONSIVE ENGINEERING
-           ========================================= */
-        @media (max-width: 900px) {
-            nav { padding: 20px; flex-direction: column; gap: 20px; background: rgba(1,1,2,0.95); }
-            nav.nav-active { padding: 20px; }
-            .hero-title { font-size: 13vw; }
-            .btn-system { padding: 15px 25px; width: 100%; justify-content: center; }
-            .process-step { flex-direction: column; padding-left: 50px; }
-            .process-icon { top: 0; transform: translate(-50%, -20%); }
-            .matrix-image { opacity: 0.6; }
-            .matrix-data { transform: translateY(0) translateZ(30px); background: linear-gradient(to top, rgba(1,1,2,1) 50%, rgba(1,1,2,0.5)); }
-            .comms-interface { padding: 40px 20px; }
-            
-            body, .btn-system, .matrix-card, a, input, textarea, button { cursor: auto !important; }
-            .cursor-assembly { display: none !important; }
-            .system-hud { display: none; } 
-        }
-        
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 159, 28, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(255, 159, 28, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 159, 28, 0); } }
-    </style>
+    /* ======================================================================
+       ENTRANCE ANIMATION
+       Opt-in via a class so content is visible if the script never runs.
+       ====================================================================== */
+    .reveal { opacity: 0; transform: translateY(18px); }
+    .reveal.is-in { opacity: 1; transform: none; transition: opacity 620ms var(--ease-out), transform 620ms var(--ease-out); }
+    @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; } }
+</style>
 </head>
 <body>
 
-    <!-- 01. SYSTEM BOOTLOADER -->
-    <div id="system-bootloader">
-        <div class="boot-console" id="boot-console"></div>
-        <div class="boot-progress"><div class="boot-bar" id="boot-bar"></div></div>
-    </div>
+<a class="skip-link" href="#work">Skip to projects</a>
+<div class="backdrop" aria-hidden="true"></div>
 
-    <!-- 02. REDIRECTION PROTOCOL -->
-    <div id="transition-protocol">
-        <div class="cipher-ring"></div>
-        <div class="protocol-text" id="trans-text">ESTABLISHING SECURE LINK...</div>
-    </div>
+<div class="wrap">
 
-    <!-- 03. BACKGROUNDS & HUD -->
-    <div class="blueprint-grid"></div>
-    <div id="webgl-core"></div>
-    <div class="cursor-assembly" aria-hidden="true"><div class="cursor-dot"></div><div class="cursor-reticle"></div></div>
+    <!-- ================= NAV ================= -->
+    <nav class="nav shell" id="nav" aria-label="Primary">
+        <a class="logo" href="#top">
+            <span class="logo-mark" aria-hidden="true">M</span>
+            Mohammad Saleh
+        </a>
+        <div class="nav-links">
+            <a href="#work">Work</a>
+            <a href="#capabilities">Capabilities</a>
+            <a href="#process">Process</a>
+            <a href="#contact">Contact</a>
+        </div>
+    </nav>
 
-    <div class="system-hud">
-        <div class="hud-panel">MEM_ALLOC: <span class="hud-value">OPTIMAL</span></div>
-        <div class="hud-panel">RENDER_FPS: <span id="fps-monitor" class="hud-value">60.0</span></div>
-        <div class="hud-panel">SCROLL_Y: <span id="scroll-monitor" class="hud-value">0000</span></div>
-        <div class="hud-panel">SYS_UPTIME: <span id="uptime-monitor" class="hud-value">0x00</span></div>
-    </div>
+    <main class="shell" id="top">
 
-    <div class="layout-wrapper">
-        <!-- NAVIGATION -->
-        <nav id="main-nav">
-            <a href="#" class="brand-logo hover-trigger">ENG.<span>MOHAMMAD</span></a>
-            <div class="nav-menu">
-                <a href="#process" class="nav-item hover-trigger">Process</a>
-                <a href="#projects" class="nav-item hover-trigger">Projects</a>
-                <a href="#specs" class="nav-item hover-trigger">Specs</a>
-                <a href="#comms" class="nav-item hover-trigger">Comms</a>
-            </div>
-        </nav>
-
-        <!-- HERO SECTION -->
-        <section class="module-hero">
-            <div class="hero-sys-status">SECURE CONNECTION ESTABLISHED</div>
-            <h1 class="hero-title cipher-text" data-original="Creative Engineer">
-                <span class="text-stroke">Creative</span><br>
-                <span>Engineer</span>
+        <!-- ================= HERO ================= -->
+        <header class="hero">
+            <span class="hero-status"><span class="pulse-dot" aria-hidden="true"></span> Open to engineering roles</span>
+            <h1>
+                <span class="outline">Systems</span><br>
+                Engineer
             </h1>
-            <p class="hero-desc">Architecting robust full-stack systems and engineering mathematically precise, high-performance digital interfaces using advanced WebGL physics and algorithmic logic.</p>
-            
-            <div class="btn-container">
-                <!-- Scrolls smoothly to the projects section instead of a placeholder page -->
-                <a href="#projects" class="btn-system hover-trigger">
-                    EXPLORE ARCHITECTURE <i class="fas fa-layer-group"></i>
+            <p class="hero-lede">
+                I build <strong>interactive engineering systems that run in the browser</strong> — GPU physics,
+                industrial digital twins, live vehicle telemetry and optimisation algorithms.
+                Every project below is a working application you can open and drive right now,
+                not a screenshot.
+            </p>
+            <div class="hero-actions">
+                <a class="btn btn-primary" href="#work">
+                    View the work <i class="fas fa-arrow-down" aria-hidden="true"></i>
                 </a>
-                <a href="#comms" class="btn-system hover-trigger" style="background: transparent;">
-                    ESTABLISH LINK <i class="fas fa-terminal"></i>
+                <a class="btn" href="#contact">
+                    Get in touch <i class="fas fa-paper-plane" aria-hidden="true"></i>
                 </a>
             </div>
-        </section>
 
-        <!-- ENGINEERING PROCESS -->
-        <section class="section-module" id="process">
-            <div class="module-header">
-                <span class="module-index">01 //</span>
-                <h2 class="cipher-text" data-original="Engineering Process">Engineering Process</h2>
+            <dl class="hero-stats">
+                <div class="stat"><dt>Live projects</dt><dd data-count="8">8</dd></div>
+                <div class="stat"><dt>Particles per frame</dt><dd data-count="120000" data-format="compact">120k</dd></div>
+                <div class="stat"><dt>Third-party runtime deps</dt><dd data-count="0">0</dd></div>
+                <div class="stat"><dt>Domains covered</dt><dd data-count="5">5</dd></div>
+            </dl>
+        </header>
+
+        <!-- ================= WORK ================= -->
+        <section id="work">
+            <div class="section-head reveal">
+                <span class="eyebrow">01 — Selected work</span>
+                <h2>Things I have built</h2>
+                <p>
+                    Eight production and engineering projects. The simulations run real algorithms —
+                    Dijkstra's shortest path, OEE arithmetic, involute gear geometry, OBD-II PID decoding —
+                    rather than replaying canned animations.
+                </p>
             </div>
 
-            <div class="process-grid">
-                <div class="process-step tilt-chassis hover-trigger">
-                    <div class="process-icon"><i class="fas fa-drafting-compass"></i></div>
-                    <div class="process-content">
-                        <h3>01. Requirements &amp; Analysis</h3>
-                        <p>Every build starts by turning an ambiguous brief into measurable constraints: throughput targets, latency budgets, data volumes and failure modes. Nothing is written until the success criteria are numeric.</p>
+            <div class="projects" id="project-grid">
+
+                <!-- 01. Lily's Designs -->
+                <a class="card reveal" style="--tint: rgba(255,138,226,0.12); --tint-fg: #ff8ae2;"
+                   href="https://lily-s-designs.mohalisal1.workers.dev" target="_blank" rel="noopener noreferrer">
+                    <div class="card-top">
+                        <span class="card-icon"><i class="fas fa-envelope-open-text" aria-hidden="true"></i></span>
+                        <span class="card-flag"><i class="fas fa-circle" style="font-size:6px" aria-hidden="true"></i> Live store</span>
                     </div>
-                </div>
-
-                <div class="process-step tilt-chassis hover-trigger">
-                    <div class="process-icon"><i class="fas fa-project-diagram"></i></div>
-                    <div class="process-content">
-                        <h3>02. System Architecture</h3>
-                        <p>Modelling the domain before the interface — schemas, state machines and module boundaries. Choosing the algorithm that fits the complexity class of the problem rather than the one that is quickest to type.</p>
-                    </div>
-                </div>
-
-                <div class="process-step tilt-chassis hover-trigger">
-                    <div class="process-icon"><i class="fas fa-code"></i></div>
-                    <div class="process-content">
-                        <h3>03. Implementation</h3>
-                        <p>Building in vertical slices so each layer is provably working before the next is stacked on it. Rendering paths are profiled as they are written, because a frame budget is a requirement, not an afterthought.</p>
-                    </div>
-                </div>
-
-                <div class="process-step tilt-chassis hover-trigger">
-                    <div class="process-icon"><i class="fas fa-vial"></i></div>
-                    <div class="process-content">
-                        <h3>04. Verification &amp; Deployment</h3>
-                        <p>Testing the edges first: empty states, disconnected sockets, unsupported hardware. A feature is only finished when it degrades gracefully on the day the network, the GPU or the API is not there.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- PROJECTS MATRIX -->
-        <section class="section-module" id="projects">
-            <div class="module-header">
-                <span class="module-index">02 //</span>
-                <h2 class="cipher-text" data-original="Architected Works">Architected Works</h2>
-            </div>
-            
-            <div class="project-matrix">
-                
-                <!-- 01. EduTech Platform -->
-                <div class="matrix-card tilt-chassis hover-trigger" role="link" tabindex="0" data-href="https://tuition-platform.mohalisal1.workers.dev/">
-                    <div class="matrix-image" style="background-image: url('https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=2070&auto=format&fit=crop');"></div>
-                    <div class="matrix-data">
-                        <h3>EduTech Platform</h3>
-                        <p>A full-stack learning management ecosystem with live streaming, logic-based gamification, and analytics.</p>
-                        <div class="tech-array"><span>REACT.JS</span> <span>FIREBASE_DB</span> <span>NODE.ENV</span></div>
-                        <div class="rtl-badge"><i class="fas fa-globe"></i> Engineered with Native RTL/i18n Localization</div>
-                    </div>
-                </div>
-
-                <!-- 02. FinTech Core -->
-                <div class="matrix-card tilt-chassis hover-trigger" role="link" tabindex="0" data-href="fintech.html">
-                    <div class="matrix-image" style="background-image: url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop');"></div>
-                    <div class="matrix-data">
-                        <h3>FinTech Core</h3>
-                        <p>High-frequency data visualization dashboard featuring real-time socket connections and secure authentication.</p>
-                        <div class="tech-array"><span>WEBSOCKETS</span> <span>CHART.JS</span> <span>SPA_ROUTER</span></div>
-                    </div>
-                </div>
-
-                <!-- 03. WebGL Engine -->
-                <div class="matrix-card tilt-chassis hover-trigger" role="link" tabindex="0" data-href="webgl.html">
-                    <div class="matrix-image" style="background-image: url('https://images.unsplash.com/photo-1618761714954-0b8cd0026356?q=80&w=2070&auto=format&fit=crop');"></div>
-                    <div class="matrix-data">
-                        <h3>WebGL Particle Engine</h3>
-                        <p>Interactive 3D simulation engine utilizing WebGL shaders and Three.js to compute complex mathematical morphologies.</p>
-                        <div class="tech-array"><span>THREE.JS</span> <span>GLSL</span> <span>MATH_KINEMATICS</span></div>
-                    </div>
-                </div>
-
-                <!-- 04. IoT Automotive Twin -->
-                <div class="matrix-card tilt-chassis hover-trigger" role="link" tabindex="0" data-href="iot.html">
-                    <div class="matrix-image" style="background-image: url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=2070&auto=format&fit=crop');"></div>
-                    <div class="matrix-data">
-                        <h3>IoT Automotive Twin</h3>
-                        <p>Hardware-to-Web OBD-II diagnostic tool linking CAN-BUS hex streams to a procedural 3D ECU hologram.</p>
-                        <div class="tech-array"><span>WEB_BLUETOOTH</span> <span>THREE.JS</span> <span>WEB_AUDIO</span></div>
-                    </div>
-                </div>
-
-                <!-- 05. Smart Factory SCADA -->
-                <div class="matrix-card tilt-chassis hover-trigger" role="link" tabindex="0" data-href="factory.html">
-                    <div class="matrix-image" style="background-image: url('https://images.unsplash.com/photo-1565514020179-026b92b84bb6?q=80&w=2070&auto=format&fit=crop');"></div>
-                    <div class="matrix-data">
-                        <h3>Smart Factory SCADA</h3>
-                        <p>Industrial Digital Twin calculating real-time OEE (Availability, Performance, Quality) for a 3D robotic assembly line.</p>
-                        <div class="tech-array"><span>OEE_MATH</span> <span>WEBGL_PHYSICS</span> <span>CANVAS_API</span></div>
-                    </div>
-                </div>
-
-                <!-- 06. AI Supply Chain -->
-                <div class="matrix-card tilt-chassis hover-trigger" role="link" tabindex="0" data-href="supply-chain.html">
-                    <div class="matrix-image" style="background-image: url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=2070&auto=format&fit=crop');"></div>
-                    <div class="matrix-data">
-                        <h3>AI Supply Chain</h3>
-                        <p>Operations Research pathfinding visualizer applying Dijkstra's algorithm for logistics cost and route optimization.</p>
-                        <div class="tech-array"><span>DIJKSTRA_ALGO</span> <span>CANVAS_2D</span> <span>SYSTEMS_ENG</span></div>
-                    </div>
-                </div>
-
-                <!-- 07. WebRTC Sync Room -->
-                <div class="matrix-card tilt-chassis hover-trigger" role="link" tabindex="0" data-href="webrtc.html">
-                    <div class="matrix-image" style="background-image: url('https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=2070&auto=format&fit=crop');"></div>
-                    <div class="matrix-data">
-                        <h3>WebRTC Sync Room</h3>
-                        <p>Remote engineering collaboration hub featuring a mathematical measurement canvas and a procedural 3D gear assembly.</p>
-                        <div class="tech-array"><span>WEBRTC_SIM</span> <span>CAD_GEOMETRY</span> <span>EUCLIDEAN_MATH</span></div>
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
-
-        <!-- LIVE TELEMETRY COUNTERS -->
-        <section class="section-module" id="telemetry">
-            <div class="telemetry-grid">
-                <div class="telemetry-node tilt-chassis hover-trigger">
-                    <div class="tel-number counter" data-target="94592">0</div>
-                    <div class="tel-label">Lines of Code Written</div>
-                </div>
-                <div class="telemetry-node tilt-chassis hover-trigger">
-                    <div class="tel-number counter" data-target="156">0</div>
-                    <div class="tel-label">Git Commits</div>
-                </div>
-                <div class="telemetry-node tilt-chassis hover-trigger">
-                    <div class="tel-number counter" data-target="99.9">0</div>
-                    <div class="tel-label">System Uptime (%)</div>
-                </div>
-                <div class="telemetry-node tilt-chassis hover-trigger">
-                    <div class="tel-number counter" data-target="4096">0</div>
-                    <div class="tel-label">Coffees Consumed</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- NEURAL DATA MESH (CANVAS) -->
-        <section class="section-module" id="algorithms">
-            <div class="module-header">
-                <span class="module-index">03 //</span>
-                <h2 class="cipher-text" data-original="Data Processing">Data Processing</h2>
-            </div>
-            <div class="algo-section">
-                <div class="algo-text">
-                    <h3>Neural Mesh Simulation</h3>
-                    <p>Real-time visualization of data packet routing. This canvas dynamically generates nodes and calculates distance thresholds to draw connecting vectors (edges) precisely when nodes interact.</p>
-                    <p style="font-family: 'Share Tech Mono', monospace; font-size: 13px; color: var(--secondary-core);">
-                        d(p, q) = √((q₁-p₁)² + (q₂-p₂)²) <br>
-                        IF d < threshold THEN connect()
+                    <p class="card-role">E-commerce · Production</p>
+                    <h3>Lily's Designs</h3>
+                    <p>
+                        A storefront for custom invitation cards: browsable catalogue with search,
+                        a persistent cart and a full checkout flow. Built without a framework and
+                        localised for Arabic, so the entire layout mirrors under RTL.
                     </p>
-                </div>
-                <div class="algo-canvas-container tilt-chassis hover-trigger">
-                    <canvas id="neural-canvas"></canvas>
-                    <div class="canvas-overlay">
-                        NODE_COUNT: <span id="node-count">00</span><br>
-                        ACTIVE_EDGES: <span id="edge-count">00</span>
+                    <p class="card-highlight">Hand-written JS — no framework runtime shipped to the customer.</p>
+                    <div class="card-tags">
+                        <span class="chip">Vanilla JS</span>
+                        <span class="chip">Cloudflare Workers</span>
+                        <span class="chip">RTL / i18n</span>
+                        <span class="chip">Cart &amp; checkout</span>
                     </div>
-                </div>
+                    <span class="card-cta">Open the store <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></span>
+                </a>
+
+                <!-- 02. EduTech -->
+                <a class="card reveal" style="--tint: rgba(61,220,151,0.12); --tint-fg: #3ddc97;"
+                   href="https://tuition-platform.mohalisal1.workers.dev/" target="_blank" rel="noopener noreferrer">
+                    <div class="card-top">
+                        <span class="card-icon"><i class="fas fa-graduation-cap" aria-hidden="true"></i></span>
+                        <span class="card-flag"><i class="fas fa-circle" style="font-size:6px" aria-hidden="true"></i> Live platform</span>
+                    </div>
+                    <p class="card-role">Full-stack · Production</p>
+                    <h3>EduTech Platform</h3>
+                    <p>
+                        A learning management system with live sessions, rule-based gamification and
+                        progress analytics. Multi-role access separates what students, tutors and
+                        administrators can each reach.
+                    </p>
+                    <p class="card-highlight">Engineered with native RTL and internationalisation from the first commit.</p>
+                    <div class="card-tags">
+                        <span class="chip">React</span>
+                        <span class="chip">Firebase</span>
+                        <span class="chip">Node</span>
+                        <span class="chip">RTL / i18n</span>
+                    </div>
+                    <span class="card-cta">Open the platform <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></span>
+                </a>
+
+                <!-- 03. WebGL engine -->
+                <a class="card reveal" style="--tint: rgba(77,159,255,0.12); --tint-fg: #4d9fff;" href="webgl.html">
+                    <div class="card-top">
+                        <span class="card-icon"><i class="fas fa-atom" aria-hidden="true"></i></span>
+                    </div>
+                    <p class="card-role">Graphics · GPU</p>
+                    <h3>WebGL Particle Engine</h3>
+                    <p>
+                        120,000 points morphing between five parametric surfaces — Fibonacci sphere,
+                        DNA double helix, trefoil torus knot, spiral galaxy and a line lattice.
+                        The interpolation happens in the vertex shader, so the main thread stays free.
+                    </p>
+                    <p class="card-highlight">One draw call. Zero per-frame CPU work across 120k points.</p>
+                    <div class="card-tags">
+                        <span class="chip">Three.js</span>
+                        <span class="chip">GLSL</span>
+                        <span class="chip">BufferGeometry</span>
+                    </div>
+                    <span class="card-cta">Launch the engine <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+                </a>
+
+                <!-- 04. Factory -->
+                <a class="card reveal" style="--tint: rgba(255,167,51,0.12); --tint-fg: #ffa733;" href="factory.html">
+                    <div class="card-top">
+                        <span class="card-icon"><i class="fas fa-industry" aria-hidden="true"></i></span>
+                    </div>
+                    <p class="card-role">Industrial · Simulation</p>
+                    <h3>Smart Factory SCADA</h3>
+                    <p>
+                        A digital twin of an assembly line: three articulated robot cells working a live
+                        conveyor while the dashboard computes real OEE — Availability × Performance ×
+                        Quality — from the parts actually produced.
+                    </p>
+                    <p class="card-highlight">Emergency-stop and maintenance states that the KPI maths genuinely respects.</p>
+                    <div class="card-tags">
+                        <span class="chip">OEE maths</span>
+                        <span class="chip">Three.js</span>
+                        <span class="chip">Canvas 2D</span>
+                    </div>
+                    <span class="card-cta">Run the line <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+                </a>
+
+                <!-- 05. Logistics -->
+                <a class="card reveal" style="--tint: rgba(181,140,255,0.12); --tint-fg: #b58cff;" href="logistics.html">
+                    <div class="card-top">
+                        <span class="card-icon"><i class="fas fa-route" aria-hidden="true"></i></span>
+                    </div>
+                    <p class="card-role">Operations research</p>
+                    <h3>Logistics Network Optimizer</h3>
+                    <p>
+                        Dijkstra's shortest path over a weighted freight network, animated one relaxation
+                        at a time so you can watch the frontier expand. Optimise for cost, time or
+                        distance, then close a lane and watch it reroute.
+                    </p>
+                    <p class="card-highlight">Binary min-heap priority queue — O((V + E) log V), measured on screen.</p>
+                    <div class="card-tags">
+                        <span class="chip">Dijkstra</span>
+                        <span class="chip">Min-heap</span>
+                        <span class="chip">Canvas 2D</span>
+                    </div>
+                    <span class="card-cta">Solve a route <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+                </a>
+
+                <!-- 06. IoT -->
+                <a class="card reveal" style="--tint: rgba(255,84,112,0.12); --tint-fg: #ff5470;" href="iot.html">
+                    <div class="card-top">
+                        <span class="card-icon"><i class="fas fa-car-battery" aria-hidden="true"></i></span>
+                    </div>
+                    <p class="card-role">Hardware · Web Bluetooth</p>
+                    <h3>IoT Automotive Twin</h3>
+                    <p>
+                        An OBD-II diagnostic bench that pairs with a real ELM327 adapter over Web Bluetooth,
+                        or runs a physics sandbox instead. Canvas gauges, a live signal oscilloscope and a
+                        procedural 3D engine control unit that heats up with engine speed.
+                    </p>
+                    <p class="card-highlight">Decodes CAN-BUS PIDs to physical units; synthesises engine audio from RPM.</p>
+                    <div class="card-tags">
+                        <span class="chip">Web Bluetooth</span>
+                        <span class="chip">Web Audio</span>
+                        <span class="chip">Three.js</span>
+                    </div>
+                    <span class="card-cta">Start the engine <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+                </a>
+
+                <!-- 07. FinTech -->
+                <a class="card reveal" style="--tint: rgba(127,188,255,0.12); --tint-fg: #7fbcff;" href="fintech.html">
+                    <div class="card-top">
+                        <span class="card-icon"><i class="fas fa-chart-line" aria-hidden="true"></i></span>
+                    </div>
+                    <p class="card-role">Real-time data</p>
+                    <h3>FinTech Telemetry</h3>
+                    <p>
+                        A trading dashboard on a live exchange websocket, with a reconnection strategy that
+                        backs off exponentially and falls through to a local simulation so the panel never
+                        sits blank behind a firewall.
+                    </p>
+                    <p class="card-highlight">Interactive security-posture scorer and a streaming ledger view.</p>
+                    <div class="card-tags">
+                        <span class="chip">WebSockets</span>
+                        <span class="chip">Chart.js</span>
+                        <span class="chip">REST</span>
+                    </div>
+                    <span class="card-cta">Open the desk <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+                </a>
+
+                <!-- 08. WebRTC -->
+                <a class="card reveal" style="--tint: rgba(0,243,255,0.12); --tint-fg: #4fe3ea;" href="webrtc.html">
+                    <div class="card-top">
+                        <span class="card-icon"><i class="fas fa-gears" aria-hidden="true"></i></span>
+                    </div>
+                    <p class="card-role">Collaboration · CAD</p>
+                    <h3>Engineering Sync Room</h3>
+                    <p>
+                        A shared blueprint canvas with a measuring tool that reports true Euclidean
+                        distance in millimetres, beside a gearbox whose teeth are generated from the
+                        involute equation and actually mesh.
+                    </p>
+                    <p class="card-highlight">Pitch-radius centre distance and half-tooth phase offset, so the mesh is correct.</p>
+                    <div class="card-tags">
+                        <span class="chip">Involute geometry</span>
+                        <span class="chip">Canvas 2D</span>
+                        <span class="chip">Three.js</span>
+                    </div>
+                    <span class="card-cta">Join the room <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+                </a>
+
             </div>
         </section>
 
-        <!-- TECHNICAL SPECS -->
-        <section class="section-module" id="specs">
-            <div class="module-header">
-                <span class="module-index">04 //</span>
-                <h2 class="cipher-text" data-original="Technical Specs">Technical Specs</h2>
+        <!-- ================= CAPABILITIES ================= -->
+        <section id="capabilities">
+            <div class="section-head reveal">
+                <span class="eyebrow">02 — Capabilities</span>
+                <h2>What I work with</h2>
             </div>
-            <div class="specs-grid">
-                <div class="spec-node tilt-chassis hover-trigger">
-                    <i class="fas fa-microchip spec-icon"></i>
-                    <h3>Frontend Logic</h3>
-                    <p>Crafting precision-engineered interfaces, custom state machines, and hardware-accelerated rendering algorithms.</p>
-                </div>
-                <div class="spec-node tilt-chassis hover-trigger">
-                    <i class="fas fa-database spec-icon"></i>
-                    <h3>Backend Arch</h3>
-                    <p>Designing normalized, scalable NoSQL/SQL databases and secure algorithmic cloud functions.</p>
-                </div>
-                <div class="spec-node tilt-chassis hover-trigger">
-                    <i class="fas fa-cubes spec-icon"></i>
-                    <h3>System Design</h3>
-                    <p>Translating abstract requirements into robust architectural patterns, focusing on modularity and OOD.</p>
-                </div>
+            <div class="capabilities">
+                <article class="cap reveal">
+                    <i class="fas fa-cube" aria-hidden="true"></i>
+                    <h3>Real-time graphics</h3>
+                    <p>Shader authoring, buffer geometry, physically based lighting and the performance discipline to hold a frame budget on a phone.</p>
+                    <ul>
+                        <li class="chip">Three.js</li><li class="chip">GLSL</li><li class="chip">Canvas 2D</li><li class="chip">WebGL</li>
+                    </ul>
+                </article>
+                <article class="cap reveal">
+                    <i class="fas fa-code" aria-hidden="true"></i>
+                    <h3>Front-end engineering</h3>
+                    <p>Accessible, responsive interfaces built on web standards, with state machines that stay honest when a user takes an unexpected path.</p>
+                    <ul>
+                        <li class="chip">JavaScript</li><li class="chip">React</li><li class="chip">CSS architecture</li><li class="chip">WCAG</li>
+                    </ul>
+                </article>
+                <article class="cap reveal">
+                    <i class="fas fa-server" aria-hidden="true"></i>
+                    <h3>Back-end &amp; edge</h3>
+                    <p>APIs and data models deployed to the edge, plus the build and release plumbing that gets them there repeatably.</p>
+                    <ul>
+                        <li class="chip">Node</li><li class="chip">Cloudflare Workers</li><li class="chip">Firebase</li><li class="chip">REST</li>
+                    </ul>
+                </article>
+                <article class="cap reveal">
+                    <i class="fas fa-diagram-project" aria-hidden="true"></i>
+                    <h3>Algorithms &amp; systems</h3>
+                    <p>Choosing the structure that fits the problem's complexity class, and proving it with tests rather than trusting that it looks right.</p>
+                    <ul>
+                        <li class="chip">Graph theory</li><li class="chip">Numerical methods</li><li class="chip">Simulation</li>
+                    </ul>
+                </article>
             </div>
         </section>
 
-        <!-- COMMS INTERFACE -->
-        <section class="section-module" id="comms">
-            <div class="module-header">
-                <span class="module-index">05 //</span>
-                <h2 class="cipher-text" data-original="Establish Link">Establish Link</h2>
+        <!-- ================= PROCESS ================= -->
+        <section id="process">
+            <div class="section-head reveal">
+                <span class="eyebrow">03 — Process</span>
+                <h2>How I build</h2>
             </div>
-            <div class="comms-interface tilt-chassis hover-trigger">
-                <div class="comms-header">
-                    <h3 class="cipher-text" data-original="Engineer the IMPOSSIBLE.">Engineer the IMPOSSIBLE.</h3>
-                    <p>Ready to deploy scalable solutions or tackle complex technical challenges? Initialize a connection protocol.</p>
-                    <div class="social-nodes">
-                        <a href="https://www.linkedin.com/in/mohammad-saleh-104927373" target="_blank" class="node-link hover-trigger"><i class="fab fa-linkedin-in"></i></a>
-                        <a href="mailto:mohalisal1@hotmail.com" class="node-link hover-trigger"><i class="fas fa-envelope"></i></a>
+            <div class="process">
+                <article class="step reveal">
+                    <span class="step-num">01</span>
+                    <div>
+                        <h3>Turn the brief into numbers</h3>
+                        <p>Throughput targets, latency budgets, data volumes, failure modes. Nothing gets written until the definition of "working" is measurable.</p>
+                    </div>
+                </article>
+                <article class="step reveal">
+                    <span class="step-num">02</span>
+                    <div>
+                        <h3>Model before interface</h3>
+                        <p>Schemas, state machines and module boundaries first. The algorithm is chosen to fit the problem's complexity class, not for how fast it is to type.</p>
+                    </div>
+                </article>
+                <article class="step reveal">
+                    <span class="step-num">03</span>
+                    <div>
+                        <h3>Build in vertical slices</h3>
+                        <p>Each layer is proven working before the next is stacked on it, and render paths get profiled as they are written — a frame budget is a requirement, not an afterthought.</p>
+                    </div>
+                </article>
+                <article class="step reveal">
+                    <span class="step-num">04</span>
+                    <div>
+                        <h3>Test the edges, then ship</h3>
+                        <p>Empty states, dropped sockets, unsupported hardware. A feature is finished when it degrades gracefully on the day the network, the GPU or the API is not there.</p>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- ================= CONTACT ================= -->
+        <section id="contact">
+            <div class="contact reveal">
+                <div>
+                    <span class="eyebrow">04 — Contact</span>
+                    <h2>Let's build something</h2>
+                    <p>
+                        Available for engineering roles and selected freelance work. If you have a hard
+                        problem — performance, simulation, data visualisation or a system that has to keep
+                        working when the network does not — I would like to hear about it.
+                    </p>
+                    <div class="contact-links">
+                        <a class="contact-link" href="mailto:mohalisal1@hotmail.com">
+                            <i class="fas fa-envelope" aria-hidden="true"></i> mohalisal1@hotmail.com
+                        </a>
+                        <a class="contact-link" href="https://www.linkedin.com/in/mohammad-saleh-104927373" target="_blank" rel="noopener noreferrer">
+                            <i class="fab fa-linkedin-in" aria-hidden="true"></i> LinkedIn profile
+                        </a>
                     </div>
                 </div>
-                <form action="https://formsubmit.co/mohalisal1@hotmail.com" method="POST" class="comms-form">
+
+                <form action="https://formsubmit.co/mohalisal1@hotmail.com" method="POST">
                     <input type="hidden" name="_captcha" value="false">
-                    <div class="form-field">
-                        <input type="text" name="name" required id="name">
-                        <label for="name">Identifier (Name)</label>
+                    <div class="field">
+                        <label for="name">Your name</label>
+                        <input type="text" id="name" name="name" autocomplete="name" required>
                     </div>
-                    <div class="form-field">
-                        <input type="email" name="email" required id="email">
-                        <label for="email">Comms Link (Email)</label>
+                    <div class="field">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" autocomplete="email" required>
                     </div>
-                    <div class="form-field">
-                        <textarea name="message" required id="message" rows="3"></textarea>
-                        <label for="message">Execution Parameters (Details)</label>
+                    <div class="field">
+                        <label for="message">What are you working on?</label>
+                        <textarea id="message" name="message" rows="4" required></textarea>
                     </div>
-                    <button type="submit" class="btn-system hover-trigger" style="width: 100%; justify-content: center; margin-top: 10px;">
-                        EXECUTE SEQUENCE <i class="fas fa-paper-plane"></i>
+                    <button class="btn btn-primary" type="submit">
+                        Send message <i class="fas fa-paper-plane" aria-hidden="true"></i>
                     </button>
                 </form>
             </div>
         </section>
 
         <footer>
-            <p>SYSTEM KERNEL v5.0.0 © 2026 ENG. MOHAMMAD SALEH. COMPILED SUCCESSFULLY.</p>
+            <span>© <span id="year">2026</span> Mohammad Saleh</span>
+            <span>Built from scratch — no framework, no third-party CDN</span>
         </footer>
-    </div>
 
-    <!-- EXTERNAL LIBRARIES -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    </main>
+</div>
 
-    <script>
-        const Config = {
-            isTouch: window.matchMedia("(max-width: 900px) or (pointer: coarse)").matches,
-            lerp: (s, e, f) => s + (e - s) * f,
-            // Animation is progressive enhancement: the site must work without the CDN.
-            hasGSAP: typeof gsap !== 'undefined',
-            hasScrollTrigger: typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined',
-            hasTHREE: typeof THREE !== 'undefined'
-        };
+<script type="module">
+/**
+ * Progressive enhancement only. Every element on this page is readable and
+ * every link works with this script removed; it adds reveal-on-scroll, the
+ * pointer sheen and the counter animation on top.
+ */
 
-        class BootSequence {
-            constructor() {
-                this.container = document.getElementById('system-bootloader');
-                this.console = document.getElementById('boot-console');
-                this.bar = document.getElementById('boot-bar');
-                this.logs = [
-                    "Initializing Kernel v5.0...", "Mounting Virtual DOM Elements...",
-                    "Establishing Secure WebGL Context...", "Compiling Shaders (GLSL)... OK",
-                    "Loading Neural Topology Map...", "Bypassing Security Protocols...",
-                    "Access Granted. Welcome, Engineer."
-                ];
-                this.init();
-            }
-            async init() {
-                document.body.style.overflow = 'hidden';
-                try {
-                    await this.runBootLines();
-                } finally {
-                    // Always release the scroll lock, even if a boot line failed.
-                    this.finish();
-                }
-            }
-            async runBootLines() {
-                for(let i=0; i<this.logs.length; i++) {
-                    await new Promise(r => setTimeout(r, Math.random() * 250 + 100));
-                    const line = document.createElement('div');
-                    line.className = 'boot-line'; line.innerText = `root@system:~# ${this.logs[i]}`;
-                    this.console.appendChild(line);
-                    this.bar.style.width = `${((i+1)/this.logs.length)*100}%`;
-                }
-            }
-            finish() {
-                setTimeout(() => {
-                    this.container.style.transform = 'translateY(-100%)';
-                    setTimeout(() => {
-                        this.container.style.display = 'none';
-                        document.body.style.overflow = 'auto';
-                        SystemArchitect.initGSAP(); 
-                    }, 1200);
-                }, 800);
-            }
-        }
+/* --- sticky nav border ---------------------------------------------------- */
+const nav = document.getElementById('nav');
+const sentinel = document.createElement('div');
+document.body.prepend(sentinel);
+new IntersectionObserver(
+    ([entry]) => nav.classList.toggle('is-stuck', !entry.isIntersecting),
+    { rootMargin: '0px' }
+).observe(sentinel);
 
-        class SystemCore {
-            constructor() {
-                this.initHUD(); this.initCursor(); this.initTiltEngine(); this.initCounters();
-            }
-            initHUD() {
-                const scrollEl = document.getElementById('scroll-monitor');
-                const fpsEl = document.getElementById('fps-monitor');
-                const uptimeEl = document.getElementById('uptime-monitor');
-                const nav = document.getElementById('main-nav');
-                
-                window.addEventListener('scroll', () => {
-                    const sy = window.scrollY;
-                    if (sy > 50) nav.classList.add('nav-active'); else nav.classList.remove('nav-active');
-                    scrollEl.innerText = Math.round(sy).toString().padStart(4, '0');
-                });
+/* --- reveal on scroll ----------------------------------------------------- */
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-                let frames = 0, lastTime = performance.now(); const startTime = Date.now();
-                const loop = () => {
-                    frames++; const now = performance.now();
-                    if (now - lastTime >= 1000) {
-                        fpsEl.innerText = Math.round((frames * 1000) / (now - lastTime)).toFixed(1);
-                        frames = 0; lastTime = now;
-                        const elapsed = Math.floor((Date.now() - startTime) / 1000);
-                        uptimeEl.innerText = `0x${elapsed.toString(16).toUpperCase().padStart(4, '0')}`;
-                    }
-                    requestAnimationFrame(loop);
-                };
-                requestAnimationFrame(loop);
-            }
-            initCursor() {
-                if(Config.isTouch) return;
-                const cursor = document.querySelector('.cursor-assembly');
-                const reticle = document.querySelector('.cursor-reticle');
-                let cx = window.innerWidth/2, cy = window.innerHeight/2, tx = cx, ty = cy;
-                document.addEventListener('pointermove', (e) => { tx = e.clientX; ty = e.clientY; });
-                document.querySelectorAll('.hover-trigger').forEach(el => {
-                    el.addEventListener('mouseenter', () => reticle.style.transform = 'scale(1.5) rotate(45deg)');
-                    el.addEventListener('mouseleave', () => reticle.style.transform = 'scale(1) rotate(0deg)');
-                });
-                const animate = () => {
-                    cx = Config.lerp(cx, tx, 0.3); cy = Config.lerp(cy, ty, 0.3);
-                    cursor.style.transform = `translate(${cx}px, ${cy}px)`;
-                    requestAnimationFrame(animate);
-                };
-                animate();
-            }
-            initTiltEngine() {
-                document.querySelectorAll('.tilt-chassis').forEach(card => {
-                    let state = { tx: 0, ty: 0, cx: 0, cy: 0, active: false };
-                    const onMove = (clientX, clientY) => {
-                        const rect = card.getBoundingClientRect();
-                        const x = clientX - rect.left; const y = clientY - rect.top;
-                        if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
-                            state.tx = ((y - rect.height / 2) / (rect.height / 2)) * -10; 
-                            state.ty = ((x - rect.width / 2) / (rect.width / 2)) * 10;
-                            state.active = true;
-                        } else { state.active = false; state.tx = 0; state.ty = 0; }
-                    };
-                    const onLeave = () => { state.tx = 0; state.ty = 0; state.active = false; };
-                    card.addEventListener('pointermove', (e) => onMove(e.clientX, e.clientY));
-                    card.addEventListener('pointerleave', onLeave);
-                    if(Config.isTouch) {
-                        card.addEventListener('touchstart', (e) => onMove(e.touches[0].clientX, e.touches[0].clientY), {passive: true});
-                        card.addEventListener('touchmove', (e) => onMove(e.touches[0].clientX, e.touches[0].clientY), {passive: true});
-                        card.addEventListener('touchend', onLeave);
-                    }
-                    const render = () => {
-                        state.cx = Config.lerp(state.cx, state.tx, 0.1); state.cy = Config.lerp(state.cy, state.ty, 0.1);
-                        if (Math.abs(state.cx) > 0.01 || Math.abs(state.cy) > 0.01 || state.active) {
-                            card.style.transform = `rotateX(${state.cx}deg) rotateY(${state.cy}deg) scale3d(${state.active?1.02:1}, ${state.active?1.02:1}, 1)`;
-                        }
-                        requestAnimationFrame(render);
-                    };
-                    render();
-                });
-            }
-            initCounters() {
-                if(!Config.hasScrollTrigger) {
-                    // No animation library: show the final figures immediately.
-                    document.querySelectorAll('.counter').forEach(c => { c.innerText = c.getAttribute('data-target'); });
-                    return;
-                }
-                gsap.registerPlugin(ScrollTrigger);
-                document.querySelectorAll('.counter').forEach(counter => {
-                    const target = parseFloat(counter.getAttribute('data-target'));
-                    ScrollTrigger.create({
-                        trigger: counter, start: "top 90%", once: true,
-                        onEnter: () => {
-                            gsap.to(counter, {
-                                innerText: target, duration: 2.5, ease: "power3.out",
-                                snap: { innerText: target % 1 === 0 ? 1 : 0.1 },
-                                onUpdate: function() { counter.innerText = this.targets()[0].innerText; }
-                            });
-                        }
-                    });
-                });
-            }
-            initGSAP() {
-                if(!Config.hasScrollTrigger) return; // content is already in its final state
-                gsap.from('.hero-sys-status', { y: 20, opacity: 0, duration: 1 });
-                gsap.from('.hero-title span', { y: 40, opacity: 0, duration: 1, stagger: 0.1, delay: 0.2 });
-                gsap.from('.hero-desc', { opacity: 0, duration: 1, delay: 0.4 });
-                gsap.from('.btn-container', { opacity: 0, y: 20, duration: 1, delay: 0.6 }); // Animate container, not buttons directly
-
-                const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*";
-                document.querySelectorAll('.cipher-text').forEach(el => {
-                    const original = el.dataset.original;
-                    if(!original || el.innerHTML.includes('<')) return;
-                    ScrollTrigger.create({
-                        trigger: el, start: "top 90%",
-                        onEnter: () => {
-                            let iteration = 0;
-                            const loop = () => {
-                                el.innerText = original.split("").map((char, i) => {
-                                    if(char === " ") return " ";
-                                    if(i < iteration) return original[i];
-                                    return chars[Math.floor(Math.random() * chars.length)];
-                                }).join("");
-                                if(iteration < original.length) { iteration += 1/3; requestAnimationFrame(loop); }
-                            };
-                            requestAnimationFrame(loop);
-                        }
-                    });
-                });
-
-                gsap.utils.toArray('.module-header').forEach(h => gsap.from(h, { scrollTrigger: { trigger: h, start: "top 85%" }, x: -30, opacity: 0, duration: 0.8 }));
-                gsap.from('.process-step', { scrollTrigger: { trigger: '.process-grid', start: "top 80%" }, x: -50, opacity: 0, duration: 0.8, stagger: 0.2 });
-                gsap.from('.matrix-card', { scrollTrigger: { trigger: '.project-matrix', start: "top 80%" }, y: 50, opacity: 0, duration: 0.8, stagger: 0.1 });
-                gsap.from('.telemetry-node', { scrollTrigger: { trigger: '.telemetry-grid', start: "top 80%" }, scale: 0.9, opacity: 0, duration: 0.8, stagger: 0.1 });
-                gsap.from('.spec-node', { scrollTrigger: { trigger: '.specs-grid', start: "top 80%" }, y: 50, opacity: 0, duration: 0.8, stagger: 0.1 });
-                gsap.from('.comms-interface', { scrollTrigger: { trigger: '#comms', start: "top 80%" }, y: 30, opacity: 0, duration: 0.8 });
-            }
-            initiateTransfer(url) {
-                // Ensure proper link redirection without issues
-                const overlay = document.getElementById('transition-protocol');
-                const text = document.getElementById('trans-text');
-                overlay.classList.add('active');
-                setTimeout(() => text.innerText = "BYPASSING FIREWALL...", 800);
-                setTimeout(() => text.innerText = "DECRYPTING PAYLOAD...", 1600);
-                setTimeout(() => text.innerText = "ACCESS GRANTED.", 2400);
-                setTimeout(() => { window.location.href = url; }, 3000);
-            }
-        }
-
-        class NeuralMesh {
-            constructor() {
-                this.canvas = document.getElementById('neural-canvas');
-                this.ctx = this.canvas.getContext('2d');
-                this.nodeLabel = document.getElementById('node-count');
-                this.edgeLabel = document.getElementById('edge-count');
-                this.nodes = []; this.numNodes = Config.isTouch ? 40 : 80; this.maxDistance = 100;
-                this.resize(); window.addEventListener('resize', () => this.resize());
-                this.initNodes(); this.animate();
-            }
-            resize() { this.canvas.width = this.canvas.parentElement.clientWidth; this.canvas.height = this.canvas.parentElement.clientHeight; }
-            initNodes() {
-                this.nodes = [];
-                for(let i=0; i<this.numNodes; i++) {
-                    this.nodes.push({ x: Math.random() * this.canvas.width, y: Math.random() * this.canvas.height, vx: (Math.random() - 0.5) * 1.5, vy: (Math.random() - 0.5) * 1.5 });
-                }
-                this.nodeLabel.innerText = this.numNodes;
-            }
-            animate() {
-                this.ctx.fillStyle = '#030406'; this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-                let activeEdges = 0;
-                for(let i=0; i<this.nodes.length; i++) {
-                    let n = this.nodes[i];
-                    n.x += n.vx; n.y += n.vy;
-                    // Clamp as well as reflect: a node left outside the canvas (e.g. after a
-                    // resize) would otherwise flip its velocity every frame and stick there.
-                    if(n.x < 0) { n.x = 0; n.vx = Math.abs(n.vx); }
-                    else if(n.x > this.canvas.width) { n.x = this.canvas.width; n.vx = -Math.abs(n.vx); }
-                    if(n.y < 0) { n.y = 0; n.vy = Math.abs(n.vy); }
-                    else if(n.y > this.canvas.height) { n.y = this.canvas.height; n.vy = -Math.abs(n.vy); }
-                    this.ctx.beginPath(); this.ctx.arc(n.x, n.y, 2, 0, Math.PI*2); this.ctx.fillStyle = '#4A90E2'; this.ctx.fill();
-                    for(let j=i+1; j<this.nodes.length; j++) {
-                        let n2 = this.nodes[j];
-                        let dx = n.x - n2.x, dy = n.y - n2.y, dist = Math.sqrt(dx*dx + dy*dy);
-                        if(dist < this.maxDistance) {
-                            activeEdges++;
-                            this.ctx.beginPath(); this.ctx.strokeStyle = `rgba(0, 255, 65, ${1 - dist/this.maxDistance})`;
-                            this.ctx.lineWidth = 0.5; this.ctx.moveTo(n.x, n.y); this.ctx.lineTo(n2.x, n2.y); this.ctx.stroke();
-                        }
-                    }
-                }
-                if(Math.random() > 0.8) this.edgeLabel.innerText = activeEdges; 
-                requestAnimationFrame(() => this.animate());
-            }
-        }
-
-        class WebGLEngine {
-            constructor() {
-                this.scene = new THREE.Scene();
-                this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-                this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: !Config.isTouch, powerPreference: "high-performance" });
-                this.renderer.setSize(window.innerWidth, window.innerHeight);
-                document.getElementById('webgl-core').appendChild(this.renderer.domElement);
-                this.group = new THREE.Group(); this.scene.add(this.group);
-
-                const gridHelper = new THREE.GridHelper(100, 40, 0x4A90E2, 0x111122);
-                gridHelper.position.y = -10; this.scene.add(gridHelper);
-
-                this.torus = new THREE.Mesh(new THREE.TorusGeometry(2, 0.5, 16, Config.isTouch ? 50 : 100), new THREE.MeshBasicMaterial({ color: 0x4A90E2, wireframe: true, transparent: true, opacity: 0.1 }));
-                this.group.add(this.torus);
-                this.icosahedron = new THREE.Mesh(new THREE.IcosahedronGeometry(1.2, 1), new THREE.MeshBasicMaterial({ color: 0xFF9F1C, wireframe: true, transparent: true, opacity: 0.15 }));
-                this.group.add(this.icosahedron);
-
-                const pGeo = new THREE.BufferGeometry(); const posArray = new Float32Array((Config.isTouch ? 300 : 1200) * 3);
-                for(let i=0; i<posArray.length; i++) posArray[i] = (Math.random() - 0.5) * 15;
-                pGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-                this.particles = new THREE.Points(pGeo, new THREE.PointsMaterial({ size: 0.02, color: 0xffffff, transparent: true, opacity: 0.2, blending: THREE.AdditiveBlending }));
-                this.scene.add(this.particles);
-
-                this.camera.position.z = 5; this.clock = new THREE.Clock();
-                window.addEventListener('resize', () => this.resize()); this.animate();
-            }
-            resize() { this.camera.aspect = window.innerWidth / window.innerHeight; this.camera.updateProjectionMatrix(); this.renderer.setSize(window.innerWidth, window.innerHeight); }
-            animate() {
-                const t = this.clock.getElapsedTime(), sy = window.scrollY;
-                this.torus.rotation.x = t * 0.1; this.torus.rotation.y = t * 0.2;
-                this.icosahedron.rotation.x = t * -0.2; this.icosahedron.rotation.y = t * -0.1;
-                this.group.position.y = (sy * -0.003) + Math.sin(t * 0.5) * 0.2;
-                this.group.rotation.z = sy * 0.001;
-                this.renderer.render(this.scene, this.camera);
-                requestAnimationFrame(() => this.animate());
-            }
-        }
-
-        const SystemArchitect = new SystemCore();
-        window.SystemArchitect = SystemArchitect;
-
-        // Project cards behave as links: clickable, focusable, and activated by Enter/Space.
-        document.querySelectorAll('.matrix-card[data-href]').forEach(card => {
-            const go = () => SystemArchitect.initiateTransfer(card.dataset.href);
-            card.addEventListener('click', go);
-            card.addEventListener('keydown', (e) => {
-                if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); }
-            });
+if (reduceMotion) {
+    document.querySelectorAll('.reveal').forEach(el => el.classList.add('is-in'));
+} else {
+    const revealer = new IntersectionObserver((entries) => {
+        entries.forEach((entry, i) => {
+            if (!entry.isIntersecting) return;
+            // Small stagger within a batch so a grid arrives as a wave.
+            entry.target.style.transitionDelay = `${Math.min(i * 60, 240)}ms`;
+            entry.target.classList.add('is-in');
+            revealer.unobserve(entry.target);
         });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
 
-        new BootSequence();
-        setTimeout(() => {
-            try { new NeuralMesh(); } catch(e) { console.warn("Neural mesh canvas unavailable:", e); }
-        }, 1500);
-        if(Config.hasTHREE) {
-            try { new WebGLEngine(); } catch(e) { console.warn("WebGL unsupported:", e); }
-        }
+    document.querySelectorAll('.reveal').forEach(el => revealer.observe(el));
+}
 
-
-    // --- SAFARI BFCACHE FIX ---
-// Hides the transition overlay when the visitor returns via the browser back button.
-window.addEventListener("pageshow", function (event) {
-    if (event.persisted) {
-        const overlay = document.getElementById('transition-protocol');
-        const text = document.getElementById('trans-text');
-        if (overlay) {
-            overlay.classList.remove('active');
-            text.innerText = "ESTABLISHING SECURE LINK...";
-        }
-    }
+/* --- pointer-tracked card sheen ------------------------------------------- */
+// One listener on the grid rather than one per card.
+const grid = document.getElementById('project-grid');
+grid.addEventListener('pointermove', (e) => {
+    const card = e.target.closest('.card');
+    if (!card) return;
+    const rect = card.getBoundingClientRect();
+    card.style.setProperty('--mx', `${e.clientX - rect.left}px`);
+    card.style.setProperty('--my', `${e.clientY - rect.top}px`);
 });
 
-    </script>
+/* --- hero counters -------------------------------------------------------- */
+const formatValue = (value, format) => {
+    if (format === 'compact') {
+        return value >= 1000 ? `${Math.round(value / 1000)}k` : String(Math.round(value));
+    }
+    return String(Math.round(value));
+};
+
+const counters = document.querySelectorAll('[data-count]');
+if (reduceMotion) {
+    // Values are already correct in the markup; nothing to animate.
+} else {
+    const counterObserver = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            const el = entry.target;
+            counterObserver.unobserve(el);
+
+            const target = Number(el.dataset.count);
+            const format = el.dataset.format;
+            const duration = 1100;
+            const start = performance.now();
+
+            const step = (now) => {
+                const t = Math.min((now - start) / duration, 1);
+                // easeOutCubic
+                el.textContent = formatValue(target * (1 - Math.pow(1 - t, 3)), format);
+                if (t < 1) requestAnimationFrame(step);
+            };
+            requestAnimationFrame(step);
+        }
+    }, { threshold: 0.5 });
+    counters.forEach(el => counterObserver.observe(el));
+}
+
+/* --- footer year ---------------------------------------------------------- */
+document.getElementById('year').textContent = new Date().getFullYear();
+</script>
 </body>
 </html>

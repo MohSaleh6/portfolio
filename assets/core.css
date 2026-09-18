@@ -1,0 +1,288 @@
+/* ==========================================================================
+   PORTFOLIO CORE
+   Shared design tokens, reset and primitives used by every page. Page-specific
+   layout stays in each document; anything that must look identical across the
+   site lives here so it is defined exactly once.
+   ========================================================================== */
+
+@import url('fonts.css');
+
+/* --------------------------------------------------------------------------
+   01. DESIGN TOKENS
+   -------------------------------------------------------------------------- */
+:root {
+    /* Surfaces — a deliberate ramp from the page base up to raised panels. */
+    --surface-base: #04070d;
+    --surface-sunken: #02040a;
+    --surface-panel: #080d16;
+    --surface-raised: #0d1421;
+    --surface-glass: rgba(10, 16, 26, 0.72);
+
+    /* Brand. Blue carries structure, amber carries emphasis. */
+    --accent: #4d9fff;
+    --accent-bright: #7fbcff;
+    --accent-dim: rgba(77, 159, 255, 0.14);
+    --accent-line: rgba(77, 159, 255, 0.22);
+    --highlight: #ffa733;
+    --signal: #3ddc97;
+    --alert: #ff5470;
+
+    /* Text — only three levels, so hierarchy stays readable. */
+    --text-strong: #f3f7fc;
+    --text-body: #b6c2d4;
+    --text-muted: #6b7a90;
+
+    /* Type */
+    --font-body: 'Space Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --font-display: 'Syncopate', 'Space Grotesk', system-ui, sans-serif;
+    --font-mono: 'Share Tech Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+    /* A fluid modular scale: one source of truth for every heading size. */
+    --step--1: clamp(0.78rem, 0.76rem + 0.1vw, 0.84rem);
+    --step-0: clamp(0.95rem, 0.92rem + 0.15vw, 1.05rem);
+    --step-1: clamp(1.2rem, 1.1rem + 0.5vw, 1.5rem);
+    --step-2: clamp(1.5rem, 1.3rem + 1vw, 2.1rem);
+    --step-3: clamp(2rem, 1.6rem + 2vw, 3.2rem);
+    --step-4: clamp(2.6rem, 1.8rem + 4.2vw, 5.6rem);
+
+    /* Spacing — a 4px-based rhythm. */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 24px;
+    --space-6: 32px;
+    --space-7: 48px;
+    --space-8: 64px;
+    --space-9: 96px;
+
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+
+    /* Motion. Every transition references these so timing feels consistent. */
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+    --speed-fast: 160ms;
+    --speed: 280ms;
+    --speed-slow: 520ms;
+
+    --shadow-panel: 0 18px 50px -22px rgba(0, 0, 0, 0.9);
+    --shadow-lift: 0 26px 60px -24px rgba(0, 0, 0, 0.95);
+}
+
+/* --------------------------------------------------------------------------
+   02. RESET & BASE
+   -------------------------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: var(--step-0);
+    line-height: 1.65;
+    color: var(--text-body);
+    background-color: var(--surface-base);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4 {
+    margin: 0;
+    color: var(--text-strong);
+    line-height: 1.15;
+    text-wrap: balance;
+}
+
+p { margin: 0; text-wrap: pretty; }
+
+img, canvas, svg { display: block; max-width: 100%; }
+
+button, input, select, textarea { font: inherit; color: inherit; }
+
+a { color: inherit; }
+
+::selection { background: var(--accent); color: #04070d; }
+
+/* A visible, consistent focus ring is a baseline accessibility requirement.
+   :focus-visible keeps it off for pointer users without losing keyboard support. */
+:focus-visible {
+    outline: 2px solid var(--highlight);
+    outline-offset: 3px;
+    border-radius: 2px;
+}
+
+/* Scrollbars, styled for both engines. */
+* { scrollbar-width: thin; scrollbar-color: var(--accent-line) transparent; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--accent-line); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+/* --------------------------------------------------------------------------
+   03. PRIMITIVES
+   -------------------------------------------------------------------------- */
+
+/* Skip link: the first tab stop on every page. */
+.skip-link {
+    position: absolute;
+    left: var(--space-4);
+    top: -100px;
+    z-index: 100000;
+    padding: var(--space-3) var(--space-5);
+    background: var(--accent);
+    color: #04070d;
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    transition: top var(--speed-fast) var(--ease-out);
+}
+.skip-link:focus { top: var(--space-4); }
+
+/* Eyebrow label above a section heading. */
+.eyebrow {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--accent);
+}
+
+/* Small capsule used for tech tags and status chips. */
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 5px 11px;
+    border: 1px solid var(--accent-line);
+    border-radius: 99px;
+    background: var(--accent-dim);
+    color: var(--accent-bright);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+/* Buttons. `.btn-primary` is the single filled action per view. */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    padding: 14px var(--space-6);
+    border: 1px solid var(--accent-line);
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text-strong);
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background var(--speed) var(--ease-out),
+                border-color var(--speed) var(--ease-out),
+                color var(--speed) var(--ease-out),
+                transform var(--speed) var(--ease-out);
+}
+.btn:hover { border-color: var(--accent); background: var(--accent-dim); transform: translateY(-2px); }
+.btn:active { transform: translateY(0); }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: #04070d; font-weight: 700; }
+.btn-primary:hover { background: var(--accent-bright); border-color: var(--accent-bright); color: #04070d; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+/* The "back to portfolio" control every project page carries. */
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: 10px var(--space-4);
+    border: 1px solid var(--accent-line);
+    border-radius: var(--radius-sm);
+    background: var(--surface-glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: var(--text-body);
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: color var(--speed) var(--ease-out), border-color var(--speed) var(--ease-out);
+}
+.back-link:hover { color: var(--accent-bright); border-color: var(--accent); }
+.back-link i { transition: transform var(--speed) var(--ease-out); }
+.back-link:hover i { transform: translateX(-3px); }
+
+/* Panel surface shared by dashboards and control columns. */
+.panel {
+    background: var(--surface-panel);
+    border: 1px solid var(--accent-line);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-panel);
+}
+
+/* Full-screen boot overlay used by the heavier project pages. */
+.boot-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: var(--space-5);
+    padding: var(--space-6);
+    text-align: center;
+    background: var(--surface-sunken);
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    transition: opacity var(--speed-slow) var(--ease-out);
+}
+.boot-screen[hidden] { display: none; }
+.boot-screen.is-done { opacity: 0; pointer-events: none; }
+.boot-ring {
+    width: 54px;
+    height: 54px;
+    border: 2px solid var(--accent-dim);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 900ms linear infinite;
+}
+.boot-screen.has-error .boot-ring { display: none; }
+.boot-note { max-width: 42ch; color: var(--text-muted); letter-spacing: 0.06em; text-transform: none; line-height: 1.8; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Utility for content that is announced but not shown. */
+.visually-hidden {
+    position: absolute;
+    width: 1px; height: 1px;
+    margin: -1px; padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* --------------------------------------------------------------------------
+   04. MOTION PREFERENCES
+   Respecting this is a WCAG requirement, not a nicety: large parallax and
+   auto-rotating scenes trigger vestibular symptoms for some people.
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

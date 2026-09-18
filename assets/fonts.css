@@ -1,0 +1,68 @@
+/* ==========================================================================
+   SELF-HOSTED TYPEFACES
+   Served from the same origin as the site: no third-party CDN, no extra DNS
+   lookup or TLS handshake, and nothing breaks when a font host is blocked.
+   `font-display: swap` paints text immediately in a fallback face.
+   ========================================================================== */
+
+/* --- Space Grotesk: body and UI ---------------------------------------- */
+@font-face {
+    font-family: 'Space Grotesk';
+    font-style: normal;
+    font-weight: 300;
+    font-display: swap;
+    src: url('fonts/space-grotesk-latin-300-normal.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Space Grotesk';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('fonts/space-grotesk-latin-400-normal.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Space Grotesk';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url('fonts/space-grotesk-latin-500-normal.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Space Grotesk';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url('fonts/space-grotesk-latin-600-normal.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Space Grotesk';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('fonts/space-grotesk-latin-700-normal.woff2') format('woff2');
+}
+
+/* --- Syncopate: display headings --------------------------------------- */
+@font-face {
+    font-family: 'Syncopate';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('fonts/syncopate-latin-400-normal.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Syncopate';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('fonts/syncopate-latin-700-normal.woff2') format('woff2');
+}
+
+/* --- Share Tech Mono: telemetry, code and data readouts ---------------- */
+@font-face {
+    font-family: 'Share Tech Mono';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('fonts/share-tech-mono-latin-400-normal.woff2') format('woff2');
+}
