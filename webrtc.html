@@ -7,12 +7,18 @@
     <meta name="description" content="Remote engineering collaboration hub: a measurement blueprint canvas using Euclidean distance maths alongside a procedurally generated 3D gear assembly.">
     <meta name="theme-color" content="#020406">
     
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=Syncopate:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/fonts.css">
+    <link rel="stylesheet" href="assets/vendor/fontawesome/css/all.min.css">
     
     <!-- Three.js for CAD Viewer -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "/assets/vendor/three/three.module.min.js",
+        "three/addons/": "/assets/vendor/three/addons/"
+      }
+    }
+    </script>
 
     <style>
         /* ==========================================================================
@@ -176,7 +182,7 @@
                 <div id="cad-webgl"></div>
                 <div class="cad-header">
                     <div class="cad-title">ASSEMBLY: DUAL GEARBOX</div>
-                    <div class="cad-metrics">PROCEDURAL GEOMETRY<br>VERTICES: <span id="cad-verts">Loading...</span></div>
+                    <div class="cad-metrics">INVOLUTE SPUR GEARS<br>RATIO: <span id="cad-ratio">-</span> &middot; VERTICES: <span id="cad-verts">-</span></div>
                 </div>
                 <div class="cad-controls">
                     <button class="btn-cad" onclick="CADEngine.toggleWireframe()"><i class="fas fa-border-all"></i> WIREFRAME</button>
@@ -221,7 +227,10 @@
     <!-- ==========================================================================
          ENGINEERING JAVASCRIPT KERNEL
          ========================================================================== -->
-    <script>
+    <script type="module">
+        import * as THREE from 'three';
+        import { Stage, renderSceneFallback, supportsWebGL } from './assets/scene.js';
+
         /**
          * 1. INTERACTIVE BLUEPRINT CANVAS (Engineering Math & Drawing)
          */
@@ -377,120 +386,172 @@
         }
 
         /**
-         * 2. PROCEDURAL 3D CAD ENGINE (THREE.JS MATH)
-         * Generates involute-like gears procedurally
+         * 2. PROCEDURAL CAD GEARBOX
+         * The gear profile is generated from the involute equation rather than
+         * drawn as decorative spikes, so the teeth actually roll against each
+         * other. Centre distance is the sum of the two PITCH radii and the
+         * driven gear is phase-offset by half a tooth, which is what makes the
+         * mesh look right when it turns.
          */
-        class CADViewer {
-            constructor() {
-                this.container = document.getElementById('cad-webgl');
-                if(!this.container) return;
-                
-                this.scene = new THREE.Scene();
-                this.camera = new THREE.PerspectiveCamera(45, this.container.clientWidth / this.container.clientHeight, 0.1, 1000);
-                this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-                this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
-                this.container.appendChild(this.renderer.domElement);
+        const CAD_MATERIALS = {
+            solid: new THREE.MeshStandardMaterial({ color: 0x9fb0c4, metalness: 0.95, roughness: 0.28 }),
+            drive: new THREE.MeshStandardMaterial({ color: 0x4d9fff, metalness: 0.85, roughness: 0.3 }),
+            shaft: new THREE.MeshStandardMaterial({ color: 0x3d4654, metalness: 0.9, roughness: 0.35 }),
+            wire:  new THREE.MeshBasicMaterial({ color: 0x00f3ff, wireframe: true, transparent: true, opacity: 0.55 }),
+            plate: new THREE.MeshStandardMaterial({ color: 0x161d28, metalness: 0.35, roughness: 0.82 })
+        };
 
-                this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
-                this.controls.enableDamping = true; 
+        class CADViewer {
+            /** Teeth per gear; the ratio between them is the gear ratio. */
+            static DRIVE_TEETH = 12;
+            static DRIVEN_TEETH = 24;
+            static MODULE = 1.1;          // pitch diameter = module x teeth
+
+            constructor(container) {
+                this.stage = new Stage(container, { fov: 40, far: 200, exposure: 1.05, background: 0x080d15 });
+                this.stage.addStudioLights({ key: 2.2, fill: 0.65, rim: 1.8, shadowArea: 26 });
+                this.stage.controls.minDistance = 14;
+                this.stage.controls.maxDistance = 90;
+                this.stage.controls.autoRotate = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                this.stage.controls.autoRotateSpeed = 0.7;
 
                 this.isWireframe = false;
                 this.isAnimating = true;
-                
                 this.gears = [];
-                this.buildAssembly();
-                
-                this.camera.position.set(0, 30, 40);
-                this.resize(); window.addEventListener('resize', () => this.resize());
-                this.animate();
+
+                this.assembly = new THREE.Group();
+                this.stage.scene.add(this.assembly);
+                this.#build();
+                this.stage.frameObject(this.assembly, { padding: 1.18, direction: new THREE.Vector3(0.35, 0.75, 1) });
+
+                this.stage.onFrame((delta) => {
+                    if (!this.isAnimating) return;
+                    for (const gear of this.gears) gear.mesh.rotation.z += gear.speed * delta;
+                });
+                this.stage.start();
             }
 
-            // Procedural Mathematics to draw a Gear Shape
-            createGearShape(numTeeth, outerRadius, innerRadius, holeRadius) {
+            /**
+             * Builds one spur-gear profile from the involute of a circle.
+             * @param {number} teeth
+             * @param {number} module pitch diameter per tooth
+             * @param {number} boreRadius central hole
+             */
+            #gearShape(teeth, module, boreRadius) {
+                const pitchR = (module * teeth) / 2;
+                const baseR = pitchR * Math.cos(Math.PI / 9);   // 20-degree pressure angle
+                const outerR = pitchR + module;                  // addendum
+                const rootR = pitchR - 1.25 * module;            // dedendum
+
+                // Involute of a circle: the curve a taut string traces off a spool.
+                const involuteAt = (r) => {
+                    if (r <= baseR) return 0;
+                    const a = Math.sqrt((r * r) / (baseR * baseR) - 1);
+                    return a - Math.atan(a);
+                };
+
                 const shape = new THREE.Shape();
-                const step = (Math.PI * 2) / (numTeeth * 2);
-                
-                for(let i=0; i < numTeeth * 2; i++) {
-                    const radius = (i % 2 === 0) ? outerRadius : innerRadius;
-                    // Add slight bevel to teeth for realism
-                    const angle1 = i * step;
-                    const angle2 = angle1 + step * 0.2; 
-                    const angle3 = angle1 + step * 0.8;
-                    
-                    if(i === 0) shape.moveTo(Math.cos(angle1)*radius, Math.sin(angle1)*radius);
-                    shape.lineTo(Math.cos(angle2)*radius, Math.sin(angle2)*radius);
-                    shape.lineTo(Math.cos(angle3)*radius, Math.sin(angle3)*radius);
+                const anglePerTooth = (Math.PI * 2) / teeth;
+                const halfThickness = anglePerTooth / 4 + involuteAt(pitchR);
+                const steps = 5;
+
+                for (let t = 0; t < teeth; t++) {
+                    const centre = t * anglePerTooth;
+
+                    // Leading flank: root -> tip along the involute.
+                    for (let i = 0; i <= steps; i++) {
+                        const r = rootR + (outerR - rootR) * (i / steps);
+                        const a = centre - halfThickness + involuteAt(Math.max(r, baseR));
+                        const x = Math.cos(a) * r, y = Math.sin(a) * r;
+                        if (t === 0 && i === 0) shape.moveTo(x, y); else shape.lineTo(x, y);
+                    }
+                    // Trailing flank: tip -> root, mirrored.
+                    for (let i = steps; i >= 0; i--) {
+                        const r = rootR + (outerR - rootR) * (i / steps);
+                        const a = centre + halfThickness - involuteAt(Math.max(r, baseR));
+                        shape.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+                    }
+                    // Root arc across to the next tooth.
+                    const next = centre + anglePerTooth - halfThickness;
+                    shape.absarc(0, 0, rootR, centre + halfThickness, next, false);
                 }
                 shape.closePath();
 
-                // Center Hole
-                const holePath = new THREE.Path();
-                holePath.absarc(0, 0, holeRadius, 0, Math.PI * 2, false);
-                shape.holes.push(holePath);
-
-                return shape;
+                const bore = new THREE.Path();
+                bore.absarc(0, 0, boreRadius, 0, Math.PI * 2, true);
+                shape.holes.push(bore);
+                return { shape, pitchR, outerR };
             }
 
-            buildAssembly() {
-                this.group = new THREE.Group(); this.scene.add(this.group);
-                
-                // Lighting
-                this.scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-                const dLight = new THREE.DirectionalLight(0xffffff, 1); dLight.position.set(10, 20, 15); this.scene.add(dLight);
-                const dLight2 = new THREE.DirectionalLight(0x00f3ff, 0.5); dLight2.position.set(-10, -10, -10); this.scene.add(dLight2);
+            #makeGear(teeth, bore, material, thickness) {
+                const { shape, pitchR } = this.#gearShape(teeth, CADViewer.MODULE, bore);
+                const geometry = new THREE.ExtrudeGeometry(shape, {
+                    depth: thickness, bevelEnabled: true,
+                    bevelSegments: 2, bevelSize: 0.12, bevelThickness: 0.12, steps: 1,
+                    curveSegments: 24
+                });
+                geometry.center();
+                const mesh = new THREE.Mesh(geometry, material);
+                mesh.castShadow = true;
+                mesh.receiveShadow = true;
+                return { mesh, pitchR, geometry };
+            }
 
-                this.matSolid = new THREE.MeshStandardMaterial({ color: 0x2d3748, metalness: 0.8, roughness: 0.4 });
-                this.matWire = new THREE.MeshBasicMaterial({ color: 0x00f3ff, wireframe: true, transparent: true, opacity: 0.4 });
+            #build() {
+                const drive = this.#makeGear(CADViewer.DRIVE_TEETH, 1.6, CAD_MATERIALS.drive, 2.4);
+                const driven = this.#makeGear(CADViewer.DRIVEN_TEETH, 2.2, CAD_MATERIALS.solid, 2.4);
 
-                // Gear 1 (Drive)
-                const shape1 = this.createGearShape(12, 6, 5, 2);
-                const extOpts1 = { depth: 2, bevelEnabled: true, bevelSegments: 2, steps: 1, bevelSize: 0.1, bevelThickness: 0.1 };
-                const geo1 = new THREE.ExtrudeGeometry(shape1, extOpts1);
-                const gear1 = new THREE.Mesh(geo1, this.matSolid);
-                gear1.rotation.x = Math.PI/2;
-                gear1.position.set(-6, 0, 0);
-                this.group.add(gear1);
-                this.gears.push({ mesh: gear1, speed: 0.02 });
+                // Centre distance = sum of the pitch radii. Anything else and the
+                // teeth either float apart or pass through each other.
+                const centreDistance = drive.pitchR + driven.pitchR;
+                drive.mesh.position.set(-centreDistance / 2, 0, 0);
+                driven.mesh.position.set(centreDistance / 2, 0, 0);
 
-                // Gear 2 (Driven - Larger, slower, opposite direction)
-                const shape2 = this.createGearShape(24, 12, 11, 3); // Double teeth = half speed
-                const extOpts2 = { depth: 2, bevelEnabled: true, bevelSegments: 2, steps: 1, bevelSize: 0.1, bevelThickness: 0.1 };
-                const geo2 = new THREE.ExtrudeGeometry(shape2, extOpts2);
-                const gear2 = new THREE.Mesh(geo2, this.matSolid);
-                gear2.rotation.x = Math.PI/2;
-                // Centre distance = sum of the PITCH radii ((outer+inner)/2): 5.5 + 11.5 = 17.
-                // Gear 1 sits at x = -6, so gear 2 goes at x = 11 for the teeth to engage.
-                gear2.position.set(11, 0, 0); 
-                // Offset rotation so teeth mesh perfectly
-                gear2.rotation.z = (Math.PI * 2) / (24 * 4); 
-                this.group.add(gear2);
-                this.gears.push({ mesh: gear2, speed: -0.01 }); // Half speed, negative dir
+                // Offset the driven gear by half a tooth so teeth sit in gaps.
+                driven.mesh.rotation.z = Math.PI / CADViewer.DRIVEN_TEETH;
 
-                // Update UI Vertex count
-                const totalVerts = geo1.attributes.position.count + geo2.attributes.position.count;
-                document.getElementById('cad-verts').innerText = totalVerts.toLocaleString();
+                // Angular velocity is inversely proportional to tooth count, and
+                // meshed gears turn in opposite directions.
+                const ratio = CADViewer.DRIVEN_TEETH / CADViewer.DRIVE_TEETH;
+                this.gears.push({ mesh: drive.mesh, speed: 0.55 });
+                this.gears.push({ mesh: driven.mesh, speed: -0.55 / ratio });
+
+                this.assembly.add(drive.mesh, driven.mesh);
+                this.solidGeometries = [drive.geometry, driven.geometry];
+
+                // Shafts through each bore.
+                for (const [gear, radius] of [[drive, 1.5], [driven, 2.1]]) {
+                    const shaft = new THREE.Mesh(
+                        new THREE.CylinderGeometry(radius, radius, 5.2, 28), CAD_MATERIALS.shaft);
+                    shaft.rotation.x = Math.PI / 2;
+                    shaft.position.copy(gear.mesh.position);
+                    shaft.castShadow = true;
+                    this.assembly.add(shaft);
+                }
+
+                // Mounting plate underneath, for scale and shadow catch.
+                const plate = new THREE.Mesh(
+                    new THREE.BoxGeometry(centreDistance + 14, 0.6, 16), CAD_MATERIALS.plate);
+                plate.position.set(0, -driven.pitchR - 3.4, 0);
+                plate.receiveShadow = true;
+                this.assembly.add(plate);
+
+                this.ratio = ratio;
+                const verts = this.solidGeometries.reduce((n, g) => n + g.attributes.position.count, 0);
+                const label = document.getElementById('cad-verts');
+                if (label) label.textContent = verts.toLocaleString();
+                const ratioLabel = document.getElementById('cad-ratio');
+                if (ratioLabel) ratioLabel.textContent = ratio.toFixed(1) + ':1';
             }
 
             toggleWireframe() {
                 this.isWireframe = !this.isWireframe;
-                this.gears.forEach(g => { g.mesh.material = this.isWireframe ? this.matWire : this.matSolid; });
+                this.gears[0].mesh.material = this.isWireframe ? CAD_MATERIALS.wire : CAD_MATERIALS.drive;
+                this.gears[1].mesh.material = this.isWireframe ? CAD_MATERIALS.wire : CAD_MATERIALS.solid;
             }
-            toggleAnimation() { this.isAnimating = !this.isAnimating; }
 
-            resize() {
-                if(this.container.clientWidth === 0) return;
-                this.camera.aspect = this.container.clientWidth / this.container.clientHeight;
-                this.camera.updateProjectionMatrix();
-                this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
-            }
-            animate() {
-                requestAnimationFrame(() => this.animate());
-                this.controls.update();
-                if(this.isAnimating) {
-                    this.gears.forEach(g => g.mesh.rotation.z += g.speed);
-                }
-                this.renderer.render(this.scene, this.camera);
-            }
+            toggleAnimation() { this.isAnimating = !this.isAnimating; }
+            resize() { this.stage.resize(); }
         }
 
         /**
@@ -582,11 +643,12 @@
             // The CAD viewer is the only part that needs WebGL; if it cannot start, the
             // blueprint canvas and the collaboration panel must still work.
             try {
-                window.CADEngine = new CADViewer();
+                if (!supportsWebGL()) throw new Error('WebGL unavailable');
+                window.CADEngine = new CADViewer(document.getElementById('cad-webgl'));
             } catch (err) {
                 console.warn("CAD viewer unavailable:", err);
-                document.getElementById('cad-webgl').innerHTML =
-                    '<div style="display:flex;height:100%;align-items:center;justify-content:center;text-align:center;padding:20px;color:var(--text-muted);font-family:\'Share Tech Mono\', monospace;font-size:11px;line-height:1.8;">3D CAD VIEWER UNAVAILABLE<br>(WebGL not supported)</div>';
+                renderSceneFallback(document.getElementById('cad-webgl'),
+                    'The blueprint canvas and collaboration panel still work.');
                 document.getElementById('cad-verts').innerText = 'n/a';
                 // No-op stand-in so the toolbar buttons stay harmless.
                 window.CADEngine = { toggleWireframe(){}, toggleAnimation(){}, resize(){} };
