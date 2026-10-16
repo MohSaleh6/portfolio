@@ -3,736 +3,795 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mohammad Saleh — Systems Engineer &amp; Full-Stack Developer</title>
-<meta name="description" content="Portfolio of Mohammad Saleh: interactive engineering systems built for the browser — GPU particle physics, an industrial OEE digital twin, OBD-II vehicle telemetry, Dijkstra route optimisation and production e-commerce.">
-<meta name="theme-color" content="#04070d">
+<title>Mohammad Saleh — Interactive Portfolio</title>
+<meta name="description" content="An interactive 3D portfolio you can explore: turn the pages of a book to move through ten built projects — live client sites with admin dashboards, and browser engineering demos.">
+<meta name="theme-color" content="#0b0906">
 <meta name="color-scheme" content="dark">
-
 <meta property="og:type" content="website">
-<meta property="og:title" content="Mohammad Saleh — Systems Engineer">
-<meta property="og:description" content="Interactive engineering systems built for the browser: GPU physics, industrial digital twins, vehicle telemetry and operations research.">
+<meta property="og:title" content="Mohammad Saleh — Interactive Portfolio">
+<meta property="og:description" content="Turn the pages of a 3D book to explore ten engineering projects.">
 
 <link rel="stylesheet" href="assets/core.css">
 <link rel="stylesheet" href="assets/vendor/fontawesome/css/all.min.css">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2304070d'/><text y='.9em' x='.5em' font-size='62' text-anchor='middle' fill='%234d9fff' font-family='monospace' font-weight='bold'>M</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230b0906'/><text y='.92em' x='.5em' font-size='60' text-anchor='middle' fill='%23e8c88a' font-family='monospace' font-weight='bold'>M</text></svg>">
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "/assets/vendor/three/three.module.min.js",
+    "three/addons/": "/assets/vendor/three/addons/"
+  }
+}
+</script>
 
 <style>
     /* ======================================================================
-       PAGE SHELL
+       A warmer palette than the rest of the site: this page is a desk, and a
+       desk is lit by a lamp.
        ====================================================================== */
-    body { background: var(--surface-base); }
-
-    /* Ambient blueprint grid + a soft glow behind the hero. */
-    .backdrop { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
-    .backdrop::before {
-        content: ''; position: absolute; inset: 0;
-        background-image:
-            linear-gradient(rgba(77,159,255,0.045) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(77,159,255,0.045) 1px, transparent 1px);
-        background-size: 54px 54px;
-        mask-image: radial-gradient(ellipse 85% 60% at 50% 0%, #000 20%, transparent 78%);
-        -webkit-mask-image: radial-gradient(ellipse 85% 60% at 50% 0%, #000 20%, transparent 78%);
-    }
-    .backdrop::after {
-        content: ''; position: absolute; top: -30vh; left: 50%; transform: translateX(-50%);
-        width: min(1100px, 120vw); height: 80vh; border-radius: 50%;
-        background: radial-gradient(circle, rgba(77,159,255,0.13), transparent 62%);
-        filter: blur(30px);
+    :root {
+        --paper: #f3ead8;
+        --ink: #0b0906;
+        --lamp: #e8c88a;
+        --lamp-soft: rgba(232, 200, 138, 0.14);
     }
 
-    .wrap { position: relative; z-index: 1; }
-    .shell { width: min(1240px, 100% - 2 * var(--space-5)); margin-inline: auto; }
+    html, body { height: 100%; overflow: hidden; }
+    body { background: #0b0906; cursor: default; }
 
-    /* ======================================================================
-       NAV
-       ====================================================================== */
-    .nav {
-        position: sticky; top: 0; z-index: 60;
-        display: flex; align-items: center; justify-content: space-between; gap: var(--space-5);
-        padding: var(--space-4) 0;
-        background: color-mix(in srgb, var(--surface-base) 82%, transparent);
-        backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-        border-bottom: 1px solid transparent;
-        transition: border-color var(--speed) var(--ease-out);
+    #stage { position: fixed; inset: 0; z-index: 0; }
+    #stage canvas { outline: none; }
+    #stage.is-over-page { cursor: pointer; }
+
+    /* Darkens the corners so the lit book is the only bright thing. */
+    .vignette {
+        position: fixed; inset: 0; z-index: 1; pointer-events: none;
+        background: radial-gradient(ellipse 72% 62% at 50% 46%, transparent 32%, rgba(5,4,3,0.82) 100%);
     }
-    .nav.is-stuck { border-bottom-color: var(--accent-line); }
-    .logo {
+
+    .ui { position: fixed; inset: 0; z-index: 2; pointer-events: none; }
+    .ui > * { pointer-events: auto; }
+
+    /* ---------------- top bar ---------------- */
+    .topbar {
+        position: absolute; inset: var(--space-5) var(--space-5) auto;
+        display: flex; align-items: center; justify-content: space-between; gap: var(--space-4);
+    }
+    .brand {
         display: inline-flex; align-items: center; gap: var(--space-3);
-        font-family: var(--font-display); font-size: 14px; font-weight: 700;
-        letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-strong); text-decoration: none;
+        font-family: var(--font-display); font-size: 13px; font-weight: 700;
+        letter-spacing: 0.14em; text-transform: uppercase; color: #f0e6d4; text-decoration: none;
     }
-    .logo-mark {
+    .brand-mark {
         display: grid; place-items: center; width: 30px; height: 30px;
-        border: 1px solid var(--accent); border-radius: var(--radius-sm);
-        background: var(--accent-dim); color: var(--accent); font-size: 13px;
+        border: 1px solid rgba(232,200,138,0.45); border-radius: 7px;
+        background: var(--lamp-soft); color: var(--lamp); font-size: 13px;
     }
-    .nav-links { display: flex; gap: var(--space-6); }
-    .nav-links a {
-        font-family: var(--font-mono); font-size: var(--step--1);
-        letter-spacing: 0.14em; text-transform: uppercase;
-        color: var(--text-muted); text-decoration: none;
-        transition: color var(--speed) var(--ease-out);
-    }
-    .nav-links a:hover { color: var(--accent-bright); }
-    @media (max-width: 760px) { .nav-links { display: none; } }
-
-    /* ======================================================================
-       HERO
-       ====================================================================== */
-    .hero { padding: clamp(var(--space-8), 11vw, 150px) 0 var(--space-9); }
-    .hero-status {
-        display: inline-flex; align-items: center; gap: var(--space-3);
-        padding: 7px 15px; margin-bottom: var(--space-5);
-        border: 1px solid rgba(61,220,151,0.28); border-radius: 99px;
-        background: rgba(61,220,151,0.07);
+    .ghost-btn {
+        display: inline-flex; align-items: center; gap: var(--space-2);
+        padding: 9px 17px; border-radius: 99px;
+        border: 1px solid rgba(232,200,138,0.34); background: rgba(20,16,11,0.5);
+        backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+        color: #efe4d1; text-decoration: none; cursor: pointer;
         font-family: var(--font-mono); font-size: 11px;
-        letter-spacing: 0.16em; text-transform: uppercase; color: var(--signal);
+        letter-spacing: 0.14em; text-transform: uppercase;
+        transition: background var(--speed) var(--ease-out), border-color var(--speed) var(--ease-out), color var(--speed) var(--ease-out);
     }
-    .pulse-dot {
-        width: 7px; height: 7px; border-radius: 50%; background: var(--signal);
-        box-shadow: 0 0 0 0 rgba(61,220,151,0.7); animation: pulse 2.4s ease-out infinite;
-    }
-    @keyframes pulse {
-        70% { box-shadow: 0 0 0 9px rgba(61,220,151,0); }
-        100% { box-shadow: 0 0 0 0 rgba(61,220,151,0); }
-    }
+    .ghost-btn:hover { background: var(--lamp); border-color: var(--lamp); color: #18120a; }
 
-    .hero h1 {
-        font-family: var(--font-display); font-size: var(--step-4);
-        font-weight: 700; letter-spacing: -0.02em; text-transform: uppercase;
-        line-height: 0.98; margin-bottom: var(--space-5);
+    /* ---------------- headline, shown on the cover only ---------------- */
+    .intro {
+        position: absolute; left: var(--space-6); top: 50%; transform: translateY(-50%);
+        max-width: min(420px, 36vw);
+        transition: opacity var(--speed-slow) var(--ease-out), transform var(--speed-slow) var(--ease-out);
     }
-    .hero h1 .outline {
-        color: transparent;
-        -webkit-text-stroke: 1.5px rgba(243,247,252,0.72);
-        text-stroke: 1.5px rgba(243,247,252,0.72);
+    .intro.is-hidden { opacity: 0; transform: translateY(-50%) translateX(-26px); pointer-events: none; }
+    .intro h1 {
+        font-family: var(--font-display); font-weight: 700;
+        font-size: clamp(26px, 3.4vw, 46px); line-height: 1.08;
+        text-transform: uppercase; color: #f6eeDC; margin-bottom: var(--space-4);
     }
-    .hero-lede { max-width: 62ch; font-size: var(--step-1); line-height: 1.6; color: var(--text-body); }
-    .hero-lede strong { color: var(--text-strong); font-weight: 600; }
-    .hero-actions { display: flex; flex-wrap: wrap; gap: var(--space-4); margin-top: var(--space-7); }
+    .intro h1 em { font-style: normal; color: var(--lamp); }
+    .intro p { color: rgba(238,228,210,0.72); font-size: var(--step-0); line-height: 1.7; }
+    .intro .hint {
+        display: inline-flex; align-items: center; gap: 10px; margin-top: var(--space-5);
+        font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.16em;
+        text-transform: uppercase; color: rgba(232,200,138,0.85);
+    }
+    .intro .hint i { animation: nudge 1.8s var(--ease-in-out) infinite; }
+    @keyframes nudge { 50% { transform: translateX(6px); } }
 
-    .hero-stats {
-        display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-        gap: var(--space-5); margin-top: var(--space-8);
-        padding-top: var(--space-6); border-top: 1px solid var(--accent-line);
+    /* ---------------- project readout ---------------- */
+    .readout {
+        position: absolute; right: var(--space-5); top: 50%; transform: translateY(-50%);
+        width: min(320px, 34vw); padding: var(--space-5);
+        border: 1px solid rgba(232,200,138,0.2); border-radius: var(--radius-md);
+        background: rgba(14, 11, 8, 0.72);
+        backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+        box-shadow: 0 24px 60px -30px rgba(0,0,0,0.95);
+        opacity: 0; transform: translateY(-50%) translateX(26px); pointer-events: none;
+        transition: opacity var(--speed-slow) var(--ease-out), transform var(--speed-slow) var(--ease-out);
     }
-    .stat dt { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted); }
-    .stat dd {
-        margin: 6px 0 0; font-family: var(--font-display); font-size: var(--step-2);
-        color: var(--text-strong); font-variant-numeric: tabular-nums;
+    .readout.is-shown { opacity: 1; transform: translateY(-50%) translateX(0); pointer-events: auto; }
+    .readout-kicker {
+        font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.2em;
+        text-transform: uppercase; color: var(--lamp);
     }
-
-    /* ======================================================================
-       SECTIONS
-       ====================================================================== */
-    section { padding-block: var(--space-9); scroll-margin-top: 80px; }
-    .section-head { margin-bottom: var(--space-7); }
-    .section-head h2 {
-        font-family: var(--font-display); font-size: var(--step-3);
-        text-transform: uppercase; letter-spacing: -0.01em; margin-top: var(--space-3);
+    .readout h2 {
+        font-family: var(--font-display); font-size: 20px; line-height: 1.2;
+        text-transform: uppercase; color: #f6eedc; margin: var(--space-3) 0;
     }
-    .section-head p { max-width: 66ch; margin-top: var(--space-4); color: var(--text-body); }
-
-    /* ======================================================================
-       PROJECT CARDS
-       ====================================================================== */
-    .projects { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: var(--space-5); }
-
-    .card {
-        position: relative; display: flex; flex-direction: column;
-        padding: var(--space-6); border-radius: var(--radius-lg);
-        background: linear-gradient(170deg, var(--surface-panel), var(--surface-sunken));
-        border: 1px solid var(--accent-line);
-        text-decoration: none; color: inherit; overflow: hidden;
-        transition: transform var(--speed) var(--ease-out),
-                    border-color var(--speed) var(--ease-out),
-                    box-shadow var(--speed) var(--ease-out);
-    }
-    /* Pointer-tracked sheen. The custom properties are written by JS. */
-    .card::before {
-        content: ''; position: absolute; inset: 0; opacity: 0;
-        background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 0%), rgba(77,159,255,0.12), transparent 62%);
-        transition: opacity var(--speed) var(--ease-out);
-    }
-    .card:hover, .card:focus-visible {
-        transform: translateY(-5px);
-        border-color: rgba(77,159,255,0.5);
-        box-shadow: var(--shadow-lift);
-    }
-    .card:hover::before, .card:focus-visible::before { opacity: 1; }
-    .card > * { position: relative; }
-
-    .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-4); margin-bottom: var(--space-5); }
-    .card-icon {
-        display: grid; place-items: center; width: 46px; height: 46px; flex-shrink: 0;
-        border-radius: var(--radius-md); font-size: 19px;
-        background: var(--tint, var(--accent-dim)); color: var(--tint-fg, var(--accent));
-        border: 1px solid color-mix(in srgb, var(--tint-fg, var(--accent)) 30%, transparent);
-    }
-    .card-flag {
-        font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.16em;
-        text-transform: uppercase; color: var(--signal);
+    .readout p { font-size: 13.5px; line-height: 1.7; color: rgba(236,226,208,0.74); }
+    .readout-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: var(--space-4); }
+    .badge {
         display: inline-flex; align-items: center; gap: 6px;
-        padding: 4px 10px; border-radius: 99px;
-        border: 1px solid rgba(61,220,151,0.3); background: rgba(61,220,151,0.07);
+        padding: 4px 11px; border-radius: 99px;
+        font-family: var(--font-mono); font-size: 9.5px;
+        letter-spacing: 0.12em; text-transform: uppercase;
     }
-    .card h3 { font-size: var(--step-1); margin-bottom: var(--space-3); }
-    .card-role {
-        font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em;
-        text-transform: uppercase; color: var(--tint-fg, var(--accent)); margin-bottom: var(--space-3);
-    }
-    .card p { font-size: var(--step--1); line-height: 1.75; color: var(--text-body); }
-    .card-highlight {
-        margin-top: var(--space-4); padding: var(--space-3) var(--space-4);
-        border-left: 2px solid var(--tint-fg, var(--accent)); border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-        background: rgba(255,255,255,0.025);
-        font-family: var(--font-mono); font-size: 10.5px; line-height: 1.7; color: var(--text-muted);
-    }
-    .card-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; padding-top: var(--space-5); }
-    .card-cta {
-        display: inline-flex; align-items: center; gap: var(--space-2); margin-top: var(--space-5);
-        font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em;
-        text-transform: uppercase; color: var(--text-strong);
-    }
-    .card-cta i { transition: transform var(--speed) var(--ease-out); }
-    .card:hover .card-cta i { transform: translateX(4px); }
+    .badge.live { background: rgba(61,220,151,0.14); color: #6ff0b4; border: 1px solid rgba(61,220,151,0.35); }
+    .badge.admin { background: rgba(255,167,51,0.12); color: #ffc271; border: 1px solid rgba(255,167,51,0.35); }
+    .badge.demo { background: rgba(127,188,255,0.12); color: #a8d1ff; border: 1px solid rgba(127,188,255,0.3); }
+    .readout-actions { display: flex; flex-direction: column; gap: var(--space-2); margin-top: var(--space-5); }
+    .readout-actions .ghost-btn { justify-content: center; }
+    .readout-actions .primary { background: var(--lamp); border-color: var(--lamp); color: #18120a; font-weight: 700; }
+    .readout-actions .primary:hover { background: #f6dba3; border-color: #f6dba3; }
 
-    /* ======================================================================
-       CAPABILITIES
-       ====================================================================== */
-    .capabilities { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--space-5); }
-    .cap { padding: var(--space-6); border-radius: var(--radius-md); background: var(--surface-panel); border: 1px solid var(--accent-line); }
-    .cap i { font-size: 21px; color: var(--highlight); }
-    .cap h3 { font-size: var(--step-0); margin: var(--space-4) 0 var(--space-3); }
-    .cap p { font-size: var(--step--1); color: var(--text-body); }
-    .cap ul { margin: var(--space-4) 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 6px; }
+    /* ---------------- bottom controls ---------------- */
+    .controls {
+        position: absolute; left: 50%; bottom: var(--space-5); transform: translateX(-50%);
+        display: flex; align-items: center; gap: var(--space-3);
+        padding: 9px 12px; border-radius: 99px;
+        border: 1px solid rgba(232,200,138,0.2); background: rgba(14,11,8,0.68);
+        backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    }
+    .icon-btn {
+        display: grid; place-items: center; width: 38px; height: 38px;
+        border-radius: 50%; border: 1px solid rgba(232,200,138,0.26);
+        background: transparent; color: #efe4d1; cursor: pointer; font-size: 13px;
+        transition: background var(--speed) var(--ease-out), color var(--speed) var(--ease-out), border-color var(--speed) var(--ease-out);
+    }
+    .icon-btn:hover:not(:disabled) { background: var(--lamp); border-color: var(--lamp); color: #18120a; }
+    .icon-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .progress { display: flex; align-items: center; gap: 7px; padding-inline: var(--space-3); }
+    .pip {
+        width: 7px; height: 7px; border-radius: 50%; padding: 0; border: 0; cursor: pointer;
+        background: rgba(232,200,138,0.26);
+        transition: background var(--speed) var(--ease-out), transform var(--speed) var(--ease-out);
+    }
+    .pip:hover { transform: scale(1.4); background: rgba(232,200,138,0.6); }
+    .pip.is-current { background: var(--lamp); transform: scale(1.5); }
 
-    /* ======================================================================
-       PROCESS
-       ====================================================================== */
-    .process { display: grid; gap: var(--space-4); counter-reset: step; }
-    .step {
-        display: grid; grid-template-columns: 54px 1fr; gap: var(--space-5); align-items: start;
-        padding: var(--space-5) var(--space-6); border-radius: var(--radius-md);
-        background: var(--surface-panel); border: 1px solid var(--accent-line);
-    }
-    .step-num {
-        display: grid; place-items: center; width: 42px; height: 42px;
-        border-radius: 50%; border: 1px solid var(--accent-line); background: var(--accent-dim);
-        font-family: var(--font-mono); font-size: 13px; color: var(--accent);
-    }
-    .step h3 { font-size: var(--step-0); margin-bottom: 6px; }
-    .step p { font-size: var(--step--1); color: var(--text-body); }
-    @media (max-width: 560px) { .step { grid-template-columns: 1fr; } }
+    /* ---------------- loading ---------------- */
+    .boot-screen { background: #0b0906; color: var(--lamp); z-index: 20; }
+    .boot-ring { border-color: rgba(232,200,138,0.18); border-top-color: var(--lamp); }
 
-    /* ======================================================================
-       CONTACT
-       ====================================================================== */
-    .contact {
-        display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-8);
-        padding: var(--space-8); border-radius: var(--radius-lg);
-        background: linear-gradient(150deg, var(--surface-panel), var(--surface-sunken));
-        border: 1px solid var(--accent-line);
+    /* ---------------- responsive ---------------- */
+    @media (max-width: 1080px) {
+        .intro { max-width: none; left: var(--space-4); right: var(--space-4); top: auto; bottom: 118px; transform: none; }
+        .intro.is-hidden { transform: translateY(18px); }
+        .readout {
+            left: var(--space-4); right: var(--space-4); width: auto;
+            top: auto; bottom: 108px; transform: translateY(18px);
+            max-height: 40vh; overflow-y: auto;
+        }
+        .readout.is-shown { transform: translateY(0); }
+        .readout-actions { flex-direction: row; }
+        .readout-actions .ghost-btn { flex: 1; }
     }
-    .contact h2 { font-family: var(--font-display); font-size: var(--step-2); text-transform: uppercase; margin-bottom: var(--space-4); }
-    .contact p { color: var(--text-body); }
-    .contact-links { display: flex; flex-direction: column; gap: var(--space-3); margin-top: var(--space-6); }
-    .contact-link {
-        display: inline-flex; align-items: center; gap: var(--space-3);
-        font-family: var(--font-mono); font-size: var(--step--1); color: var(--text-body);
-        text-decoration: none; transition: color var(--speed) var(--ease-out);
+    @media (max-width: 560px) {
+        .brand span.full { display: none; }
+        .intro h1 { font-size: 23px; }
+        .intro p { font-size: 13px; }
     }
-    .contact-link:hover { color: var(--accent-bright); }
-    .contact-link i { width: 18px; color: var(--accent); }
-
-    form { display: flex; flex-direction: column; gap: var(--space-5); }
-    .field label {
-        display: block; margin-bottom: 7px;
-        font-family: var(--font-mono); font-size: 10px;
-        letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-muted);
-    }
-    .field input, .field textarea {
-        width: 100%; padding: 12px 14px; border-radius: var(--radius-sm);
-        background: rgba(0,0,0,0.32); border: 1px solid var(--accent-line);
-        color: var(--text-strong); font-family: var(--font-body); font-size: var(--step-0);
-        transition: border-color var(--speed) var(--ease-out), background var(--speed) var(--ease-out);
-    }
-    .field textarea { resize: vertical; min-height: 110px; }
-    .field input:focus, .field textarea:focus { outline: none; border-color: var(--accent); background: rgba(0,0,0,0.5); }
-
-    footer {
-        padding: var(--space-7) 0; margin-top: var(--space-8);
-        border-top: 1px solid var(--accent-line);
-        display: flex; flex-wrap: wrap; gap: var(--space-4); justify-content: space-between;
-        font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);
-    }
-
-    /* ======================================================================
-       ENTRANCE ANIMATION
-       Opt-in via a class so content is visible if the script never runs.
-       ====================================================================== */
-    .reveal { opacity: 0; transform: translateY(18px); }
-    .reveal.is-in { opacity: 1; transform: none; transition: opacity 620ms var(--ease-out), transform 620ms var(--ease-out); }
-    @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; } }
 </style>
 </head>
 <body>
 
-<a class="skip-link" href="#work">Skip to projects</a>
-<div class="backdrop" aria-hidden="true"></div>
+<a class="skip-link" href="#contents">Skip to project list</a>
 
-<div class="wrap">
-
-    <!-- ================= NAV ================= -->
-    <nav class="nav shell" id="nav" aria-label="Primary">
-        <a class="logo" href="#top">
-            <span class="logo-mark" aria-hidden="true">M</span>
-            Mohammad Saleh
-        </a>
-        <div class="nav-links">
-            <a href="#work">Work</a>
-            <a href="#capabilities">Capabilities</a>
-            <a href="#process">Process</a>
-            <a href="#contact">Contact</a>
-        </div>
-    </nav>
-
-    <main class="shell" id="top">
-
-        <!-- ================= HERO ================= -->
-        <header class="hero">
-            <span class="hero-status"><span class="pulse-dot" aria-hidden="true"></span> Open to engineering roles</span>
-            <h1>
-                <span class="outline">Systems</span><br>
-                Engineer
-            </h1>
-            <p class="hero-lede">
-                I build <strong>interactive engineering systems that run in the browser</strong> — GPU physics,
-                industrial digital twins, live vehicle telemetry and optimisation algorithms.
-                Every project below is a working application you can open and drive right now,
-                not a screenshot.
-            </p>
-            <div class="hero-actions">
-                <a class="btn btn-primary" href="#work">
-                    View the work <i class="fas fa-arrow-down" aria-hidden="true"></i>
-                </a>
-                <a class="btn" href="#contact">
-                    Get in touch <i class="fas fa-paper-plane" aria-hidden="true"></i>
-                </a>
-            </div>
-
-            <dl class="hero-stats">
-                <div class="stat"><dt>Live projects</dt><dd data-count="8">8</dd></div>
-                <div class="stat"><dt>Particles per frame</dt><dd data-count="120000" data-format="compact">120k</dd></div>
-                <div class="stat"><dt>Third-party runtime deps</dt><dd data-count="0">0</dd></div>
-                <div class="stat"><dt>Domains covered</dt><dd data-count="5">5</dd></div>
-            </dl>
-        </header>
-
-        <!-- ================= WORK ================= -->
-        <section id="work">
-            <div class="section-head reveal">
-                <span class="eyebrow">01 — Selected work</span>
-                <h2>Things I have built</h2>
-                <p>
-                    Eight production and engineering projects. The simulations run real algorithms —
-                    Dijkstra's shortest path, OEE arithmetic, involute gear geometry, OBD-II PID decoding —
-                    rather than replaying canned animations.
-                </p>
-            </div>
-
-            <div class="projects" id="project-grid">
-
-                <!-- 01. Lily's Designs -->
-                <a class="card reveal" style="--tint: rgba(255,138,226,0.12); --tint-fg: #ff8ae2;"
-                   href="https://lily-s-designs.mohalisal1.workers.dev" target="_blank" rel="noopener noreferrer">
-                    <div class="card-top">
-                        <span class="card-icon"><i class="fas fa-envelope-open-text" aria-hidden="true"></i></span>
-                        <span class="card-flag"><i class="fas fa-circle" style="font-size:6px" aria-hidden="true"></i> Live store</span>
-                    </div>
-                    <p class="card-role">E-commerce · Production</p>
-                    <h3>Lily's Designs</h3>
-                    <p>
-                        A storefront for custom invitation cards: browsable catalogue with search,
-                        a persistent cart and a full checkout flow. Built without a framework and
-                        localised for Arabic, so the entire layout mirrors under RTL.
-                    </p>
-                    <p class="card-highlight">Hand-written JS — no framework runtime shipped to the customer.</p>
-                    <div class="card-tags">
-                        <span class="chip">Vanilla JS</span>
-                        <span class="chip">Cloudflare Workers</span>
-                        <span class="chip">RTL / i18n</span>
-                        <span class="chip">Cart &amp; checkout</span>
-                    </div>
-                    <span class="card-cta">Open the store <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></span>
-                </a>
-
-                <!-- 02. EduTech -->
-                <a class="card reveal" style="--tint: rgba(61,220,151,0.12); --tint-fg: #3ddc97;"
-                   href="https://tuition-platform.mohalisal1.workers.dev/" target="_blank" rel="noopener noreferrer">
-                    <div class="card-top">
-                        <span class="card-icon"><i class="fas fa-graduation-cap" aria-hidden="true"></i></span>
-                        <span class="card-flag"><i class="fas fa-circle" style="font-size:6px" aria-hidden="true"></i> Live platform</span>
-                    </div>
-                    <p class="card-role">Full-stack · Production</p>
-                    <h3>EduTech Platform</h3>
-                    <p>
-                        A learning management system with live sessions, rule-based gamification and
-                        progress analytics. Multi-role access separates what students, tutors and
-                        administrators can each reach.
-                    </p>
-                    <p class="card-highlight">Engineered with native RTL and internationalisation from the first commit.</p>
-                    <div class="card-tags">
-                        <span class="chip">React</span>
-                        <span class="chip">Firebase</span>
-                        <span class="chip">Node</span>
-                        <span class="chip">RTL / i18n</span>
-                    </div>
-                    <span class="card-cta">Open the platform <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></span>
-                </a>
-
-                <!-- 03. WebGL engine -->
-                <a class="card reveal" style="--tint: rgba(77,159,255,0.12); --tint-fg: #4d9fff;" href="webgl.html">
-                    <div class="card-top">
-                        <span class="card-icon"><i class="fas fa-atom" aria-hidden="true"></i></span>
-                    </div>
-                    <p class="card-role">Graphics · GPU</p>
-                    <h3>WebGL Particle Engine</h3>
-                    <p>
-                        120,000 points morphing between five parametric surfaces — Fibonacci sphere,
-                        DNA double helix, trefoil torus knot, spiral galaxy and a line lattice.
-                        The interpolation happens in the vertex shader, so the main thread stays free.
-                    </p>
-                    <p class="card-highlight">One draw call. Zero per-frame CPU work across 120k points.</p>
-                    <div class="card-tags">
-                        <span class="chip">Three.js</span>
-                        <span class="chip">GLSL</span>
-                        <span class="chip">BufferGeometry</span>
-                    </div>
-                    <span class="card-cta">Launch the engine <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
-                </a>
-
-                <!-- 04. Factory -->
-                <a class="card reveal" style="--tint: rgba(255,167,51,0.12); --tint-fg: #ffa733;" href="factory.html">
-                    <div class="card-top">
-                        <span class="card-icon"><i class="fas fa-industry" aria-hidden="true"></i></span>
-                    </div>
-                    <p class="card-role">Industrial · Simulation</p>
-                    <h3>Smart Factory SCADA</h3>
-                    <p>
-                        A digital twin of an assembly line: three articulated robot cells working a live
-                        conveyor while the dashboard computes real OEE — Availability × Performance ×
-                        Quality — from the parts actually produced.
-                    </p>
-                    <p class="card-highlight">Emergency-stop and maintenance states that the KPI maths genuinely respects.</p>
-                    <div class="card-tags">
-                        <span class="chip">OEE maths</span>
-                        <span class="chip">Three.js</span>
-                        <span class="chip">Canvas 2D</span>
-                    </div>
-                    <span class="card-cta">Run the line <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
-                </a>
-
-                <!-- 05. Logistics -->
-                <a class="card reveal" style="--tint: rgba(181,140,255,0.12); --tint-fg: #b58cff;" href="logistics.html">
-                    <div class="card-top">
-                        <span class="card-icon"><i class="fas fa-route" aria-hidden="true"></i></span>
-                    </div>
-                    <p class="card-role">Operations research</p>
-                    <h3>Logistics Network Optimizer</h3>
-                    <p>
-                        Dijkstra's shortest path over a weighted freight network, animated one relaxation
-                        at a time so you can watch the frontier expand. Optimise for cost, time or
-                        distance, then close a lane and watch it reroute.
-                    </p>
-                    <p class="card-highlight">Binary min-heap priority queue — O((V + E) log V), measured on screen.</p>
-                    <div class="card-tags">
-                        <span class="chip">Dijkstra</span>
-                        <span class="chip">Min-heap</span>
-                        <span class="chip">Canvas 2D</span>
-                    </div>
-                    <span class="card-cta">Solve a route <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
-                </a>
-
-                <!-- 06. IoT -->
-                <a class="card reveal" style="--tint: rgba(255,84,112,0.12); --tint-fg: #ff5470;" href="iot.html">
-                    <div class="card-top">
-                        <span class="card-icon"><i class="fas fa-car-battery" aria-hidden="true"></i></span>
-                    </div>
-                    <p class="card-role">Hardware · Web Bluetooth</p>
-                    <h3>IoT Automotive Twin</h3>
-                    <p>
-                        An OBD-II diagnostic bench that pairs with a real ELM327 adapter over Web Bluetooth,
-                        or runs a physics sandbox instead. Canvas gauges, a live signal oscilloscope and a
-                        procedural 3D engine control unit that heats up with engine speed.
-                    </p>
-                    <p class="card-highlight">Decodes CAN-BUS PIDs to physical units; synthesises engine audio from RPM.</p>
-                    <div class="card-tags">
-                        <span class="chip">Web Bluetooth</span>
-                        <span class="chip">Web Audio</span>
-                        <span class="chip">Three.js</span>
-                    </div>
-                    <span class="card-cta">Start the engine <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
-                </a>
-
-                <!-- 07. FinTech -->
-                <a class="card reveal" style="--tint: rgba(127,188,255,0.12); --tint-fg: #7fbcff;" href="fintech.html">
-                    <div class="card-top">
-                        <span class="card-icon"><i class="fas fa-chart-line" aria-hidden="true"></i></span>
-                    </div>
-                    <p class="card-role">Real-time data</p>
-                    <h3>FinTech Telemetry</h3>
-                    <p>
-                        A trading dashboard on a live exchange websocket, with a reconnection strategy that
-                        backs off exponentially and falls through to a local simulation so the panel never
-                        sits blank behind a firewall.
-                    </p>
-                    <p class="card-highlight">Interactive security-posture scorer and a streaming ledger view.</p>
-                    <div class="card-tags">
-                        <span class="chip">WebSockets</span>
-                        <span class="chip">Chart.js</span>
-                        <span class="chip">REST</span>
-                    </div>
-                    <span class="card-cta">Open the desk <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
-                </a>
-
-                <!-- 08. WebRTC -->
-                <a class="card reveal" style="--tint: rgba(0,243,255,0.12); --tint-fg: #4fe3ea;" href="webrtc.html">
-                    <div class="card-top">
-                        <span class="card-icon"><i class="fas fa-gears" aria-hidden="true"></i></span>
-                    </div>
-                    <p class="card-role">Collaboration · CAD</p>
-                    <h3>Engineering Sync Room</h3>
-                    <p>
-                        A shared blueprint canvas with a measuring tool that reports true Euclidean
-                        distance in millimetres, beside a gearbox whose teeth are generated from the
-                        involute equation and actually mesh.
-                    </p>
-                    <p class="card-highlight">Pitch-radius centre distance and half-tooth phase offset, so the mesh is correct.</p>
-                    <div class="card-tags">
-                        <span class="chip">Involute geometry</span>
-                        <span class="chip">Canvas 2D</span>
-                        <span class="chip">Three.js</span>
-                    </div>
-                    <span class="card-cta">Join the room <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
-                </a>
-
-            </div>
-        </section>
-
-        <!-- ================= CAPABILITIES ================= -->
-        <section id="capabilities">
-            <div class="section-head reveal">
-                <span class="eyebrow">02 — Capabilities</span>
-                <h2>What I work with</h2>
-            </div>
-            <div class="capabilities">
-                <article class="cap reveal">
-                    <i class="fas fa-cube" aria-hidden="true"></i>
-                    <h3>Real-time graphics</h3>
-                    <p>Shader authoring, buffer geometry, physically based lighting and the performance discipline to hold a frame budget on a phone.</p>
-                    <ul>
-                        <li class="chip">Three.js</li><li class="chip">GLSL</li><li class="chip">Canvas 2D</li><li class="chip">WebGL</li>
-                    </ul>
-                </article>
-                <article class="cap reveal">
-                    <i class="fas fa-code" aria-hidden="true"></i>
-                    <h3>Front-end engineering</h3>
-                    <p>Accessible, responsive interfaces built on web standards, with state machines that stay honest when a user takes an unexpected path.</p>
-                    <ul>
-                        <li class="chip">JavaScript</li><li class="chip">React</li><li class="chip">CSS architecture</li><li class="chip">WCAG</li>
-                    </ul>
-                </article>
-                <article class="cap reveal">
-                    <i class="fas fa-server" aria-hidden="true"></i>
-                    <h3>Back-end &amp; edge</h3>
-                    <p>APIs and data models deployed to the edge, plus the build and release plumbing that gets them there repeatably.</p>
-                    <ul>
-                        <li class="chip">Node</li><li class="chip">Cloudflare Workers</li><li class="chip">Firebase</li><li class="chip">REST</li>
-                    </ul>
-                </article>
-                <article class="cap reveal">
-                    <i class="fas fa-diagram-project" aria-hidden="true"></i>
-                    <h3>Algorithms &amp; systems</h3>
-                    <p>Choosing the structure that fits the problem's complexity class, and proving it with tests rather than trusting that it looks right.</p>
-                    <ul>
-                        <li class="chip">Graph theory</li><li class="chip">Numerical methods</li><li class="chip">Simulation</li>
-                    </ul>
-                </article>
-            </div>
-        </section>
-
-        <!-- ================= PROCESS ================= -->
-        <section id="process">
-            <div class="section-head reveal">
-                <span class="eyebrow">03 — Process</span>
-                <h2>How I build</h2>
-            </div>
-            <div class="process">
-                <article class="step reveal">
-                    <span class="step-num">01</span>
-                    <div>
-                        <h3>Turn the brief into numbers</h3>
-                        <p>Throughput targets, latency budgets, data volumes, failure modes. Nothing gets written until the definition of "working" is measurable.</p>
-                    </div>
-                </article>
-                <article class="step reveal">
-                    <span class="step-num">02</span>
-                    <div>
-                        <h3>Model before interface</h3>
-                        <p>Schemas, state machines and module boundaries first. The algorithm is chosen to fit the problem's complexity class, not for how fast it is to type.</p>
-                    </div>
-                </article>
-                <article class="step reveal">
-                    <span class="step-num">03</span>
-                    <div>
-                        <h3>Build in vertical slices</h3>
-                        <p>Each layer is proven working before the next is stacked on it, and render paths get profiled as they are written — a frame budget is a requirement, not an afterthought.</p>
-                    </div>
-                </article>
-                <article class="step reveal">
-                    <span class="step-num">04</span>
-                    <div>
-                        <h3>Test the edges, then ship</h3>
-                        <p>Empty states, dropped sockets, unsupported hardware. A feature is finished when it degrades gracefully on the day the network, the GPU or the API is not there.</p>
-                    </div>
-                </article>
-            </div>
-        </section>
-
-        <!-- ================= CONTACT ================= -->
-        <section id="contact">
-            <div class="contact reveal">
-                <div>
-                    <span class="eyebrow">04 — Contact</span>
-                    <h2>Let's build something</h2>
-                    <p>
-                        Available for engineering roles and selected freelance work. If you have a hard
-                        problem — performance, simulation, data visualisation or a system that has to keep
-                        working when the network does not — I would like to hear about it.
-                    </p>
-                    <div class="contact-links">
-                        <a class="contact-link" href="mailto:mohalisal1@hotmail.com">
-                            <i class="fas fa-envelope" aria-hidden="true"></i> mohalisal1@hotmail.com
-                        </a>
-                        <a class="contact-link" href="https://www.linkedin.com/in/mohammad-saleh-104927373" target="_blank" rel="noopener noreferrer">
-                            <i class="fab fa-linkedin-in" aria-hidden="true"></i> LinkedIn profile
-                        </a>
-                    </div>
-                </div>
-
-                <form action="https://formsubmit.co/mohalisal1@hotmail.com" method="POST">
-                    <input type="hidden" name="_captcha" value="false">
-                    <div class="field">
-                        <label for="name">Your name</label>
-                        <input type="text" id="name" name="name" autocomplete="name" required>
-                    </div>
-                    <div class="field">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" name="email" autocomplete="email" required>
-                    </div>
-                    <div class="field">
-                        <label for="message">What are you working on?</label>
-                        <textarea id="message" name="message" rows="4" required></textarea>
-                    </div>
-                    <button class="btn btn-primary" type="submit">
-                        Send message <i class="fas fa-paper-plane" aria-hidden="true"></i>
-                    </button>
-                </form>
-            </div>
-        </section>
-
-        <footer>
-            <span>© <span id="year">2026</span> Mohammad Saleh</span>
-            <span>Built from scratch — no framework, no third-party CDN</span>
-        </footer>
-
-    </main>
+<div class="boot-screen" id="boot">
+    <div class="boot-ring"></div>
+    <div id="boot-text">Binding the book</div>
+    <p class="boot-note" id="boot-note" hidden></p>
 </div>
 
+<div id="stage" role="application" aria-label="Interactive 3D portfolio book"></div>
+<div class="vignette" aria-hidden="true"></div>
+
+<div class="ui">
+    <header class="topbar">
+        <a class="brand" href="#contents">
+            <span class="brand-mark" aria-hidden="true">M</span>
+            <span class="full">Mohammad Saleh</span>
+        </a>
+        <a class="ghost-btn" href="mailto:mohalisal1@hotmail.com">
+            <i class="fas fa-envelope" aria-hidden="true"></i> Get in touch
+        </a>
+    </header>
+
+    <section class="intro" id="intro">
+        <h1>Interactive portfolio<br><em>you can explore</em></h1>
+        <p>Ten built projects, bound into one volume. Turn a page to open a project — four live client sites with their own admin dashboards, and six engineering demos that run real algorithms in your browser.</p>
+        <span class="hint">Click the right page to turn <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+    </section>
+
+    <aside class="readout" id="readout" aria-live="polite">
+        <span class="readout-kicker" id="r-kicker">Project</span>
+        <h2 id="r-title">—</h2>
+        <p id="r-blurb"></p>
+        <div class="readout-badges" id="r-badges"></div>
+        <div class="readout-actions">
+            <a class="ghost-btn primary" id="r-open" href="#" target="_blank" rel="noopener noreferrer">
+                <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i> <span id="r-open-label">Open</span>
+            </a>
+            <button class="ghost-btn" id="r-admin" type="button" hidden>
+                <i class="fas fa-lock" aria-hidden="true"></i> About the admin panel
+            </button>
+        </div>
+    </aside>
+
+    <nav class="controls" aria-label="Page navigation">
+        <button class="icon-btn" id="btn-prev" type="button" aria-label="Previous page" disabled>
+            <i class="fas fa-chevron-left" aria-hidden="true"></i>
+        </button>
+        <div class="progress" id="progress" role="tablist" aria-label="Jump to a project"></div>
+        <button class="icon-btn" id="btn-next" type="button" aria-label="Next page">
+            <i class="fas fa-chevron-right" aria-hidden="true"></i>
+        </button>
+    </nav>
+</div>
+
+<!-- A plain, always-present list so the portfolio works without WebGL,
+     for search engines, and for anyone using a screen reader. -->
+<section id="contents" class="visually-hidden">
+    <h2>Projects</h2>
+    <ul id="contents-list"></ul>
+</section>
+
 <script type="module">
-/**
- * Progressive enhancement only. Every element on this page is readable and
- * every link works with this script removed; it adds reveal-on-scroll, the
- * pointer sheen and the counter animation on top.
- */
+import * as THREE from 'three';
+import { Stage, renderSceneFallback, supportsWebGL } from './assets/scene.js';
+import { Book, createDesk } from './assets/book.js';
+import {
+    drawCover, drawBackPage, drawProjectPage, ensureFonts, setPageResolution
+} from './assets/page-art.js';
 
-/* --- sticky nav border ---------------------------------------------------- */
-const nav = document.getElementById('nav');
-const sentinel = document.createElement('div');
-document.body.prepend(sentinel);
-new IntersectionObserver(
-    ([entry]) => nav.classList.toggle('is-stuck', !entry.isIntersecting),
-    { rootMargin: '0px' }
-).observe(sentinel);
-
-/* --- reveal on scroll ----------------------------------------------------- */
-const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-if (reduceMotion) {
-    document.querySelectorAll('.reveal').forEach(el => el.classList.add('is-in'));
-} else {
-    const revealer = new IntersectionObserver((entries) => {
-        entries.forEach((entry, i) => {
-            if (!entry.isIntersecting) return;
-            // Small stagger within a batch so a grid arrives as a wave.
-            entry.target.style.transitionDelay = `${Math.min(i * 60, 240)}ms`;
-            entry.target.classList.add('is-in');
-            revealer.unobserve(entry.target);
-        });
-    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
-
-    document.querySelectorAll('.reveal').forEach(el => revealer.observe(el));
-}
-
-/* --- pointer-tracked card sheen ------------------------------------------- */
-// One listener on the grid rather than one per card.
-const grid = document.getElementById('project-grid');
-grid.addEventListener('pointermove', (e) => {
-    const card = e.target.closest('.card');
-    if (!card) return;
-    const rect = card.getBoundingClientRect();
-    card.style.setProperty('--mx', `${e.clientX - rect.left}px`);
-    card.style.setProperty('--my', `${e.clientY - rect.top}px`);
-});
-
-/* --- hero counters -------------------------------------------------------- */
-const formatValue = (value, format) => {
-    if (format === 'compact') {
-        return value >= 1000 ? `${Math.round(value / 1000)}k` : String(Math.round(value));
+/* ==========================================================================
+   PROJECT DATA
+   One source of truth: the book pages, the readout panel and the no-WebGL
+   list are all generated from this array.
+   ========================================================================== */
+const PROJECTS = [
+    {
+        title: "Lily's Designs",
+        category: 'E-commerce · Client',
+        blurb: 'A storefront for custom invitation cards: a searchable catalogue, a persistent cart and a complete checkout. Built without a framework and localised for Arabic, so the whole layout mirrors under RTL.',
+        note: 'Hand-written JS — no framework runtime reaches the customer.',
+        tags: ['Vanilla JS', 'Cloudflare Workers', 'RTL / i18n', 'Cart & checkout'],
+        art: 'cards', tint: '#ff8ae2', tintSoft: 'rgba(255,138,226,0.16)',
+        url: 'https://lily-s-designs.mohalisal1.workers.dev',
+        live: true, admin: true,
+        adminNote: 'Protected sign-in, product management, order queue and a sales overview.'
+    },
+    {
+        title: 'Al-Neran Restaurant',
+        category: 'Restaurant · Client',
+        blurb: 'A digital menu and ordering system covering both sides of the counter: customers order online for delivery, and staff raise dine-in orders from the same catalogue, with everything landing in one kitchen queue.',
+        note: 'One order pipeline serves both the web storefront and the in-house terminal.',
+        tags: ['Online ordering', 'Dine-in orders', 'Admin dashboard', 'Cloudflare Workers'],
+        art: 'restaurant', tint: '#ff8a3d', tintSoft: 'rgba(255,138,61,0.17)',
+        url: 'https://alneran.mohalisal1.workers.dev/',
+        live: true, admin: true,
+        adminNote: 'Menu editor, live order board with status changes, and daily sales figures behind a protected login.'
+    },
+    {
+        title: 'Rootsym',
+        category: 'Education · Client',
+        blurb: 'A platform for engineering courses and consulting: structured course modules, enrolment, and a booking path for one-to-one engineering consultations.',
+        note: 'Course catalogue and bookings share one content model, so a change lands in both.',
+        tags: ['Courses', 'Consulting', 'Admin dashboard', 'Cloudflare Workers'],
+        art: 'courses', tint: '#3ddc97', tintSoft: 'rgba(61,220,151,0.15)',
+        url: 'https://rootsym.mohalisal1.workers.dev',
+        live: true, admin: true,
+        adminNote: 'Protected dashboard for course content, enrolments and consultation requests.'
+    },
+    {
+        title: 'EduTech Platform',
+        category: 'Full-stack · Client',
+        blurb: 'A learning management system with live sessions, rule-based gamification and progress analytics. Multi-role access separates what students, tutors and administrators can each reach.',
+        note: 'Engineered with native RTL and internationalisation from the first commit.',
+        tags: ['React', 'Firebase', 'Node', 'RTL / i18n'],
+        art: 'platform', tint: '#7fbcff', tintSoft: 'rgba(127,188,255,0.15)',
+        url: 'https://tuition-platform.mohalisal1.workers.dev/',
+        live: true, admin: true,
+        adminNote: 'Role-gated administration for users, course content and progress reporting.'
+    },
+    {
+        title: 'WebGL Particle Engine',
+        category: 'Graphics · GPU',
+        blurb: '120,000 points morphing between five parametric surfaces — Fibonacci sphere, DNA double helix, trefoil torus knot, spiral galaxy and a line lattice — interpolated entirely in the vertex shader.',
+        note: 'One draw call. Zero per-frame CPU work across 120,000 points.',
+        tags: ['Three.js', 'GLSL', 'BufferGeometry'],
+        art: 'particles', tint: '#4d9fff', tintSoft: 'rgba(77,159,255,0.15)',
+        url: 'webgl.html', live: false, admin: false
+    },
+    {
+        title: 'Smart Factory SCADA',
+        category: 'Industrial · Simulation',
+        blurb: 'A digital twin of an assembly line: three articulated robot cells working a live conveyor while the dashboard computes real OEE — Availability × Performance × Quality — from the parts actually produced.',
+        note: 'Emergency-stop and maintenance states the KPI maths genuinely respects.',
+        tags: ['OEE maths', 'Three.js', 'Canvas 2D'],
+        art: 'factory', tint: '#ffa733', tintSoft: 'rgba(255,167,51,0.15)',
+        url: 'factory.html', live: false, admin: false
+    },
+    {
+        title: 'Logistics Optimizer',
+        category: 'Operations research',
+        blurb: "Dijkstra's shortest path over a weighted freight network, animated one relaxation at a time. Optimise for cost, time or distance, then close a lane and watch the route re-solve.",
+        note: 'Binary min-heap priority queue — O((V + E) log V), measured on screen.',
+        tags: ['Dijkstra', 'Min-heap', 'Canvas 2D'],
+        art: 'graph', tint: '#b58cff', tintSoft: 'rgba(181,140,255,0.15)',
+        url: 'logistics.html', live: false, admin: false
+    },
+    {
+        title: 'IoT Automotive Twin',
+        category: 'Hardware · Web Bluetooth',
+        blurb: 'An OBD-II diagnostic bench that pairs with a real ELM327 adapter over Web Bluetooth, or runs a physics sandbox instead. Canvas gauges, a signal oscilloscope and a procedural 3D ECU that heats with engine speed.',
+        note: 'Decodes CAN-BUS PIDs to physical units; synthesises engine audio from RPM.',
+        tags: ['Web Bluetooth', 'Web Audio', 'Three.js'],
+        art: 'telemetry', tint: '#ff5470', tintSoft: 'rgba(255,84,112,0.15)',
+        url: 'iot.html', live: false, admin: false
+    },
+    {
+        title: 'FinTech Telemetry',
+        category: 'Real-time data',
+        blurb: 'A trading dashboard on a live exchange websocket, with a reconnection strategy that backs off exponentially and falls through to a local simulation so the panel never sits blank behind a firewall.',
+        note: 'Interactive security-posture scorer and a streaming ledger view.',
+        tags: ['WebSockets', 'Chart.js', 'REST'],
+        art: 'market', tint: '#4fe3ea', tintSoft: 'rgba(79,227,234,0.14)',
+        url: 'fintech.html', live: false, admin: false
+    },
+    {
+        title: 'Engineering Sync Room',
+        category: 'Collaboration · CAD',
+        blurb: 'A shared blueprint canvas with a measuring tool reporting true Euclidean distance in millimetres, beside a gearbox whose teeth are generated from the involute equation and actually mesh.',
+        note: 'Pitch-radius centre distance and half-tooth phase offset, so the mesh is correct.',
+        tags: ['Involute geometry', 'Canvas 2D', 'Three.js'],
+        art: 'gears', tint: '#9bb4d4', tintSoft: 'rgba(155,180,212,0.14)',
+        url: 'webrtc.html', live: false, admin: false
     }
-    return String(Math.round(value));
-};
+];
 
-const counters = document.querySelectorAll('[data-count]');
-if (reduceMotion) {
-    // Values are already correct in the markup; nothing to animate.
-} else {
-    const counterObserver = new IntersectionObserver((entries) => {
-        for (const entry of entries) {
-            if (!entry.isIntersecting) continue;
-            const el = entry.target;
-            counterObserver.unobserve(el);
+/* --- the no-WebGL / screen-reader list ---------------------------------- */
+document.getElementById('contents-list').innerHTML = PROJECTS.map(p =>
+    `<li><a href="${p.url}">${p.title}</a> — ${p.blurb}</li>`
+).join('');
 
-            const target = Number(el.dataset.count);
-            const format = el.dataset.format;
-            const duration = 1100;
-            const start = performance.now();
+const boot = document.getElementById('boot');
+const bootText = document.getElementById('boot-text');
+const bootNote = document.getElementById('boot-note');
 
-            const step = (now) => {
-                const t = Math.min((now - start) / duration, 1);
-                // easeOutCubic
-                el.textContent = formatValue(target * (1 - Math.pow(1 - t, 3)), format);
-                if (t < 1) requestAnimationFrame(step);
-            };
-            requestAnimationFrame(step);
-        }
-    }, { threshold: 0.5 });
-    counters.forEach(el => counterObserver.observe(el));
+function failBoot(message) {
+    boot.classList.add('has-error');
+    bootText.textContent = 'WebGL unavailable';
+    bootNote.hidden = false;
+    bootNote.textContent = message;
+    renderSceneFallback(document.getElementById('stage'), message);
+    // Fall back to the plain list, which is already in the document.
+    const list = document.getElementById('contents');
+    list.classList.remove('visually-hidden');
+    list.style.cssText = 'position:relative;z-index:30;max-width:760px;margin:0 auto;padding:120px 24px 60px;color:#e9dfcd;';
+    document.querySelector('.vignette')?.remove();
+    document.querySelectorAll('.intro, .readout, .controls').forEach(el => el.remove());
+    document.body.style.overflow = 'auto';
+    boot.style.position = 'absolute';
 }
 
-/* --- footer year ---------------------------------------------------------- */
-document.getElementById('year').textContent = new Date().getFullYear();
+/* ==========================================================================
+   SCENE
+   ========================================================================== */
+class PortfolioBook {
+    constructor() {
+        const isSmall = window.innerWidth < 900;
+        setPageResolution(isSmall ? 0.6 : 1);
+
+        this.stage = new Stage(document.getElementById('stage'), {
+            fov: 38, far: 160, exposure: 1.05, background: 0x0b0906
+        });
+        this.stage.controls.enabled = false;        // the camera is directed, not orbited
+
+        this.#light();
+        this.stage.scene.add(createDesk(44));
+        this.#props();
+
+        this.book = new Book({ width: 3.15, height: 4.45, segments: isSmall ? 24 : 40 });
+        this.book.group.rotation.x = -Math.PI / 2;  // lay the book flat on the desk
+        this.book.group.position.y = 0.055;
+        this.stage.scene.add(this.book.group);
+
+        this.raycaster = new THREE.Raycaster();
+        this.pointer = new THREE.Vector2(-5, -5);
+        this.parallax = { x: 0, y: 0, tx: 0, ty: 0 };
+        this.hoverSide = 0;
+
+        this.#buildPages();
+        this.#frameCamera(isSmall);
+        this.#bindUI();
+
+        this.book.onPageChange(state => this.#renderReadout(state));
+        this.#renderReadout(this.book.getVisible());
+
+        this.stage.onFrame((delta) => this.#tick(delta));
+        this.stage.start();
+    }
+
+    /* --------------------- lighting --------------------- */
+    #light() {
+        const scene = this.stage.scene;
+        scene.add(new THREE.AmbientLight(0xffd9a8, 0.34));
+
+        // Desk lamp: warm, high and slightly to the left.
+        const lamp = new THREE.SpotLight(0xffe4bb, 210, 40, Math.PI / 4.2, 0.62, 1.5);
+        lamp.position.set(-3.2, 11, 6.2);
+        lamp.target.position.set(0.9, 0, 0.1);
+        lamp.castShadow = true;
+        lamp.shadow.mapSize.set(2048, 2048);
+        lamp.shadow.bias = -0.0006;
+        lamp.shadow.normalBias = 0.022;
+        lamp.shadow.camera.near = 1;
+        lamp.shadow.camera.far = 30;
+        scene.add(lamp, lamp.target);
+        this.lamp = lamp;
+
+        // Cool bounce from the room, so the shadow side is not dead black.
+        const bounce = new THREE.DirectionalLight(0x7f94c4, 0.8);
+        bounce.position.set(7, 4, -6);
+        scene.add(bounce);
+
+        // A soft kicker along the page edges.
+        const rim = new THREE.DirectionalLight(0xffc98a, 0.75);
+        rim.position.set(2, 3, -8);
+        scene.add(rim);
+    }
+
+    /** A pen and a coffee cup, for scale and to sell the desk. */
+    #props() {
+        const scene = this.stage.scene;
+        const metal = new THREE.MeshStandardMaterial({ color: 0x8e9aa8, metalness: 0.9, roughness: 0.3 });
+        const dark = new THREE.MeshStandardMaterial({ color: 0x15110d, metalness: 0.4, roughness: 0.6 });
+        const ceramic = new THREE.MeshStandardMaterial({ color: 0xe9e3d8, roughness: 0.42, metalness: 0.05 });
+        const coffee = new THREE.MeshStandardMaterial({ color: 0x2a160c, roughness: 0.25, metalness: 0.1 });
+
+        const pen = new THREE.Group();
+        const body = new THREE.Mesh(new THREE.CylinderGeometry(0.052, 0.052, 1.5, 18), dark);
+        const nib = new THREE.Mesh(new THREE.ConeGeometry(0.052, 0.22, 18), metal);
+        body.rotation.z = Math.PI / 2;
+        nib.rotation.z = -Math.PI / 2;
+        nib.position.x = 0.86;
+        pen.add(body, nib);
+        pen.position.set(3.7, 0.055, 2.9);
+        pen.rotation.y = 0.42;
+        pen.traverse(o => { o.castShadow = true; });
+        scene.add(pen);
+
+        const cup = new THREE.Group();
+        const mug = new THREE.Mesh(new THREE.CylinderGeometry(0.46, 0.38, 0.6, 32, 1, true), ceramic);
+        mug.material.side = THREE.DoubleSide;
+        const base = new THREE.Mesh(new THREE.CircleGeometry(0.38, 32), ceramic);
+        base.rotation.x = -Math.PI / 2;
+        base.position.y = -0.3;
+        const brew = new THREE.Mesh(new THREE.CircleGeometry(0.42, 32), coffee);
+        brew.rotation.x = -Math.PI / 2;
+        brew.position.y = 0.2;
+        const saucer = new THREE.Mesh(new THREE.CylinderGeometry(0.78, 0.74, 0.05, 36), ceramic);
+        saucer.position.y = -0.28;
+        cup.add(mug, base, brew, saucer);
+        cup.position.set(5.2, 0.33, 0.2);
+        cup.traverse(o => { o.castShadow = true; o.receiveShadow = true; });
+        scene.add(cup);
+    }
+
+    /* --------------------- pages --------------------- */
+    #toTexture(canvas) {
+        const tex = new THREE.CanvasTexture(canvas);
+        tex.colorSpace = THREE.SRGBColorSpace;
+        tex.anisotropy = Math.min(8, this.stage.renderer.capabilities.getMaxAnisotropy());
+        tex.generateMipmaps = true;
+        tex.minFilter = THREE.LinearMipmapLinearFilter;
+        return tex;
+    }
+
+    #buildPages() {
+        // Sheet 0 front is the cover; the last sheet's back closes the volume.
+        // Everything in between is two projects per sheet.
+        const pages = [
+            { kind: 'cover' },
+            ...PROJECTS.map((p, i) => ({ kind: 'project', project: p, number: i + 1 })),
+            { kind: 'contact' }
+        ];
+
+        for (let i = 0; i < pages.length; i += 2) {
+            const front = pages[i];
+            const back = pages[i + 1] ?? { kind: 'blank' };
+            this.book.addSheet(
+                this.#toTexture(this.#drawPage(front)),
+                this.#toTexture(this.#drawPage(back)),
+                { front, back }
+            );
+        }
+    }
+
+    #drawPage(page) {
+        if (page.kind === 'cover') return drawCover();
+        if (page.kind === 'contact') return drawBackPage();
+        if (page.kind === 'project') return drawProjectPage(page.project, page.number);
+        return drawCover();
+    }
+
+    /* --------------------- camera --------------------- */
+    #frameCamera(isSmall) {
+        this.isSmall = isSmall;
+        // `lookAt` sits at screen centre, so moving it left pushes the book
+        // right. The cover wants room for the headline; an open project wants
+        // room for the readout panel on the other side.
+        this.shiftCover = isSmall ? 0 : -1.05;
+        this.shiftOpen = isSmall ? 0 : 0.85;
+        this.shift = this.shiftCover;
+        this.shiftTarget = this.shiftCover;
+
+        // A portrait phone has a very narrow horizontal field of view, so a
+        // fixed distance crops the spread. Widen the lens there and solve the
+        // distance from the viewport instead of hard-coding it.
+        this.stage.camera.fov = isSmall ? 50 : 38;
+        this.cameraHome = new THREE.Vector3(0, 7.6, 7.5);
+        // Aim in front of the book on phones so it rides above the headline
+        // and the page controls rather than behind them.
+        this.lookAt = new THREE.Vector3(this.shift, 0, isSmall ? 2.45 : 0.2);
+
+        this.fitCamera();
+        window.addEventListener('resize', () => this.fitCamera());
+    }
+
+    /**
+     * Solves the camera distance by actually projecting the book's corners and
+     * backing off until every one of them lands inside the viewport.
+     *
+     * A closed-form fit from field of view alone is not enough here: the book
+     * is a flat rectangle tilted away from the camera, so its near edge is
+     * much closer than its centre and projects wider than any single
+     * "distance to the object" would predict. Iterating on the real projection
+     * handles that, and any aspect ratio, elevation or lateral shift, without
+     * special cases.
+     */
+    fitCamera() {
+        const cam = this.stage.camera;
+        const el = this.stage.container;
+        if (el.clientHeight > 0) cam.aspect = el.clientWidth / el.clientHeight;
+        cam.updateProjectionMatrix();
+
+        // Book extents plus a little air, including the height a turning page
+        // reaches as it arcs over the spine.
+        const corners = [
+            new THREE.Vector3(-3.35, 0, -2.45), new THREE.Vector3(3.35, 0, -2.45),
+            new THREE.Vector3(-3.35, 0, 2.45), new THREE.Vector3(3.35, 0, 2.45),
+            new THREE.Vector3(0, 0.75, -2.45), new THREE.Vector3(0, 0.75, 2.45)
+        ];
+
+        const elevation = this.isSmall ? 1.02 : 0.79;   // radians above the desk
+        const sinE = Math.sin(elevation), cosE = Math.cos(elevation);
+
+        // Fit for whichever framing pushes the book furthest off centre.
+        let required = 5;
+        for (const shift of [this.shiftCover, this.shiftOpen]) {
+            let distance = 6;
+            for (let step = 0; step < 48; step++) {
+                cam.position.set(shift, sinE * distance, cosE * distance);
+                cam.lookAt(shift, 0, this.lookAt.z);
+                cam.updateMatrixWorld(true);
+
+                let worst = 0;
+                for (const corner of corners) {
+                    const ndc = corner.clone().project(cam);
+                    worst = Math.max(worst, Math.abs(ndc.x), Math.abs(ndc.y));
+                }
+                if (worst > 0.93) distance *= 1.04;
+                else if (worst < 0.86) distance *= 0.985;
+                else break;
+            }
+            required = Math.max(required, distance);
+        }
+
+        this.cameraHome.y = sinE * required;
+        this.cameraHome.z = cosE * required;
+        cam.position.set(this.shift, this.cameraHome.y, this.cameraHome.z);
+        cam.lookAt(this.lookAt);
+    }
+
+    /* --------------------- interaction --------------------- */
+    #bindUI() {
+        const stageEl = document.getElementById('stage');
+
+        stageEl.addEventListener('pointermove', (e) => {
+            const r = stageEl.getBoundingClientRect();
+            this.pointer.x = ((e.clientX - r.left) / r.width) * 2 - 1;
+            this.pointer.y = -((e.clientY - r.top) / r.height) * 2 + 1;
+            // Parallax is deliberately tiny: the desk should breathe, not sway.
+            this.parallax.tx = this.pointer.x * 0.5;
+            this.parallax.ty = this.pointer.y * 0.28;
+        });
+
+        stageEl.addEventListener('pointerleave', () => {
+            this.pointer.set(-5, -5);
+            this.parallax.tx = 0;
+            this.parallax.ty = 0;
+        });
+
+        stageEl.addEventListener('click', () => {
+            if (this.hoverSide > 0) this.book.next();
+            else if (this.hoverSide < 0) this.book.prev();
+        });
+
+        // Wheel turns pages, with a cooldown so one flick is one page.
+        let wheelLock = 0;
+        stageEl.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const now = performance.now();
+            if (now < wheelLock) return;
+            wheelLock = now + 420;
+            if (e.deltaY > 0) this.book.next(); else this.book.prev();
+        }, { passive: false });
+
+        // Swipe on touch.
+        let startX = null;
+        stageEl.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; }, { passive: true });
+        stageEl.addEventListener('touchend', (e) => {
+            if (startX === null) return;
+            const dx = e.changedTouches[0].clientX - startX;
+            if (Math.abs(dx) > 42) { dx < 0 ? this.book.next() : this.book.prev(); }
+            startX = null;
+        }, { passive: true });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'PageDown') { e.preventDefault(); this.book.next(); }
+            if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); this.book.prev(); }
+            if (e.key === 'Home') { e.preventDefault(); this.book.goTo(0); }
+            if (e.key === 'End') { e.preventDefault(); this.book.goTo(this.book.sheets.length); }
+        });
+
+        document.getElementById('btn-next').addEventListener('click', () => this.book.next());
+        document.getElementById('btn-prev').addEventListener('click', () => this.book.prev());
+
+        // One pip per sheet, for jumping straight to a spread.
+        const progress = document.getElementById('progress');
+        progress.innerHTML = this.book.sheets
+            .map((_, i) => `<button class="pip" type="button" role="tab" data-sheet="${i}" aria-label="Go to spread ${i + 1}"></button>`)
+            .join('');
+        progress.addEventListener('click', (e) => {
+            const pip = e.target.closest('.pip');
+            if (pip) this.book.goTo(Number(pip.dataset.sheet));
+        });
+
+        document.getElementById('r-admin').addEventListener('click', () => {
+            const note = this.currentProject?.adminNote;
+            if (note) {
+                const el = document.getElementById('r-blurb');
+                el.textContent = note;
+                el.style.color = '#ffc271';
+            }
+        });
+    }
+
+    /* --------------------- readout --------------------- */
+    #renderReadout(state) {
+        const page = state.right ?? state.left;
+        const isCover = !page || page.kind === 'cover';
+
+        document.getElementById('intro').classList.toggle('is-hidden', !isCover);
+        const readout = document.getElementById('readout');
+        readout.classList.toggle('is-shown', !isCover);
+        this.shiftTarget = isCover ? this.shiftCover : this.shiftOpen;
+
+        document.getElementById('btn-prev').disabled = state.index <= 0;
+        document.getElementById('btn-next').disabled = state.index >= state.total;
+
+        for (const pip of document.querySelectorAll('.pip')) {
+            pip.classList.toggle('is-current', Number(pip.dataset.sheet) === Math.min(state.index, state.total - 1));
+        }
+
+        if (isCover || page.kind === 'contact') {
+            this.currentProject = null;
+            if (page?.kind === 'contact') {
+                readout.classList.add('is-shown');
+                document.getElementById('r-kicker').textContent = 'End of volume';
+                document.getElementById('r-title').textContent = "Let's build something";
+                document.getElementById('r-blurb').textContent = 'Available for engineering roles and selected freelance work.';
+                document.getElementById('r-blurb').style.color = '';
+                document.getElementById('r-badges').innerHTML = '';
+                const open = document.getElementById('r-open');
+                open.href = 'mailto:mohalisal1@hotmail.com';
+                open.removeAttribute('target');
+                document.getElementById('r-open-label').textContent = 'Email me';
+                document.getElementById('r-admin').hidden = true;
+            }
+            return;
+        }
+
+        const p = page.project;
+        this.currentProject = p;
+
+        document.getElementById('r-kicker').textContent = p.category;
+        document.getElementById('r-title').textContent = p.title;
+        const blurb = document.getElementById('r-blurb');
+        blurb.textContent = p.blurb;
+        blurb.style.color = '';
+
+        const badges = [];
+        if (p.live) badges.push('<span class="badge live"><i class="fas fa-circle" style="font-size:5px"></i> Live site</span>');
+        if (p.admin) badges.push('<span class="badge admin"><i class="fas fa-lock"></i> Admin dashboard</span>');
+        if (!p.live) badges.push('<span class="badge demo"><i class="fas fa-play"></i> Interactive demo</span>');
+        document.getElementById('r-badges').innerHTML = badges.join('');
+
+        const open = document.getElementById('r-open');
+        open.href = p.url;
+        if (p.live) open.setAttribute('target', '_blank'); else open.removeAttribute('target');
+        document.getElementById('r-open-label').textContent = p.live ? 'Visit the site' : 'Launch the demo';
+
+        document.getElementById('r-admin').hidden = !p.admin;
+    }
+
+    /* --------------------- frame --------------------- */
+    #tick(delta) {
+        this.book.update(delta);
+
+        // Hover test against only the two visible pages.
+        this.raycaster.setFromCamera(this.pointer, this.stage.camera);
+        const hits = this.raycaster.intersectObjects(this.book.pickTargets, false);
+        const side = hits.length && !this.book.isTurning ? this.book.sideOf(hits[0]) : 0;
+
+        if (side !== this.hoverSide) {
+            this.hoverSide = side;
+            const el = document.getElementById('stage');
+            el.classList.toggle('is-over-page', side !== 0);
+            this.book.setHover(side);
+        }
+
+        // Ease the camera toward the parallax target.
+        this.parallax.x += (this.parallax.tx - this.parallax.x) * Math.min(1, delta * 2.6);
+        this.parallax.y += (this.parallax.ty - this.parallax.y) * Math.min(1, delta * 2.6);
+        // Ease the lateral framing between the cover and open-project layouts.
+        this.shift += (this.shiftTarget - this.shift) * Math.min(1, delta * 2.4);
+        this.lookAt.x = this.shift;
+
+        this.stage.camera.position.set(
+            this.shift + this.parallax.x,
+            this.cameraHome.y + this.parallax.y * 0.6,
+            this.cameraHome.z - this.parallax.y * 0.5
+        );
+        this.stage.camera.lookAt(this.lookAt);
+    }
+}
+
+/* ==========================================================================
+   BOOT
+   ========================================================================== */
+if (!supportsWebGL()) {
+    failBoot('This portfolio renders a 3D book and needs hardware-accelerated WebGL. The full project list is below.');
+} else {
+    try {
+        // Fonts first: pages are drawn into canvases, and canvas text cannot
+        // re-render itself once a web font arrives late.
+        await ensureFonts();
+        window.portfolio = new PortfolioBook();
+        requestAnimationFrame(() => setTimeout(() => {
+            boot.classList.add('is-done');
+            setTimeout(() => { boot.hidden = true; }, 520);
+        }, 280));
+    } catch (err) {
+        console.error('Portfolio failed to start:', err);
+        failBoot('The 3D context could not be created on this device. The full project list is below.');
+    }
+}
 </script>
 </body>
 </html>
